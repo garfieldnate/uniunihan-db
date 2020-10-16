@@ -17,6 +17,10 @@ I've always wanted the ultimate unihan database.
 
 ## Developing
 
+The project is managed using [Poetry](https://python-poetry.org/docs/):
+
+    pip3 install --user poetry
+
 Install the pre-commit hook:
 
     poetry run pre-commit install
@@ -28,6 +32,10 @@ If you *have* to commit or push right now and don't have time to fix a failing t
 
 For now, all of the tests, formatting, etc. can be run only from the pre-commit hook:
 
-    .git/hooks/pre-commit
+    poetry run pre-commit run --all-files
 
 I know it's dumb... I'm looking into it.
+
+Building the database:
+
+    poetry build-db

@@ -1,8 +1,11 @@
 [tool.poetry]
 name = "uniunihan-db"
 version = "0.1.0"
-description = ""
+description = "Han character database"
 authors = ["Nathan Glenn <garfieldnate@gmail.com>"]
+keywords = [
+    "unihan", "linguistics", "sinoxenic", "Chinese", "Mandarin", "Cantonese",
+    "Japanese", "Korean", "Vietnamese", "kanji", "hanzi", "hanja", "han tu", "hantu"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -23,3 +26,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths="test"
+
+[tool.poetry.scripts]
+build-db = "uniunihan_db.build_db:main"
