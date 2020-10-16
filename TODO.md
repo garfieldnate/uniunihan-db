@@ -2,7 +2,6 @@
 
 ## Tasks
 
-* next: add unihan-etl to dev deps
 * script to download Unihan as JSON into local working directory
 * lib for parsing Syllables:
     - Japanese
