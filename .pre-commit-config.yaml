@@ -37,6 +37,8 @@ repos:
         language: system
         entry: poetry run pytest
         types: [python]
+        always_run: true
+        pass_filenames: false
 
     # for now we have no tests
     #   - id: pytest-cov
