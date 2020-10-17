@@ -2,6 +2,7 @@
 
 ## Tasks
 
+* Write out kana for Unihan
 * lib for parsing Syllables:
     - Japanese
     - Mandarin
