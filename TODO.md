@@ -30,6 +30,8 @@
 ## Questions
 
 * DB for on readings by period (go-on, kan-on, tou-on, etc.)
+* unihan kun'yomi don't indicate okurigana!
+* historical spellings, with wi, we, ye, etc. for Japanese
 
 ## Dev Tools
 * poetry: script aliases like for node; test-all = `poetry run pre-commit run --all-files`, etc.
