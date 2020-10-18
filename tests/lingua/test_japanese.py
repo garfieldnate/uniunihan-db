@@ -17,15 +17,28 @@ def pytest_generate_tests(metafunc):
     if "hepburn" in metafunc.fixturenames:
         data = read_hepburn_test_data()
         metafunc.parametrize("hepburn,expected", data, ids=idfn)
+    elif "expected_ime" in metafunc.fixturenames:
+        data = read_ime_test_data()
+        metafunc.parametrize("kana,expected_ime", data, ids=idfn)
 
 
 def read_hepburn_test_data():
-    data_csv = Path(CODE_DIR, "hepburn_to_kana.csv")
+    data_csv = Path(CODE_DIR, "romaji_kanaization.csv")
     data = []
 
     reader = read_csv(data_csv)
     for row in reader:
         data.append((row["hepburn"], row["hiragana"]))
+    return data
+
+
+def read_ime_test_data():
+    data_csv = Path(CODE_DIR, "kana_romanization.csv")
+    data = []
+
+    reader = read_csv(data_csv)
+    for row in reader:
+        data.append((row["hiragana"], row["IME"]))
     return data
 
 
@@ -38,6 +51,11 @@ def read_csv(path: Path) -> csv.DictReader:
 ###### Tests ######
 
 
-def test_split_hepburn(hepburn, expected):
+def test_hepburn_to_kana(hepburn, expected):
     actual = japanese.to_kana(hepburn)
     assert actual == expected
+
+
+def test_kana_to_ime(kana, expected_ime):
+    actual = japanese.to_alpha(kana)
+    assert actual == expected_ime

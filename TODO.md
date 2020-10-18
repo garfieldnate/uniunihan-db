@@ -29,13 +29,15 @@
         - seems like data is very hit and miss; 人 article for Korean contains many compounds. Check page for 人力車 and it doesn't have a sino-xenic descendants section 🤔
     - would it still be valuable to create my own database?
         - probably, if nothing else we can find what wiktionary is missing
-## Questions
+
+## Questions/Needs
 
 * DB for on readings by period (go-on, kan-on, tou-on, etc.)
 * unihan kun'yomi don't indicate okurigana!
 * historical spellings, with wi, we, ye, etc. for Japanese
 
 ## Dev Tools
+* mypy doesn't check that types are used in signatures, nor that methods are used correctly 😡 Maybe try pyre, pyright, or pytype
 * poetry: script aliases like for node; test-all = `poetry run pre-commit run --all-files`, etc.
 * verify vscode integration
 * Standalone build script

@@ -1,17 +1,18 @@
 # Parse Japanese sino-xenic vocabulary, which were imported from syllables in foreign languages
-# into polymoraic morphemes.
+# into mono- or polymoraic morphemes.
 
-# import re
-
-# from dataclasses import dataclass
+import re
 from enum import Enum
 
+# from dataclasses import dataclass
 # from typing import List
 
 
 class Romanization(Enum):
     # *not* revised hepburn, so no macrons
     HEPBURN = 1
+    # It's like nihonsiki, but without diacritics
+    IME = 2
 
 
 # @dataclass
@@ -47,6 +48,7 @@ class Romanization(Enum):
 # du and di?
 
 HEPBURN_DIGRAPHS = {
+    "shi": "し",
     "chi": "ち",
     "tsu": "つ",
     "sha": "しゃ",
@@ -57,7 +59,7 @@ HEPBURN_DIGRAPHS = {
     "cho": "ちょ",
 }
 
-HEPBURN_TO_KANA_50 = {
+HEPBURN_50 = {
     "ka": "か",
     "ki": "き",
     "ku": "く",
@@ -69,7 +71,6 @@ HEPBURN_TO_KANA_50 = {
     "ge": "げ",
     "go": "ご",
     "sa": "さ",
-    "shi": "し",
     "su": "す",
     "se": "せ",
     "so": "そ",
@@ -118,7 +119,7 @@ HEPBURN_TO_KANA_50 = {
     "wo": "を",
 }
 
-HEPBURN_TO_KANA_GLIDE = {
+HEPBURN_GLIDE = {
     "kya": "きゃ",
     "kyu": "きゅ",
     "kyo": "きょ",
@@ -154,13 +155,47 @@ HEPBURN_SEMIVOWELS = {
     "yo": "よ",
 }
 
-HEPBURN_VOWELS = {
+VOWELS = {
     "a": "あ",
     "i": "い",
     "u": "う",
     "e": "え",
     "o": "お",
 }
+
+# Lots of nihonsiki/IME are the same as hepburn
+NIHONSIKI_TRIGRAPH = {**HEPBURN_GLIDE}
+# override the parts that are different for nihonsiki
+NIHONSIKI_TRIGRAPH.pop("ja")
+NIHONSIKI_TRIGRAPH.pop("ju")
+NIHONSIKI_TRIGRAPH.pop("jo")
+NIHONSIKI_TRIGRAPH.update(
+    {
+        "zya": "じゃ",
+        "zyu": "じゅ",
+        "zyo": "じょ",
+        "sya": "しゃ",
+        "syu": "しゅ",
+        "syo": "しょ",
+        "tya": "ちゃ",
+        "tyu": "ちゅ",
+        "tyo": "ちょ",
+    }
+)
+
+NIHONSIKI_COMPOUND = {**HEPBURN_50, **HEPBURN_GLIDE, **HEPBURN_SEMIVOWELS}
+# override the parts that are different for nihonsiki
+NIHONSIKI_COMPOUND.pop("fu")
+NIHONSIKI_COMPOUND.pop("ji")
+NIHONSIKI_COMPOUND.update(
+    {
+        "hu": "ふ",
+        "zi": "じ",
+        "si": "し",
+        "ti": "ち",
+        "tu": "つ",
+    }
+)
 
 
 def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str:
@@ -169,13 +204,13 @@ def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str
     word = word.lower().strip()
     for k, v in HEPBURN_DIGRAPHS.items():
         word = word.replace(k, v)
-    for k, v in HEPBURN_TO_KANA_50.items():
+    for k, v in HEPBURN_50.items():
         word = word.replace(k, v)
-    for k, v in HEPBURN_TO_KANA_GLIDE.items():
+    for k, v in HEPBURN_GLIDE.items():
         word = word.replace(k, v)
     for k, v in HEPBURN_SEMIVOWELS.items():
         word = word.replace(k, v)
-    for k, v in HEPBURN_VOWELS.items():
+    for k, v in VOWELS.items():
         word = word.replace(k, v)
     # other final nasal orthography
     word = word.replace("n", "ん")
@@ -186,7 +221,28 @@ def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str
     word = word.replace("k", "っ")
     word = word.replace("s", "っ")
     word = word.replace("t", "っ")
+    word = word.replace("p", "っ")
     word = word.replace("h", "っ")
+    return word
+
+
+def to_alpha(word: str, romanization=Romanization.IME) -> str:
+    """Romanize kana input; currently only supports IME"""
+    for k, v in NIHONSIKI_TRIGRAPH.items():
+        word = word.replace(v, k)
+    for k, v in NIHONSIKI_COMPOUND.items():
+        word = word.replace(v, k)
+    for k, v in VOWELS.items():
+        word = word.replace(v, k)
+    # Personally, I type "nn" in IME's, but "n'" is easier to read, so we'll go with that
+    word = re.sub("ん(?=[aiueoy])", "n'", word)
+    word = word.replace("ん", "n")
+    # geminates
+    word = word.replace("っk", "kk")
+    word = word.replace("っs", "ss")
+    word = word.replace("っt", "tt")
+    word = word.replace("っp", "pp")
+    word = word.replace("っh", "hh")
     return word
 
 

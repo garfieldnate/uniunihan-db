@@ -1,0 +1,62 @@
+hepburn,hiragana
+# trim white space
+  ,
+# empty string
+,
+# 1 syllable
+ka,か
+# digraphs
+tsutsu,つつ
+chichi,ちち
+shishi,しし
+# 2 syllables
+jojo,じょじょ
+kara,から
+fufu,ふふ
+wawo,わを
+# syllable-final nasal
+karan,からん
+# same, followed by consonant
+karanda,からんだ
+# n used as initial
+kanada,かなだ
+# n as final and then initial
+danna,だんな
+# other nasal orthography
+homma,ほんま
+# apostrophe and dash supported because they're easy, though not in Unihan
+dan'na,だんな
+kan-i,かんい
+# uppercase
+KANADA,かなだ
+# all consonants
+akasatanahamayarawan,あかさたなはまやらわん
+ikishichinihimirin,いきしちにひみりん
+ukusutsunufumuyurun,うくすつぬふむゆるん
+# long vowels
+apaato,あぱあと
+ruumumeeto,るうむめえと
+ookami,おおかみ
+# diphthongs
+keisanki,けいさんき
+ousama,おうさま
+oishii,おいしい
+deau,であう
+# adjacent vowels
+iie,いいえ
+iu,いう
+ue,うえ
+# double long vowels
+keieigaku,けいえいがく
+keioudaigaku,けいおうだいがく
+# glides
+sanbyaku,さんびゃく
+gyuunyuu,ぎゅうにゅう
+tounyoubyou,とうにょうびょう
+# geminates
+tatta,たった
+sakka,さっか
+bottsu,ぼっつ
+bahha,ばっは
+kissa,きっさ
+happa,はっぱ
