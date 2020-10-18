@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import logging
 import os
@@ -9,12 +10,6 @@ from unihan_etl.process import Packager as unihan_packager
 
 from .lingua import japanese
 
-logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
-    format="[%(levelname)s] %(name)s: %(message)s",
-)
-log = logging.getLogger(__name__)
-
 PROJECT_DIR = Path(__file__).parents[1]
 DATA_DIR = Path(PROJECT_DIR, "data")
 DATA_DIR.mkdir(exist_ok=True)
@@ -23,6 +18,17 @@ UNIHAN_AUGMENTATION_FILE = Path(DATA_DIR, "unihan_augmentation.json")
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
 CJKV_IDS_ZIP_FILE = Path(DATA_DIR, "cjkvi-ids-master.zip")
 CJKV_IDS_DIR = Path(DATA_DIR, "cjkvi-ids-master")
+LOG_FILE = Path(DATA_DIR, "log.txt")
+
+logging.basicConfig(
+    level=os.environ.get("LOGLEVEL", "INFO"),
+    format="[%(levelname)s] %(name)s: %(message)s",
+)
+log = logging.getLogger(__name__)
+
+fh = logging.FileHandler(LOG_FILE, mode="w")
+fh.setLevel(logging.WARN)
+log.addHandler(fh)
 
 
 def unihan_download():
@@ -67,20 +73,34 @@ def expand_unihan():
     log.info("Reading in Unihan DB...")
     with open(UNIHAN_FILE) as f:
         unihan = json.load(f)
+    log.info(f"Read {len(unihan)} characters from Unihan DB")
 
-    log.info("Expanding kJapaneseOn spellings...")
+    log.info("Expanding kJapaneseOn data...")
     new_data = {}
     for entry in unihan:
         if on_list := entry.get("kJapaneseOn"):
             kana_list = []
             ime_list = []
+            parsed_list = []
             for on in on_list:
                 kana = japanese.alpha_to_kana(on)
                 ime = japanese.kana_to_alpha(kana)
+                try:
+                    han_syl = japanese.parse_han_syllable(ime)
+                    han_syl = dataclasses.asdict(han_syl)
+                    parsed_list.append(han_syl)
+                except TypeError:
+                    log.warn(
+                        f"{entry['char']}/{on}/romanization={ime}: Failed to parse Han syllable!"
+                    )
                 kana_list.append(kana)
                 ime_list.append(ime)
             key = entry["ucn"]
-            new_data[key] = {"kJapaneseOn_kana": kana_list, "kJapaneseOn_ime": ime_list}
+            new_data[key] = {
+                "kJapaneseOn_kana": kana_list,
+                "kJapaneseOn_ime": ime_list,
+                "kJapaneseOn_parsed": parsed_list,
+            }
 
     log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
     with open(UNIHAN_AUGMENTATION_FILE, "w") as f:

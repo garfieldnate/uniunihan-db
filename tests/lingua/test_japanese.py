@@ -70,3 +70,34 @@ def test_kana_to_ime(kana, expected_ime):
 def test_hepburn_to_ime(input, expected):
     actual = japanese.alpha_to_alpha(input)
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "input,onset,semivowel,vowel,coda,epenthetic_vowel,rhyme",
+    [
+        ("kyatu", "k", "y", "a", "t", "u", "yat"),
+        ("piti", "p", "", "i", "t", "i", "it"),
+        ("ban", "b", "", "a", "n", "", "an"),
+        ("doku", "d", "", "o", "k", "u", "ok"),
+        ("osu", "", "", "o", "s", "u", "os"),
+        ("kou", "k", "", "ou", "", "", "ou"),
+        ("ryuu", "r", "y", "uu", "", "", "yuu"),
+        ("watu", "", "w", "a", "t", "u", "wat"),
+        ("kamu", "k", "", "a", "m", "u", "am"),
+        ("ani", "", "", "a", "n", "i", "an"),
+        ("kuwa", "k", "w", "a", "", "", "wa"),
+        ("hiyaku", "h", "y", "a", "k", "u", "yak"),
+        ("habi", "h", "", "a", "b", "i", "ab"),
+    ],
+)
+def test_parse_han_syllable(
+    input, onset, semivowel, vowel, coda, epenthetic_vowel, rhyme
+):
+    actual = japanese.parse_han_syllable(input)
+    assert actual is not None
+    assert actual.onset == onset
+    assert actual.semivowel == semivowel
+    assert actual.vowel == vowel
+    assert actual.coda == coda
+    assert actual.epenthetic_vowel == epenthetic_vowel
+    assert actual.rhyme == rhyme

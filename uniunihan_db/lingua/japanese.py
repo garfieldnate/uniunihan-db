@@ -2,10 +2,9 @@
 # into mono- or polymoraic morphemes.
 
 import re
+from dataclasses import dataclass
 from enum import Enum
-
-# from dataclasses import dataclass
-# from typing import List
+from typing import Optional
 
 
 class Romanization(Enum):
@@ -14,38 +13,6 @@ class Romanization(Enum):
     # It's like nihonsiki, but without diacritics
     IME = 2
 
-
-# @dataclass
-# class Syllable:
-#     onset: str
-#     vowel: str
-#     coda: str
-
-#     def __post_init__(self):
-#         self.rhyme = self.vowel + self.coda
-#         self.is_glide = len(self.onset) > 1 and "y" in self.onset
-#         # TODO: provide morae count (1,2 or 3)
-
-
-# VOWELS = "aiueo"
-
-# CONSONANTS = "kgszjtdnhfbpmyrw"
-
-# DIGRAPHS = "ch|ts"
-
-# NON_DIPHTHONS = r"("
-
-# SPLITTER = f"(?i)(?<=[{VOWELS}])(?=[{CONSONANTS}])(?!n$|n[{CONSONANTS}])|(?<=n)(?=[{CONSONANTS}])|(?={DIGRAPHS})"
-# a
-# i
-# u
-# e
-# o
-# ya
-# yu
-# yo
-# '
-# du and di?
 
 HEPBURN_DIGRAPHS = {
     "shi": "し",
@@ -93,6 +60,7 @@ HEPBURN_50 = {
     "ha": "は",
     "hi": "ひ",
     "fu": "ふ",
+    "hu": "ふ",
     "he": "へ",
     "ho": "ほ",
     "ba": "ば",
@@ -257,13 +225,41 @@ def alpha_to_alpha(
     return kana_to_alpha(kana, romanization=output_romanization)
 
 
-# def split_syllables(word, romanization=Romanization.HEPBURN) -> List[str]:
-#     pass
-#     # return list(filter(lambda x: len(x), re.split(SPLITTER, word)))
+@dataclass
+class HanSyllable:
+    onset: str
+    semivowel: str
+    vowel: str
+    coda: str
+    epenthetic_vowel: str
+
+    def __post_init__(self):
+        self.nucleus = self.semivowel + self.vowel
+        self.rhyme = self.nucleus + self.coda
+        # TODO: provide morae count (1,2 or 3)
 
 
-# def parse_syllable(word, romanization=Romanization.HEPBURN) -> List[Syllable]:
-#     pass
+HAN_SYLLABLE_RE = r"(?i)^(?P<onset>[kgsztdnhpbmr](?:u(?=w)|i(?=y))?)?(?P<semivowel>y|w)?(?P<vowel>[aiueo]+)(?P<coda>n|[ktshbmn](?P<epenthetic_vowel>i|u)|)$"
 
-# def hepburn_to_kana(word: str) -> str:
-#     pass
+
+def parse_han_syllable(s: str) -> Optional[HanSyllable]:
+    """Parse an IME-romanized string containing an on'yomi into a han syllable"""
+    s = s.strip()
+    match = re.match(HAN_SYLLABLE_RE, s)
+    if match is None:
+        return None
+    pieces = match.groupdict()
+    # remove epenthetic vowels if there are any
+    # coda vowel gets saved in epenthetic_vowel field
+    if coda := pieces["coda"]:
+        coda = coda[0]
+    # onset vowel is thrown away at the moment
+    if onset := pieces["onset"]:
+        onset = onset[0]
+    return HanSyllable(
+        onset or "",
+        pieces["semivowel"] or "",
+        pieces["vowel"],
+        coda,
+        pieces["epenthetic_vowel"] or "",
+    )

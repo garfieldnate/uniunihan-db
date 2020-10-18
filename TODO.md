@@ -35,6 +35,7 @@
 * historical spellings, with wi, we, ye, etc. for Japanese
 
 ## Dev Tools
+* integrate darglint and/or pydocstyle to help keep documentation together
 * mypy doesn't check that types are used in signatures, nor that methods are used correctly 😡 Maybe try pyre, pyright, or pytype
 * poetry: script aliases like for node; test-all = `poetry run pre-commit run --all-files`, etc.
 * verify vscode integration
