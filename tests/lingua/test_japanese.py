@@ -1,6 +1,8 @@
 import csv
 from pathlib import Path
 
+import pytest
+
 from uniunihan_db.lingua import japanese
 
 CODE_DIR = Path(__file__).parents[0]
@@ -52,10 +54,19 @@ def read_csv(path: Path) -> csv.DictReader:
 
 
 def test_hepburn_to_kana(hepburn, expected):
-    actual = japanese.to_kana(hepburn)
+    actual = japanese.alpha_to_kana(hepburn)
     assert actual == expected
 
 
 def test_kana_to_ime(kana, expected_ime):
-    actual = japanese.to_alpha(kana)
+    actual = japanese.kana_to_alpha(kana)
     assert actual == expected_ime
+
+
+@pytest.mark.parametrize(
+    "input,expected",
+    [("katsu", "katu"), ("jachunfu", "zyatyunhu"), ("saan'i", "saan'i")],
+)
+def test_hepburn_to_ime(input, expected):
+    actual = japanese.alpha_to_alpha(input)
+    assert actual == expected

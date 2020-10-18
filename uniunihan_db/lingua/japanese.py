@@ -198,7 +198,7 @@ NIHONSIKI_COMPOUND.update(
 )
 
 
-def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str:
+def alpha_to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str:
     """Convert romanized Japanese pronunciation into kana
     Currently only supports hiragana and Hepburn romanization used in Unihan database"""
     word = word.lower().strip()
@@ -226,7 +226,7 @@ def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str
     return word
 
 
-def to_alpha(word: str, romanization=Romanization.IME) -> str:
+def kana_to_alpha(word: str, romanization=Romanization.IME) -> str:
     """Romanize kana input; currently only supports IME"""
     for k, v in NIHONSIKI_TRIGRAPH.items():
         word = word.replace(v, k)
@@ -244,6 +244,17 @@ def to_alpha(word: str, romanization=Romanization.IME) -> str:
     word = word.replace("っp", "pp")
     word = word.replace("っh", "hh")
     return word
+
+
+def alpha_to_alpha(
+    word: str,
+    input_romanization=Romanization.HEPBURN,
+    output_romanization=Romanization.IME,
+) -> str:
+    """Convert from one romanization to another
+    Currently only hepburn to IME conversion is supported"""
+    kana = alpha_to_kana(word, romanization=input_romanization)
+    return kana_to_alpha(kana, romanization=output_romanization)
 
 
 # def split_syllables(word, romanization=Romanization.HEPBURN) -> List[str]:
