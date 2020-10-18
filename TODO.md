@@ -2,8 +2,6 @@
 
 ## Tasks
 
-* Kana to nihonsiki conversion
-* Write out kana and nihonsiki for Unihan
 * lib for parsing Syllables:
     - Japanese
     - Mandarin

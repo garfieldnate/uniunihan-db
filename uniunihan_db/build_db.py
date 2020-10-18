@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import zipfile
@@ -5,6 +6,8 @@ from pathlib import Path
 
 import requests
 from unihan_etl.process import Packager as unihan_packager
+
+from .lingua import japanese
 
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "INFO"),
@@ -16,6 +19,7 @@ PROJECT_DIR = Path(__file__).parents[1]
 DATA_DIR = Path(PROJECT_DIR, "data")
 DATA_DIR.mkdir(exist_ok=True)
 UNIHAN_FILE = Path(DATA_DIR, "unihan.json")
+UNIHAN_AUGMENTATION_FILE = Path(DATA_DIR, "unihan_augmentation.json")
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
 CJKV_IDS_ZIP_FILE = Path(DATA_DIR, "cjkvi-ids-master.zip")
 CJKV_IDS_DIR = Path(DATA_DIR, "cjkvi-ids-master")
@@ -57,9 +61,36 @@ def cjkvi_ids_download():
             zip_ref.extractall(DATA_DIR)
 
 
+def expand_unihan():
+    """Write Kana and IME spellings for Japanese on'yomi in Unihan DB"""
+
+    log.info("Reading in Unihan DB...")
+    with open(UNIHAN_FILE) as f:
+        unihan = json.load(f)
+
+    log.info("Expanding kJapaneseOn spellings...")
+    new_data = {}
+    for entry in unihan:
+        if on_list := entry.get("kJapaneseOn"):
+            kana_list = []
+            ime_list = []
+            for on in on_list:
+                kana = japanese.alpha_to_kana(on)
+                ime = japanese.kana_to_alpha(kana)
+                kana_list.append(kana)
+                ime_list.append(ime)
+            key = entry["ucn"]
+            new_data[key] = {"kJapaneseOn_kana": kana_list, "kJapaneseOn_ime": ime_list}
+
+    log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
+    with open(UNIHAN_AUGMENTATION_FILE, "w") as f:
+        json.dump(new_data, f, indent=2, ensure_ascii=False)
+
+
 def main():
     unihan_download()
     cjkvi_ids_download()
+    expand_unihan()
 
 
 if __name__ == "__main__":
