@@ -181,6 +181,7 @@ def to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) -> str
     word = word.replace("n", "ん")
     word = word.replace("m", "ん")
     word = word.replace("'", "")
+    word = word.replace("-", "")
     # geminates
     word = word.replace("k", "っ")
     word = word.replace("s", "っ")
