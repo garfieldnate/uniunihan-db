@@ -243,7 +243,10 @@ HAN_SYLLABLE_RE = r"(?i)^(?P<onset>[kgsztdnhpbmr](?:u(?=w)|i(?=y))?)?(?P<semivow
 
 
 def parse_han_syllable(s: str) -> Optional[HanSyllable]:
-    """Parse an IME-romanized string containing an on'yomi into a han syllable"""
+    """Parse an IME-romanized han syllable on'yomi into its constituent parts.
+    This does not attempt
+    to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
+    then None will be returned."""
     s = s.strip()
     match = re.match(HAN_SYLLABLE_RE, s)
     if match is None:

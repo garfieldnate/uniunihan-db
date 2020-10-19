@@ -90,7 +90,7 @@ def test_hepburn_to_ime(input, expected):
         ("habi", "h", "", "a", "b", "i", "ab"),
     ],
 )
-def test_parse_han_syllable(
+def test_parse_legal_han_syllable(
     input, onset, semivowel, vowel, coda, epenthetic_vowel, rhyme
 ):
     actual = japanese.parse_han_syllable(input)
@@ -101,3 +101,8 @@ def test_parse_han_syllable(
     assert actual.coda == coda
     assert actual.epenthetic_vowel == epenthetic_vowel
     assert actual.rhyme == rhyme
+
+
+def test_parse_nonce_han_syllable():
+    syl = japanese.parse_han_syllable("xyadfs")
+    assert syl is None

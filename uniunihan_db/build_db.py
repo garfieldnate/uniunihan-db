@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from unihan_etl.process import Packager as unihan_packager
 
-from .lingua import japanese
+from .lingua import japanese, mandarin
 
 PROJECT_DIR = Path(__file__).parents[1]
 DATA_DIR = Path(PROJECT_DIR, "data")
@@ -68,14 +68,16 @@ def cjkvi_ids_download():
 
 
 def expand_unihan():
-    """Write Kana and IME spellings for Japanese on'yomi in Unihan DB"""
+    """Expand Unihan DB with the following data:
+    * Kana and IME spellings for Japanese on'yomi
+    * On'yomi and Mandarin syllable analyses (for testing purposes)"""
 
     log.info("Reading in Unihan DB...")
     with open(UNIHAN_FILE) as f:
         unihan = json.load(f)
     log.info(f"Read {len(unihan)} characters from Unihan DB")
 
-    log.info("Expanding kJapaneseOn data...")
+    log.info("Expanding Unihan data...")
     new_data = {}
     for entry in unihan:
         if on_list := entry.get("kJapaneseOn"):
@@ -93,6 +95,7 @@ def expand_unihan():
                     log.warn(
                         f"{entry['char']}/{on}/romanization={ime}: Failed to parse Han syllable!"
                     )
+                    parsed_list.append(None)
                 kana_list.append(kana)
                 ime_list.append(ime)
             key = entry["ucn"]
@@ -101,6 +104,18 @@ def expand_unihan():
                 "kJapaneseOn_ime": ime_list,
                 "kJapaneseOn_parsed": parsed_list,
             }
+        if pinyin_dict := entry.get("kMandarin"):
+            parsed_dict = {}
+            for k, v in pinyin_dict.items():
+                try:
+                    syl = mandarin.parse_syllable(v)
+                    syl = dataclasses.asdict(syl)
+                    parsed_dict[k] = syl
+                except TypeError:
+                    log.warn(
+                        f"{entry['char']}/{k}={v}: Failed to parse pinyin syllable!"
+                    )
+                    parsed_dict[k] = None
 
     log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
     with open(UNIHAN_AUGMENTATION_FILE, "w") as f:

@@ -30,3 +30,4 @@ testpaths="test"
 
 [tool.poetry.scripts]
 build-db = "uniunihan_db.build_db:main"
+# test = "pre-commit run --all-files"
