@@ -8,14 +8,19 @@
     - Japanese -> Mandarin
     - Japanese -> Cantonese
     - Cantonese -> Mandarin
+* convert between simplified and traditional characters
 * Character lists (grade level, newspaper standard, etc.)
     - generate pronunciation decision trees for subsets
+    - https://en.wikisource.org/wiki/Translation:List_of_Frequently_Used_Characters_in_Modern_Chinese#Inferior_frequently_used_characters
+    - https://web.archive.org/web/20160404231631/http://resources.publicense.moe.edu.tw/dict_reviseddict_download.html
 * Investigate https://github.com/nieldlr/hanzi
     - how does determinePhoneticRegularity work? It's essential the Heisig chapter grouping. Can we use this to build a better decision tree?
-* Investigate https://code.google.com/archive/p/cjklib
-    - website is long gone, project long abandoned, but it looks pretty comprehensive!
-    - https://web.archive.org/web/20100902210649/http://cjklib.org/0.3/
+* Investigate https://github.com/cburgmer/cjklib
+    - website is long gone, project no longer maintained abandoned, but it looks pretty comprehensive!
     - Can we revive/modernize it? May be a better data source!
+* Investigate http://www.lrec-conf.org/proceedings/lrec2012/pdf/306_Paper.pdf
+    - lists some good resources
+    - they don't share their results :(
 * build_db should download radicals data
 * generate decision tree for pronunciations:
     - radicals -> joyo Japanese
