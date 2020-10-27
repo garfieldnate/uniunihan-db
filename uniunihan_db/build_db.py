@@ -13,12 +13,19 @@ from .lingua import japanese, mandarin
 PROJECT_DIR = Path(__file__).parents[1]
 DATA_DIR = Path(PROJECT_DIR, "data")
 DATA_DIR.mkdir(exist_ok=True)
+LOG_FILE = Path(DATA_DIR, "log.txt")
+
 UNIHAN_FILE = Path(DATA_DIR, "unihan.json")
 UNIHAN_AUGMENTATION_FILE = Path(DATA_DIR, "unihan_augmentation.json")
+
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
 CJKV_IDS_ZIP_FILE = Path(DATA_DIR, "cjkvi-ids-master.zip")
 CJKV_IDS_DIR = Path(DATA_DIR, "cjkvi-ids-master")
-LOG_FILE = Path(DATA_DIR, "log.txt")
+
+JUN_DA_CHAR_FREQ_URL = (
+    "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
+)
+JUN_DA_CHAR_FREQ_FILE = Path(DATA_DIR, "jun_da_char.tsv")
 
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "INFO"),
@@ -46,9 +53,7 @@ def unihan_download():
 
 
 def cjkvi_ids_download():
-    """Download and unzip the CJKV IDS database. As it is better formatted
-    and actively maintained, cjkdecomp recommended using this instead
-    of itself."""
+    """Download and unzip the CJKV IDS database."""
     # download
     if CJKV_IDS_ZIP_FILE.exists() and CJKV_IDS_ZIP_FILE.stat().st_size > 0:
         log.info(f"{CJKV_IDS_ZIP_FILE.name} already exists; skipping download")
@@ -65,6 +70,40 @@ def cjkvi_ids_download():
     else:
         with zipfile.ZipFile(CJKV_IDS_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(DATA_DIR)
+
+
+def jun_da_char_freq_download():
+    """Download and save Jun Da's character frequency list"""
+    # TODO: this thing is super fragile. Would be better to create and distribute
+    # a data package version of the list somewhere.
+
+    if JUN_DA_CHAR_FREQ_FILE.exists() and JUN_DA_CHAR_FREQ_FILE.stat().st_size > 0:
+        log.info(f"{JUN_DA_CHAR_FREQ_FILE.name} already exists; skipping download")
+        return
+
+    log.info(
+        f"Downloading Jun Da's character frequency list from {JUN_DA_CHAR_FREQ_URL}..."
+    )
+    r = requests.get(JUN_DA_CHAR_FREQ_URL)
+    r.encoding = "GBK"
+    for line in r.text.splitlines():
+        if line.startswith("<pre>"):
+            # remove leading <pre>
+            line = line[5:]
+            # remove trailing </pre> and extra content
+            line = line.split("</pre>")[0]
+
+            log.info(
+                f"Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
+            )
+            with open(JUN_DA_CHAR_FREQ_FILE, "w") as f:
+                f.write(
+                    "Rank\tCharacter\tRaw Frequency\tFrequency Percentile\tPinyin\tEnglish\n"
+                )
+                for entry in line.split("<br>"):
+                    if entry:
+                        f.write(entry)
+                        f.write("\n")
 
 
 def expand_unihan():
@@ -123,9 +162,11 @@ def expand_unihan():
 
 
 def main():
-    unihan_download()
-    cjkvi_ids_download()
-    expand_unihan()
+    # unihan_download()
+    # cjkvi_ids_download()
+    # expand_unihan()
+
+    jun_da_char_freq_download()
 
 
 if __name__ == "__main__":

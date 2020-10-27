@@ -1,5 +1,10 @@
 # TODO
 
+Next:
+
+* Install simp to trad converter
+* Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
+
 ## Tasks
 
 * lib for parsing Syllables:
@@ -13,14 +18,22 @@
     - generate pronunciation decision trees for subsets
     - https://en.wikisource.org/wiki/Translation:List_of_Frequently_Used_Characters_in_Modern_Chinese#Inferior_frequently_used_characters
     - https://web.archive.org/web/20160404231631/http://resources.publicense.moe.edu.tw/dict_reviseddict_download.html
+    - HSK (simplified): http://www.chinesetest.cn/userfiles/file/HSK/HSK-2012.xls
+    - Seems that frequency lists and class lists are for simplified only. Here's a traditional-simplified converter: https://github.com/berniey/hanziconv/blob/master/hanziconv/charmap.py (Apache 2.0)
 * Investigate https://github.com/nieldlr/hanzi
     - how does determinePhoneticRegularity work? It's essential the Heisig chapter grouping. Can we use this to build a better decision tree?
 * Investigate https://github.com/cburgmer/cjklib
     - website is long gone, project no longer maintained abandoned, but it looks pretty comprehensive!
     - Can we revive/modernize it? May be a better data source!
+* Investigate http://ocbaxtersagart.lsait.lsa.umich.edu/ (historical reconstructions)
+    - try to predict Mandarin/Cantonese from Middle Chinese or reconstructions?
+    - an old version has been uploaded to wiktionary and needs to be updated
+    - sent an email asking for the license
 * Investigate http://www.lrec-conf.org/proceedings/lrec2012/pdf/306_Paper.pdf
     - lists some good resources
     - they don't share their results :(
+* Investigate https://humanum.arts.cuhk.edu.hk/Lexis/lexi-mf/
+    - seems they have a very permissive license (used in Wiktionary), but the content is not downloadable as a single file. This resource is truly amazing; if only it were more easily accessible!
 * build_db should download radicals data
 * generate decision tree for pronunciations:
     - radicals -> joyo Japanese
