@@ -2,17 +2,27 @@
 
 Next:
 
-* Install simp to trad converter
+* Char to component -> pron features
+    - get traditional variant
+        - error if multiples, then figure out how to handle them (pick one?)
+    - get components, including self, from cjkv-ids
+    - choose one pronunciation (most common? most regular?)
+    - break pron into sylable pieces (and keep whole sylable, too)
+    -
 * Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
+* simp to trad converter
+    - so does Unihan!
 
 ## Tasks
 
-* lib for parsing Syllables:
-    - Cantonese
 * generate decision trees with accuracy stats for pronunciations:
+    - components -> Japanese (check against Heisig)
+    - components -> Mandarin
     - Japanese -> Mandarin
     - Japanese -> Cantonese
     - Cantonese -> Mandarin
+* lib for parsing Syllables:
+    - Cantonese
 * convert between simplified and traditional characters
 * Character lists (grade level, newspaper standard, etc.)
     - generate pronunciation decision trees for subsets
@@ -57,10 +67,15 @@ Next:
 * unihan kun'yomi don't indicate okurigana!
 * historical spellings, with wi, we, ye, etc. for Japanese
 
+## Ideas
+
+* Generate shiritori sequence for all characters in a group
+
 ## Issues to Open
 
 * Make the on'yomi parser slightly less accommodating and then report misspellings to Unihan
 * poetry: script aliases like for npm; test-all = `poetry run pre-commit run --all-files`, etc.
+* Unihan does not link 麺 and 麵 as variants (Wikipedia correctly shows trad/simp/sinjitai)
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together
@@ -74,3 +89,4 @@ Next:
 * hanzidb.org/about
 * hanzicraft.com/about
 * https://github.com/jsksxs360/Hanzi
+* https://github.com/proycon/hanzigrid
