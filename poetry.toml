@@ -1,0 +1,3 @@
+[virtualenvs]
+# Until https://github.com/microsoft/vscode-python/issues/8372 is closed
+in-project = true

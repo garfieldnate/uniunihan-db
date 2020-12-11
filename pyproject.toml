@@ -22,27 +22,32 @@ unihan-etl = "^0.11.0"
 requests = "^2.24.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+# setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
+requires = ["setuptools","poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-testpaths="test"
+testpaths = ["tests"]
 
 [tool.poetry.scripts]
 build-db = "uniunihan_db.build_db:main"
 # test = "pre-commit run --all-files"
 
 [tool.isort]
-multi_line_output=3
-include_trailing_comma=true
-force_grid_wrap=0
-use_parentheses=true
-line_length=88
+# black-compatible settings
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
 
 [tool.coverage.run]
-source = "uniunihan_db"
+source = ["uniunihan_db"]
 
 [tool.coverage.report]
+# TODO: require certain level of test coverage
+# fail_under = 100
 exclude_lines = [
     # Have to re-enable the standard pragma
     "pragma: no cover",
