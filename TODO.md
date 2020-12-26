@@ -2,13 +2,15 @@
 
 Next:
 
-* Char to component -> pron features
-    - get traditional variant
-        - error if multiples, then figure out how to handle them (pick one?)
-    - get components, including self, from cjkv-ids
-    - choose one pronunciation (most common? most regular?)
-    - break pron into sylable pieces (and keep whole sylable, too)
-    -
+* For each character in HSK-6 (allow specify char list; could use Jun Da top 3k, for example):
+    * Char to component -> pron features
+        - get traditional variant
+            - error if multiples, then figure out how to handle them (pick one?)
+        - get components, including self, from cjkv-ids
+        - choose one pronunciation (most common? most regular?)
+        - break pron into sylable pieces (and keep whole sylable, too)
+        -
+
 * Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
 * simp to trad converter
     - so does Unihan!
