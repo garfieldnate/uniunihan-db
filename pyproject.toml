@@ -8,7 +8,8 @@ keywords = [
     "Japanese", "Korean", "Vietnamese", "kanji", "hanzi", "hanja", "han tu", "hantu"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
+importlib-metadata = {version = "^1.0", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
