@@ -119,6 +119,9 @@ def expand_unihan():
     log.info("Expanding Unihan data...")
     new_data = {}
     for entry in unihan:
+        key = entry["ucn"]
+        # new_data[key] = entry
+        new_data[key] = {}
         if on_list := entry.get("kJapaneseOn"):
             kana_list = []
             ime_list = []
@@ -137,8 +140,7 @@ def expand_unihan():
                     parsed_list.append(None)
                 kana_list.append(kana)
                 ime_list.append(ime)
-            key = entry["ucn"]
-            new_data[key] = {
+            new_data[key] |= {
                 "kJapaneseOn_kana": kana_list,
                 "kJapaneseOn_ime": ime_list,
                 "kJapaneseOn_parsed": parsed_list,
@@ -155,6 +157,7 @@ def expand_unihan():
                         f"{entry['char']}/{k}={v}: Failed to parse pinyin syllable!"
                     )
                     parsed_dict[k] = None
+            new_data[key] |= {"kMandarin_parsed": parsed_dict}
 
     log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
     with open(UNIHAN_AUGMENTATION_FILE, "w") as f:
@@ -162,11 +165,11 @@ def expand_unihan():
 
 
 def main():
-    # unihan_download()
-    # cjkvi_ids_download()
-    # expand_unihan()
-
+    unihan_download()
+    cjkvi_ids_download()
     jun_da_char_freq_download()
+
+    expand_unihan()
 
 
 if __name__ == "__main__":
