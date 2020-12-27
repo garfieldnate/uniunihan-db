@@ -7,6 +7,7 @@ from pathlib import Path
 
 import requests
 from unihan_etl.process import Packager as unihan_packager
+from unihan_etl.process import export_json
 
 from .lingua import japanese, mandarin
 
@@ -39,17 +40,26 @@ log.addHandler(fh)
 
 
 def unihan_download():
-    """Download the famous Unihan database, from the Unicode Consortium,
+    """Download the famous Unihan database from the Unicode Consortium,
     and store it has a normalized JSON file"""
 
     if UNIHAN_FILE.exists() and UNIHAN_FILE.stat().st_size > 0:
         log.info(f"{UNIHAN_FILE.name} already exists; skipping download")
         return
 
-    log.info(f"Downloading unihan to {UNIHAN_FILE}...")
+    log.info("Downloading unihan data...")
     p = unihan_packager.from_cli(["-F", "json", "--destination", str(UNIHAN_FILE)])
     p.download()
-    p.export()
+    # instruct packager to return data instead of writing to file
+    # https://github.com/cihai/unihan-etl/issues/233
+    p.options["format"] = "python"
+    unihan = p.export()
+
+    log.info("Converting unihan data to dictionary format...")
+    unihan_dict = {entry["char"]: entry for entry in unihan}
+
+    log.info(f"Writing unihan to {UNIHAN_FILE}...")
+    export_json(unihan_dict, UNIHAN_FILE)
 
 
 def cjkvi_ids_download():
@@ -118,9 +128,7 @@ def expand_unihan():
 
     log.info("Expanding Unihan data...")
     new_data = {}
-    for entry in unihan:
-        key = entry["ucn"]
-        # new_data[key] = entry
+    for key, entry in unihan.items():
         new_data[key] = {}
         if on_list := entry.get("kJapaneseOn"):
             kana_list = []
