@@ -88,6 +88,8 @@ def test_hepburn_to_ime(input, expected):
         ("kuwa", "k", "w", "a", "", "", "wa"),
         ("hiyaku", "h", "y", "a", "k", "u", "yak"),
         ("habi", "h", "", "a", "b", "i", "ab"),
+        # uppercase with whitespace
+        (" HATi  ", "h", "", "a", "t", "i", "at"),
     ],
 )
 def test_parse_legal_han_syllable(
@@ -95,6 +97,7 @@ def test_parse_legal_han_syllable(
 ):
     actual = japanese.parse_han_syllable(input)
     assert actual is not None
+    assert actual.surface == input.strip().lower()
     assert actual.onset == onset
     assert actual.semivowel == semivowel
     assert actual.vowel == vowel

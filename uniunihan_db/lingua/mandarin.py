@@ -13,6 +13,7 @@ class Syllable:
     See http://orient.avcr.cz/miranda2/export/sitesavcr/data.avcr.cz/humansci/orient/kontakty/pracovnici/publikace/Triskova/ArOr_Mandarin_Syllable.pdf
     for a more detailed explanation.
     Fields:
+    `surface`: the entire syllable in pinyin romanization
     `onset` = X: /b/, /p/, /m/, /f/, /d/,/t/, /n/, /l/…
     `glide` = G: /i/, /u/, /ü/
     `nucleus` = V: /a/, /o/, /e/, /i/, /u/, /ü/
@@ -22,6 +23,7 @@ class Syllable:
     `rhyme`: phonetic transcription of the glide, nucleus and final
     """
 
+    surface: str
     onset: str
     glide: str
     nucleus: str
@@ -69,6 +71,7 @@ def parse_syllable(s: str) -> Optional[Syllable]:
     to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
     then None will be returned."""
     s = s.strip().lower()
+    surface = s
 
     # determine the tone and strip the diacritic first to simplify later processing
     tone = 0
@@ -114,6 +117,7 @@ def parse_syllable(s: str) -> Optional[Syllable]:
         final = "u"
 
     return Syllable(
+        surface,
         pieces["onset"] or "",
         pieces["glide"] or "",
         # vowel_no_tone,

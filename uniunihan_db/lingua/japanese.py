@@ -227,6 +227,7 @@ def alpha_to_alpha(
 
 @dataclass
 class HanSyllable:
+    surface: str
     onset: str
     semivowel: str
     vowel: str
@@ -247,7 +248,7 @@ def parse_han_syllable(s: str) -> Optional[HanSyllable]:
     This does not attempt
     to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
     then None will be returned."""
-    s = s.strip()
+    s = s.strip().lower()
     match = re.match(HAN_SYLLABLE_RE, s)
     if match is None:
         return None
@@ -260,6 +261,7 @@ def parse_han_syllable(s: str) -> Optional[HanSyllable]:
     if onset := pieces["onset"]:
         onset = onset[0]
     return HanSyllable(
+        s,
         onset or "",
         pieces["semivowel"] or "",
         pieces["vowel"],

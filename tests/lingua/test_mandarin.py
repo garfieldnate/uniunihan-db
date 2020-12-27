@@ -43,7 +43,7 @@ def test_parse_legal_syllable(
 ):
     actual = mandarin.parse_syllable(input)
     assert actual is not None
-    print(actual)
+    assert actual.surface == input.strip().lower()
     assert actual.onset == onset
     assert actual.glide == glide
     assert actual.nucleus == nucleus
