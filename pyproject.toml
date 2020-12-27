@@ -21,6 +21,9 @@ isort = "^5.6.4"
 pre-commit = "^2.7.1"
 unihan-etl = "^0.11.0"
 requests = "^2.24.0"
+opencc-python-reimplemented = "^0.1.6"
+scikit-learn = "^0.24.0"
+matplotlib = "^3.3.3"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
@@ -32,6 +35,8 @@ testpaths = ["tests"]
 
 [tool.poetry.scripts]
 build-db = "uniunihan_db.build_db:main"
+# > data/features.json
+features = "uniunihan_db.feature_extraction:main"
 # test = "pre-commit run --all-files"
 
 [tool.isort]

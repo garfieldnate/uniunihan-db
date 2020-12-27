@@ -1,22 +1,18 @@
 # TODO
 
-Next:
+Next: Decision tree experiments:
+- components -> Japanese (sanity check with Heisig)
+- components -> Mandarin
+- Japanese -> Mandarin
+- Japanese -> Cantonese
+- Cantonese -> Mandarin
 
-* For each character in HSK-6 (allow specify char list; could use Jun Da top 3k, for example):
-    * Char to component -> pron features
-        - get traditional variant
-            - error if multiples, then figure out how to handle them (pick one?)
-        - get components, including self, from cjkv-ids
-        - choose one pronunciation (most common? most regular?)
-        - break pron into sylable pieces (and keep whole sylable, too)
-        -
+* Re-organize and write at least one test
 
-* Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
-* simp to trad converter
-    - so does Unihan!
 
 ## Tasks
 
+* Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
 * generate decision trees with accuracy stats for pronunciations:
     - components -> Japanese (check against Heisig)
     - components -> Mandarin
@@ -32,6 +28,7 @@ Next:
     - https://web.archive.org/web/20160404231631/http://resources.publicense.moe.edu.tw/dict_reviseddict_download.html
     - HSK (simplified): http://www.chinesetest.cn/userfiles/file/HSK/HSK-2012.xls
     - Seems that frequency lists and class lists are for simplified only. Here's a traditional-simplified converter: https://github.com/berniey/hanziconv/blob/master/hanziconv/charmap.py (Apache 2.0)
+    - Ach! Unihan has Hong Kong grade levels included already!
 * Investigate https://github.com/nieldlr/hanzi
     - how does determinePhoneticRegularity work? It's essential the Heisig chapter grouping. Can we use this to build a better decision tree?
 * Investigate https://github.com/cburgmer/cjklib
@@ -61,6 +58,9 @@ Next:
         - seems like data is very hit and miss; 人 article for Korean contains many compounds. Check page for 人力車 and it doesn't have a sino-xenic descendants section 🤔
     - would it still be valuable to create my own database?
         - probably, if nothing else we can find what wiktionary is missing
+* Investigate OpenCC
+    - https://github.com/BYVoid/OpenCC/blob/master/data/dictionary
+
 
 ## Questions/Needs
 
@@ -85,6 +85,9 @@ Next:
 * verify vscode integration
 * Standalone build script
 * Dockerfile
+
+## Technical Questions
+* Should we use importlib or something intead of Path(__file__).parents[1]?
 
 ## Inspirations
 
