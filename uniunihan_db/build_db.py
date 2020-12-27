@@ -11,21 +11,21 @@ from unihan_etl.process import Packager as unihan_packager
 from .lingua import japanese, mandarin
 
 PROJECT_DIR = Path(__file__).parents[1]
-DATA_DIR = Path(PROJECT_DIR, "data")
+DATA_DIR = PROJECT_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
-LOG_FILE = Path(DATA_DIR, "log.txt")
+LOG_FILE = DATA_DIR / "log.txt"
 
-UNIHAN_FILE = Path(DATA_DIR, "unihan.json")
-UNIHAN_AUGMENTATION_FILE = Path(DATA_DIR, "unihan_augmentation.json")
+UNIHAN_FILE = DATA_DIR / "unihan.json"
+UNIHAN_AUGMENTATION_FILE = DATA_DIR / "unihan_augmentation.json"
 
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
-CJKV_IDS_ZIP_FILE = Path(DATA_DIR, "cjkvi-ids-master.zip")
-CJKV_IDS_DIR = Path(DATA_DIR, "cjkvi-ids-master")
+CJKV_IDS_ZIP_FILE = DATA_DIR / "cjkvi-ids-master.zip"
+CJKV_IDS_DIR = DATA_DIR / "cjkvi-ids-master"
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
 )
-JUN_DA_CHAR_FREQ_FILE = Path(DATA_DIR, "jun_da_char.tsv")
+JUN_DA_CHAR_FREQ_FILE = DATA_DIR / "jun_da_char.tsv"
 
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "INFO"),
