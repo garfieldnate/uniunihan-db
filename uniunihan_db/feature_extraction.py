@@ -28,6 +28,7 @@ fh.setLevel(logging.WARN)
 log.addHandler(fh)
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
+UNENCODED_DC_REGEX = r"[①-⑳]"
 
 
 # TODO: put data loading in utils file or something
@@ -76,7 +77,10 @@ def _read_ids():
             # TODO: allow specifying country?
             breakdown = r[2].split("[")[0]
             # remove IDC's
+            # TODO: this could be useful information for prediction
             breakdown = re.sub(IDC_REGEX, "", breakdown)
+            # remove unencoded DC's
+            breakdown = re.sub(UNENCODED_DC_REGEX, "", breakdown)
             ids[r[1]] = breakdown
     return ids
 
