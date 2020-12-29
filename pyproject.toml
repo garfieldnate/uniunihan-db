@@ -37,6 +37,7 @@ testpaths = ["tests"]
 build-db = "uniunihan_db.build_db:main"
 # > data/features.json
 features = "uniunihan_db.feature_extraction:main"
+learn = "uniunihan_db.learn_chars:main"
 # test = "pre-commit run --all-files"
 
 [tool.isort]

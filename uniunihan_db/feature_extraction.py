@@ -64,6 +64,19 @@ def _read_unihan():
     return unihan
 
 
+def _find_joyo(unihan):
+    log.info("Extracting Joyo Kanji from Unihan database...")
+    chars = []
+    for char, entry in unihan.items():
+        if "kJoyoKanji" in entry:
+            joyo = entry["kJoyoKanji"][0]
+            # Don't include variants
+            if not joyo.startswith("U"):
+                chars.append(char)
+
+    return chars
+
+
 def _read_ids():
     log.info("Loading IDS data...")
     ids = {}
@@ -119,8 +132,9 @@ def get_feats(unihan_entry, ids_entry):
 
 def main():
     # TODO: allow choosing character set
-    _, char_set = _read_hsk(6)
+    # _, char_set = _read_hsk(6)
     unihan = _read_unihan()
+    char_set = _find_joyo(unihan)
     ids = _read_ids()
 
     log.info("Extracting features...")

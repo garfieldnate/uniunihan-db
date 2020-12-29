@@ -78,6 +78,10 @@ Next: Decision tree experiments:
 * Make the on'yomi parser slightly less accommodating and then report misspellings to Unihan
 * poetry: script aliases like for npm; test-all = `poetry run pre-commit run --all-files`, etc.
 * Unihan does not link 麺 and 麵 as variants (Wikipedia correctly shows trad/simp/sinjitai)
+* Unihan does not indicate where okurigana in a kun'yomi begin
+* Would be great if unihan-etl (or better yet, Unihan itself!) structurized the (traditional variant of X), (non-classical variant of X), (same as X), etc. in the `kDefinition` field.
+    - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
+* unihan_etl uses arrays for several fields that should not be arrays, such as `kJoyoKanji`, `kKarlgren`, etc. Maybe that's an attempt to future-proof?
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together
