@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from collections import defaultdict
 from pathlib import Path
 
 from opencc import OpenCC
@@ -100,7 +101,7 @@ def _read_ids():
 
 def _get_pronunciation_feats(syl, prefix):
     syl = dataclasses.asdict(syl)
-    return {f"{prefix}_{k}": v for k, v in syl.items()}
+    return {f"{prefix}_{k}": str(v) for k, v in syl.items()}
 
 
 def get_feats(unihan_entry, ids_entry):
@@ -124,10 +125,66 @@ def get_feats(unihan_entry, ids_entry):
 
     # list of top-level radicals
     feats |= {f"ids_{c}": True for c in ids_entry}
+    # the character itself may be useful for grouping it with other characters of the same pronunciation
+    # if it's unique, we trim it out in _trim_ids
     feats[f"ids_{unihan_entry['char']}"] = True
     # TODO: list of recursively added radicals?
 
     return feats
+
+
+def _trim_ids(data):
+    """Delete IDS features that are only found once, since they are useless for
+    predicting pronunciation for our character list"""
+    ids_freq = defaultdict(int)
+    for feats in data:
+        for feat in feats:
+            if feat.startswith("ids"):
+                ids_freq[feat] += 1
+
+    for feats in data:
+        to_delete = [
+            feat for feat in feats if feat.startswith("ids") and ids_freq[feat] < 2
+        ]
+        for feat in to_delete:
+            del feats[feat]
+
+
+def _format_json(data):
+    return json.dumps(data, ensure_ascii=False, indent=2)
+
+
+def _format_arff(data):
+    unique_features = set()
+    for feats in data:
+        unique_features |= feats.keys()
+
+    log.info(f"{len(unique_features)} unique features")
+
+    text_builder = []
+    text_builder.append("@RELATION chinese_characters\n")
+    counter = 0
+    for feat in sorted(unique_features):
+        if feat.startswith("ids_"):
+            text_builder.append(f"@ATTRIBUTE {feat} {{T, F}}\n")
+        else:
+            text_builder.append(f"@ATTRIBUTE {feat} string\n")
+        counter += 1
+
+    log.info(f"wrote {counter} attributes")
+
+    text_builder.append("@data\n")
+    for feats in data:
+        data_spec = []
+        for feat in sorted(unique_features):
+            if feat.startswith("ids_"):
+                data_spec.append(str(feat in feats)[0])
+            else:
+                data_spec.append(feats.get(feat, "?") or "?")
+        text_builder.append(",".join(data_spec))
+        text_builder.append("\n")
+
+    return "".join(text_builder)
 
 
 def main():
@@ -144,8 +201,11 @@ def main():
         ids_entry = ids[c]
         feature_dicts.append(get_feats(unihan_entry, ids_entry))
 
+    _trim_ids(feature_dicts)
+
     # with open(DATA_DIR / 'features.json') as f:
-    print(json.dumps(feature_dicts, ensure_ascii=False, indent=2))
+    # print(_format_json(feature_dicts))
+    print(_format_arff(feature_dicts))
 
 
 if __name__ == "__main__":
