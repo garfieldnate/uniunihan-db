@@ -133,18 +133,34 @@ def get_feats(unihan_entry, ids_entry):
     return feats
 
 
-def _trim_ids(data):
+def _trim_ids(data, class_):
     """Delete IDS features that are only found once, since they are useless for
     predicting pronunciation for our character list"""
-    ids_freq = defaultdict(int)
+    # ids -> class_ -> frequency
+    ids_class_freq = defaultdict(lambda: defaultdict(int))
     for feats in data:
+        class_value = feats.get(class_, None)
+        if not class_value:
+            continue
         for feat in feats:
             if feat.startswith("ids"):
-                ids_freq[feat] += 1
+                ids_class_freq[feat][class_value] += 1
 
+    # get the maximum number of characters where the IDS could help in classification
+    # log.info(ids_class_freq)
+    # ids_max = {k: max(ids_class_freq[k].values()) for k in ids_class_freq}
+    ids_filtered = {k for k in ids_class_freq if max(ids_class_freq[k].values()) > 1}
+    # log.info(ids_filtered)
+    # log.info(ids_max)
     for feats in data:
+        class_value = feats.get(class_, None)
+        if not class_value:
+            continue
         to_delete = [
-            feat for feat in feats if feat.startswith("ids") and ids_freq[feat] < 2
+            feat
+            for feat in feats
+            # feat in ids_filtered  #
+            if feat.startswith("ids") and feat not in ids_filtered
         ]
         for feat in to_delete:
             del feats[feat]
@@ -201,7 +217,8 @@ def main():
         ids_entry = ids[c]
         feature_dicts.append(get_feats(unihan_entry, ids_entry))
 
-    _trim_ids(feature_dicts)
+    # TODO: read the class from a parameter
+    _trim_ids(feature_dicts, "jp_surface")
 
     # with open(DATA_DIR / 'features.json') as f:
     # print(_format_json(feature_dicts))
