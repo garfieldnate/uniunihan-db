@@ -124,10 +124,10 @@ def get_feats(unihan_entry, ids_entry):
             feats["zh_surface"] = syl.surface
 
     # list of top-level radicals
-    feats |= {f"ids_{c}": True for c in ids_entry}
+    feats |= {f"ids_{c}": "T" for c in ids_entry}
     # the character itself may be useful for grouping it with other characters of the same pronunciation
     # if it's unique, we trim it out in _trim_ids
-    feats[f"ids_{unihan_entry['char']}"] = True
+    feats[f"ids_{unihan_entry['char']}"] = "T"
     # TODO: list of recursively added radicals?
 
     return feats
@@ -221,8 +221,8 @@ def main():
     _trim_ids(feature_dicts, "jp_surface")
 
     # with open(DATA_DIR / 'features.json') as f:
-    # print(_format_json(feature_dicts))
-    print(_format_arff(feature_dicts))
+    print(_format_json(feature_dicts))
+    # print(_format_arff(feature_dicts))
 
 
 if __name__ == "__main__":
