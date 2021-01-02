@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from pathlib import Path
 from typing import Set
 
@@ -98,6 +98,7 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
             regularities[f"{char}:{char_pron}"].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
+                regularities[f"{component}:{char_pron}"].add(char)
                 if component not in unihan:
                     unknown_comps.add(component)
                     continue
@@ -105,10 +106,6 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
                 if not component_prons:
                     no_pron_comps.add(component)
                     continue
-                for component_pron in component_prons:
-                    if component_pron == char_pron:
-                        regularities[f"{component}:{component_pron}"].add(char)
-            # TODO: report characters with no regularities
 
     # delete the characters with only themselves in the value
     to_delete = [k for k, v in regularities.items() if len(v) == 1]
@@ -125,7 +122,7 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
 
 
 def _format_json(data):
-    return json.dumps(data, cls=SetEncoder, ensure_ascii=False, indent=2)
+    return json.dumps(OrderedDict(data), cls=SetEncoder, ensure_ascii=False, indent=2)
 
 
 def main():
@@ -144,6 +141,7 @@ def main():
         no_pron_comps,
         unknown_comps,
     ) = get_phonetic_regularities(char_set, ids, unihan)
+    log.info(f"Found {len(regularities)} pronunciation groups")
     log.info(f"{len(no_pron_comps)} components with no pronunciations: {no_pron_comps}")
     log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
@@ -153,7 +151,7 @@ def main():
     print(_format_json(regularities))
 
     # Next issues:
-    # * 妨: 方 should give bou regularity, but it doesn't have that reading on its own. Also 穂,
+
     # * hou and bou should at least be linked as similar
     # * sprinkle in exceptions to get the numbers down
 
