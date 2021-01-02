@@ -6,7 +6,6 @@ import os
 import re
 from collections import OrderedDict, defaultdict
 from pathlib import Path
-from typing import Set
 
 # TODO: putting logging config in shared file
 logging.basicConfig(
@@ -78,25 +77,28 @@ class SetEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+def _read_joyo():
+    log.info("Loading joyo data...")
+    chars = {}
+    with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
+        # filter comments
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
+        for r in rows:
+            readings = r["on-yomi"].split("|")
+            # remove empty readings;
+            # forget about parenthesized readings; focus on the main reading for pattern finding
+            readings = [yomi for yomi in readings if yomi and "（" not in yomi]
+            chars[r["new"]] = readings
+
+    return chars
+
+
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
     with open(GENERATED_DATA_DIR / "unihan.json") as f:
         unihan = json.load(f)
     return unihan
-
-
-def _find_joyo(unihan):
-    log.info("Extracting Joyo Kanji from Unihan database...")
-    chars = set()
-    for char, entry in unihan.items():
-        if "kJoyoKanji" in entry:
-            joyo = entry["kJoyoKanji"][0]
-            # Don't include variants
-            if not joyo.startswith("U"):
-                chars.add(char)
-
-    return chars
 
 
 def _read_ids():
@@ -120,13 +122,11 @@ def _read_ids():
     return ids
 
 
-def get_phonetic_regularities(char_set: Set[str], ids, unihan):
-    pron_field = "kJapaneseOn"
+def get_phonetic_regularities(char_to_readings, ids):
     regularities = defaultdict(set)
     no_pron_chars = set()
     unknown_comps = set()
-    for char in char_set:
-        char_prons = unihan[char].get(pron_field)
+    for char, char_prons in char_to_readings.items():
         if not char_prons:
             no_pron_chars.add(char)
             continue
@@ -137,9 +137,9 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
                 if component in BLACKLIST:
                     continue
                 regularities[f"{component}:{char_pron}"].add(char)
-                if component not in unihan:
-                    unknown_comps.add(component)
-                    continue
+                # if component not in unihan:
+                #     unknown_comps.add(component)
+                #     continue
 
     # delete the characters with only themselves in the value
     to_delete = [k for k, v in regularities.items() if len(v) == 1]
@@ -150,7 +150,7 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
     chars_with_regularities = set()
     for _, v in regularities.items():
         chars_with_regularities |= v
-    no_regularities = char_set - no_pron_chars - chars_with_regularities
+    no_regularities = char_to_readings.keys() - no_pron_chars - chars_with_regularities
 
     return regularities, no_regularities, no_pron_chars, unknown_comps
 
@@ -164,10 +164,11 @@ def _format_json(data):
 def main():
     # args = parser.parse_args()
 
-    unihan = _read_unihan()
+    # unihan = _read_unihan()
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
-    char_set = _find_joyo(unihan)
+    char_to_readings = _read_joyo()
+    # char_set = _find_joyo(unihan)
     ids = _read_ids()
 
     (
@@ -175,7 +176,7 @@ def main():
         no_regularities,
         no_pron_chars,
         unknown_comps,
-    ) = get_phonetic_regularities(char_set, ids, unihan)
+    ) = get_phonetic_regularities(char_to_readings, ids)
     log.info(f"Found {len(regularities)} pronunciation groups")
     log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
@@ -185,9 +186,10 @@ def main():
     print(_format_json(regularities))
 
     # Next issues:
-    # * hou and bou should at least be linked as similar
+    # * look at Heisig for un-classified chars to determine next step
+    # * try extracting component combos for better coverage?
     # * sprinkle in exceptions to get the numbers down
-    #
+    # * hou and bou, kaku and gaku, etc. are similar and can be combined in "similar pronunciation" groups
 
 
 if __name__ == "__main__":
