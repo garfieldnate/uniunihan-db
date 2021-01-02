@@ -80,6 +80,7 @@ class SetEncoder(json.JSONEncoder):
 def _read_joyo():
     log.info("Loading joyo data...")
     chars = {}
+    radicals = {}
     with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
@@ -89,8 +90,9 @@ def _read_joyo():
             # forget about parenthesized readings; focus on the main reading for pattern finding
             readings = [yomi for yomi in readings if yomi and "（" not in yomi]
             chars[r["new"]] = readings
+            radicals[r["new"]] = r["radical"]
 
-    return chars
+    return chars, radicals
 
 
 def _read_unihan():
@@ -167,9 +169,11 @@ def main():
     # unihan = _read_unihan()
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
-    char_to_readings = _read_joyo()
+    char_to_readings, joyo_radicals = _read_joyo()
     # char_set = _find_joyo(unihan)
     ids = _read_ids()
+    for char, rad in joyo_radicals.items():
+        ids[char] = ids[char] + rad
 
     (
         regularities,
