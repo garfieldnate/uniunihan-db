@@ -22,6 +22,41 @@ DATA_DIR = PROJECT_DIR / "data"
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
 UNENCODED_DC_REGEX = r"[①-⑳]"
 
+# none of these are phonetic characters
+BLACKLIST = set(
+    [
+        "一",
+        "八",
+        "辶",
+        "艹",
+        "扌",
+        "宀",
+        "亻",
+        "人",
+        "𠂉",
+        "氵",
+        "𭕄",
+        "䒑",
+        "丨",
+        "丬",
+        "丶",
+        "丷",
+        "丿",
+        "亍",
+        "亠",
+        "冂",
+        "冖",
+        "彳",
+        "忄",
+        "日",
+        "月",
+        "木",  # except maybe 朴?
+        "疒",
+        "糹",
+        "阝",
+        "飠",
+    ]
+)
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument(
@@ -88,7 +123,6 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
     regularities = defaultdict(set)
     no_pron_chars = set()
     unknown_comps = set()
-    no_pron_comps = set()
     for char in char_set:
         char_prons = unihan[char].get(pron_field)
         if not char_prons:
@@ -98,13 +132,11 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
             regularities[f"{char}:{char_pron}"].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
+                if component in BLACKLIST:
+                    continue
                 regularities[f"{component}:{char_pron}"].add(char)
                 if component not in unihan:
                     unknown_comps.add(component)
-                    continue
-                component_prons = unihan[component].get(pron_field)
-                if not component_prons:
-                    no_pron_comps.add(component)
                     continue
 
     # delete the characters with only themselves in the value
@@ -118,11 +150,13 @@ def get_phonetic_regularities(char_set: Set[str], ids, unihan):
         chars_with_regularities |= v
     no_regularities = char_set - no_pron_chars - chars_with_regularities
 
-    return regularities, no_regularities, no_pron_chars, no_pron_comps, unknown_comps
+    return regularities, no_regularities, no_pron_chars, unknown_comps
 
 
 def _format_json(data):
-    return json.dumps(OrderedDict(data), cls=SetEncoder, ensure_ascii=False, indent=2)
+    return json.dumps(
+        OrderedDict(sorted(data.items())), cls=SetEncoder, ensure_ascii=False, indent=2
+    )
 
 
 def main():
@@ -138,11 +172,9 @@ def main():
         regularities,
         no_regularities,
         no_pron_chars,
-        no_pron_comps,
         unknown_comps,
     ) = get_phonetic_regularities(char_set, ids, unihan)
     log.info(f"Found {len(regularities)} pronunciation groups")
-    log.info(f"{len(no_pron_comps)} components with no pronunciations: {no_pron_comps}")
     log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
     log.info(
@@ -151,9 +183,9 @@ def main():
     print(_format_json(regularities))
 
     # Next issues:
-
     # * hou and bou should at least be linked as similar
     # * sprinkle in exceptions to get the numbers down
+    #
 
 
 if __name__ == "__main__":
