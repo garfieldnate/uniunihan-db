@@ -3,7 +3,7 @@
 Next:
 
 
-Decision tree experiments:
+Prediction experiments:
 - components -> Japanese (sanity check with Heisig)
 - components -> Mandarin
 - Japanese -> Mandarin

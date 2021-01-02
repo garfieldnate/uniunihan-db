@@ -90,11 +90,6 @@ def get_phonetic_regularities(char_set, ids, unihan):
         for char_pron in char_prons:
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
-                if component == char:
-                    log.info(
-                        f"skipping component {component}, since it's identical to its character"
-                    )
-                    continue
                 if component not in unihan:
                     log.info(f"Component {component} not found in unihan")
                     continue
@@ -104,7 +99,7 @@ def get_phonetic_regularities(char_set, ids, unihan):
                     continue
                 for component_pron in component_prons:
                     if component_pron == char_pron:
-                        regularities[f"{component_pron}:{component}"].append(char)
+                        regularities[f"{component}:{component_pron}"].append(char)
                         unique_chars.add(component)
                         unique_chars.add(char)
                         has_regularity = True
@@ -112,6 +107,7 @@ def get_phonetic_regularities(char_set, ids, unihan):
             no_regularities.add(char)
             # TODO: report characters with no regularities
 
+    regularities = {k: v for k, v in regularities.items() if len(v) > 1}
     return regularities, no_regularities, no_pronunciations, unique_chars
 
 
@@ -145,10 +141,11 @@ def main():
     print(_format_json(regularities))
 
     # Next issues:
+    # * 韻:  should be categorized under 音:IN. Also 動 -> add ALL characters under their own name as a regularity
     # * 妨: 方 should give bou regularity, but it doesn't have that reading on its own. Also 穂,
-    # * 心: I disallowed characters from being their own components and unfortunately this was the result -> move to post-processing step. Also 音, 里,
     # * 化: we need to explicitly set characters to their own components; similar to kokoro
-    # Later: hou and bou should at least be linked as similar
+    # * hou and bou should at least be linked as similar
+    # * okay to sprinkle in exceptions
 
 
 if __name__ == "__main__":
