@@ -6,6 +6,7 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
+from typing import Set
 
 # TODO: putting logging config in shared file
 logging.basicConfig(
@@ -33,6 +34,13 @@ UNENCODED_DC_REGEX = r"[①-⑳]"
 # )
 
 
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
@@ -43,13 +51,13 @@ def _read_unihan():
 
 def _find_joyo(unihan):
     log.info("Extracting Joyo Kanji from Unihan database...")
-    chars = []
+    chars = set()
     for char, entry in unihan.items():
         if "kJoyoKanji" in entry:
             joyo = entry["kJoyoKanji"][0]
             # Don't include variants
             if not joyo.startswith("U"):
-                chars.append(char)
+                chars.add(char)
 
     return chars
 
@@ -75,44 +83,49 @@ def _read_ids():
     return ids
 
 
-def get_phonetic_regularities(char_set, ids, unihan):
+def get_phonetic_regularities(char_set: Set[str], ids, unihan):
     pron_field = "kJapaneseOn"
-    regularities = defaultdict(list)
-    no_regularities = set()
-    no_pronunciations = set()
-    unique_chars = set()
+    regularities = defaultdict(set)
+    no_pron_chars = set()
+    unknown_comps = set()
+    no_pron_comps = set()
     for char in char_set:
         char_prons = unihan[char].get(pron_field)
         if not char_prons:
-            no_pronunciations.add(char)
+            no_pron_chars.add(char)
             continue
-        has_regularity = False
         for char_pron in char_prons:
+            regularities[f"{char}:{char_pron}"].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
                 if component not in unihan:
-                    log.info(f"Component {component} not found in unihan")
+                    unknown_comps.add(component)
                     continue
                 component_prons = unihan[component].get(pron_field)
                 if not component_prons:
-                    log.info(f"Component {component} has no values for {pron_field}")
+                    no_pron_comps.add(component)
                     continue
                 for component_pron in component_prons:
                     if component_pron == char_pron:
-                        regularities[f"{component}:{component_pron}"].append(char)
-                        unique_chars.add(component)
-                        unique_chars.add(char)
-                        has_regularity = True
-        if not has_regularity:
-            no_regularities.add(char)
+                        regularities[f"{component}:{component_pron}"].add(char)
             # TODO: report characters with no regularities
 
-    regularities = {k: v for k, v in regularities.items() if len(v) > 1}
-    return regularities, no_regularities, no_pronunciations, unique_chars
+    # delete the characters with only themselves in the value
+    to_delete = [k for k, v in regularities.items() if len(v) == 1]
+    for k in to_delete:
+        del regularities[k]
+
+    # get the list of characters for which no regularities could be found
+    chars_with_regularities = set()
+    for _, v in regularities.items():
+        chars_with_regularities |= v
+    no_regularities = char_set - no_pron_chars - chars_with_regularities
+
+    return regularities, no_regularities, no_pron_chars, no_pron_comps, unknown_comps
 
 
 def _format_json(data):
-    return json.dumps(data, ensure_ascii=False, indent=2)
+    return json.dumps(data, cls=SetEncoder, ensure_ascii=False, indent=2)
 
 
 def main():
@@ -127,25 +140,22 @@ def main():
     (
         regularities,
         no_regularities,
-        no_pronunciations,
-        unique_chars,
+        no_pron_chars,
+        no_pron_comps,
+        unknown_comps,
     ) = get_phonetic_regularities(char_set, ids, unihan)
-    # TODO: report characters not in unihan
-    log.info(f"{len(unique_chars)} unique characters")
-    log.info(
-        f"{len(no_pronunciations)} characters with no pronunciations: {no_pronunciations}"
-    )
+    log.info(f"{len(no_pron_comps)} components with no pronunciations: {no_pron_comps}")
+    log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
+    log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
     log.info(
         f"{len(no_regularities)} characters with no regularities: {no_regularities}"
     )
     print(_format_json(regularities))
 
     # Next issues:
-    # * 韻:  should be categorized under 音:IN. Also 動 -> add ALL characters under their own name as a regularity
     # * 妨: 方 should give bou regularity, but it doesn't have that reading on its own. Also 穂,
-    # * 化: we need to explicitly set characters to their own components; similar to kokoro
     # * hou and bou should at least be linked as similar
-    # * okay to sprinkle in exceptions
+    # * sprinkle in exceptions to get the numbers down
 
 
 if __name__ == "__main__":
