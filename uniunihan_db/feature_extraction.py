@@ -15,7 +15,9 @@ from .lingua import japanese, mandarin
 PROJECT_DIR = Path(__file__).parents[1]
 
 DATA_DIR = PROJECT_DIR / "data"
-LOG_FILE = DATA_DIR / "log.txt"
+GENERATED_DATA_DIR = DATA_DIR / "generated"
+INCLUDED_DATA_DIR = DATA_DIR / "included"
+LOG_FILE = GENERATED_DATA_DIR / "log.txt"
 
 # TODO: putting logging config in shared file
 logging.basicConfig(
@@ -41,7 +43,7 @@ def _read_hsk(max_level):
     char_set = set()
     word_list = []
     for level in range(1, max_level + 1):
-        with open(DATA_DIR / "hsk" / f"hsk-{level}.txt") as f:
+        with open(INCLUDED_DATA_DIR / "hsk" / f"hsk-{level}.txt") as f:
             for line in f:
                 word = line.strip()
                 # Use traditional characters for better IDS->pronunciation predictability
@@ -60,7 +62,7 @@ def _read_hsk(max_level):
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
-    with open(DATA_DIR / "unihan.json") as f:
+    with open(GENERATED_DATA_DIR / "unihan.json") as f:
         unihan = json.load(f)
     return unihan
 
@@ -81,7 +83,7 @@ def _find_joyo(unihan):
 def _read_ids():
     log.info("Loading IDS data...")
     ids = {}
-    with open(DATA_DIR / "cjkvi-ids-master" / "ids.txt") as f:
+    with open(GENERATED_DATA_DIR / "cjkvi-ids-master" / "ids.txt") as f:
         rows = csv.reader(f, delimiter="\t")
         for r in rows:
             # comments
@@ -220,7 +222,7 @@ def main():
     # TODO: read the class from a parameter
     _trim_ids(feature_dicts, "jp_surface")
 
-    # with open(DATA_DIR / 'features.json') as f:
+    # with open(GENERATED_DATA_DIR / 'features.json') as f:
     print(_format_json(feature_dicts))
     # print(_format_arff(feature_dicts))
 

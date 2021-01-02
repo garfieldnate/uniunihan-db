@@ -12,7 +12,7 @@ from unihan_etl.process import export_json
 from .lingua import japanese, mandarin
 
 PROJECT_DIR = Path(__file__).parents[1]
-DATA_DIR = PROJECT_DIR / "data"
+DATA_DIR = PROJECT_DIR / "data" / "generated"
 DATA_DIR.mkdir(exist_ok=True)
 LOG_FILE = DATA_DIR / "log.txt"
 

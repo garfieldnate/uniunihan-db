@@ -18,6 +18,8 @@ log = logging.getLogger(__name__)
 PROJECT_DIR = Path(__file__).parents[1]
 
 DATA_DIR = PROJECT_DIR / "data"
+GENERATED_DATA_DIR = DATA_DIR / "generated"
+INCLUDED_DATA_DIR = DATA_DIR / "included"
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
 UNENCODED_DC_REGEX = r"[①-⑳]"
@@ -79,7 +81,7 @@ class SetEncoder(json.JSONEncoder):
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
-    with open(DATA_DIR / "unihan.json") as f:
+    with open(GENERATED_DATA_DIR / "unihan.json") as f:
         unihan = json.load(f)
     return unihan
 
@@ -100,7 +102,7 @@ def _find_joyo(unihan):
 def _read_ids():
     log.info("Loading IDS data...")
     ids = {}
-    with open(DATA_DIR / "cjkvi-ids-master" / "ids.txt") as f:
+    with open(GENERATED_DATA_DIR / "cjkvi-ids-master" / "ids.txt") as f:
         rows = csv.reader(f, delimiter="\t")
         for r in rows:
             # comments
