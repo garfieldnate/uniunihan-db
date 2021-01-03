@@ -56,6 +56,7 @@ BLACKLIST = set(
         "糹",
         "阝",
         "飠",
+        "口",  # could technically be useful, but appears way to often so block for now
     ]
 )
 
