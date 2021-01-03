@@ -127,6 +127,7 @@ def _read_ids():
 def get_phonetic_regularities(char_to_readings, ids):
     # component -> pronunciation -> character
     regularities = defaultdict(lambda: defaultdict(set))
+    pronunciation_to_chars = defaultdict(set)
     # TODO: character -> candidate regularity components
     no_pron_chars = set()
     unknown_comps = set()
@@ -135,6 +136,7 @@ def get_phonetic_regularities(char_to_readings, ids):
             no_pron_chars.add(char)
             continue
         for char_pron in char_prons:
+            pronunciation_to_chars[char_pron].add(char)
             regularities[char][char_pron].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
@@ -164,7 +166,13 @@ def get_phonetic_regularities(char_to_readings, ids):
             chars_with_regularities |= chars
     no_regularities = char_to_readings.keys() - no_pron_chars - chars_with_regularities
 
-    return regularities, no_regularities, no_pron_chars, unknown_comps
+    # get the characters which have a unique reading
+    unique_readings = {}
+    for pron, chars in pronunciation_to_chars.items():
+        if len(chars) == 1:
+            unique_readings[pron] = next(iter(chars))
+
+    return regularities, no_regularities, no_pron_chars, unique_readings, unknown_comps
 
 
 def _format_json(data):
@@ -189,6 +197,7 @@ def main():
         regularities,
         no_regularities,
         no_pron_chars,
+        unique_readings,
         unknown_comps,
     ) = get_phonetic_regularities(char_to_readings, ids)
     log.info(f"Found {len(regularities)} candidate pattern components")
@@ -199,6 +208,9 @@ def main():
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
     log.info(
         f"{len(no_regularities)} characters with no regularities: {no_regularities}"
+    )
+    log.info(
+        f"{len(unique_readings)} characters with unique readings: {unique_readings}"
     )
     print(_format_json(regularities))
 
