@@ -125,7 +125,9 @@ def _read_ids():
 
 
 def get_phonetic_regularities(char_to_readings, ids):
-    regularities = defaultdict(set)
+    # component -> pronunciation -> character
+    regularities = defaultdict(lambda: defaultdict(set))
+    # TODO: character -> candidate regularity components
     no_pron_chars = set()
     unknown_comps = set()
     for char, char_prons in char_to_readings.items():
@@ -133,25 +135,33 @@ def get_phonetic_regularities(char_to_readings, ids):
             no_pron_chars.add(char)
             continue
         for char_pron in char_prons:
-            regularities[f"{char}:{char_pron}"].add(char)
+            regularities[char][char_pron].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
                 if component in BLACKLIST:
                     continue
-                regularities[f"{component}:{char_pron}"].add(char)
+                regularities[component][char_pron].add(char)
                 # if component not in unihan:
                 #     unknown_comps.add(component)
                 #     continue
 
     # delete the characters with only themselves in the value
-    to_delete = [k for k, v in regularities.items() if len(v) == 1]
-    for k in to_delete:
+    comps_to_delete = []
+    for component, pron_to_chars in regularities.items():
+        prons_to_delete = [k for k, v in pron_to_chars.items() if len(v) == 1]
+        for k in prons_to_delete:
+            # log.info(k)
+            del pron_to_chars[k]
+        if not len(pron_to_chars):
+            comps_to_delete.append(component)
+    for k in comps_to_delete:
         del regularities[k]
 
     # get the list of characters for which no regularities could be found
     chars_with_regularities = set()
-    for _, v in regularities.items():
-        chars_with_regularities |= v
+    for pron_to_char in regularities.values():
+        for chars in pron_to_char.values():
+            chars_with_regularities |= chars
     no_regularities = char_to_readings.keys() - no_pron_chars - chars_with_regularities
 
     return regularities, no_regularities, no_pron_chars, unknown_comps
@@ -181,7 +191,10 @@ def main():
         no_pron_chars,
         unknown_comps,
     ) = get_phonetic_regularities(char_to_readings, ids)
-    log.info(f"Found {len(regularities)} pronunciation groups")
+    log.info(f"Found {len(regularities)} candidate pattern components")
+    log.info(
+        f"Found {sum([len(prons) for prons in regularities.values()])} candidate pronunciation patterns"
+    )
     log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
     log.info(
