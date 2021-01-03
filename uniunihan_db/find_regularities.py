@@ -1,11 +1,14 @@
 # import argparse
 import csv
+import dataclasses
 import json
 import logging
 import os
 import re
 from collections import OrderedDict, defaultdict
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Set
 
 # TODO: putting logging config in shared file
 logging.basicConfig(
@@ -71,10 +74,13 @@ BLACKLIST = set(
 # )
 
 
-class SetEncoder(json.JSONEncoder):
+class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
             return list(obj)
+        elif dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+
         return json.JSONEncoder.default(self, obj)
 
 
@@ -125,14 +131,47 @@ def _read_ids():
     return ids
 
 
-def get_phonetic_regularities(char_to_readings, ids):
+@dataclass
+class PureGroup:
+    pron: str
+    chars: Set[str]
+    component: str
+    # warnings: [str]
+
+
+def _get_pure_groups(regularities, char_to_prons):
+    # TODO next: extract pure groups (start with components with one pronunciation, take largest group of chars with one pronunciation)
+    pure_groups = []
+    pure_comps_to_pron = {}
+
+    for component, pron_to_chars in regularities.items():
+        if len(pron_to_chars) == 1:
+            pron = next(iter(pron_to_chars.keys()))
+            chars = pron_to_chars[pron]
+
+            all_have_one_pron = True
+            for char in chars:
+                if len(char_to_prons[char]) != 1:
+                    all_have_one_pron = False
+                    break
+            if all_have_one_pron:
+                # print(
+                #     f"Found pure group with {1} pronunciation! {component}/{pron}:{chars}"
+                # )
+                pure_comps_to_pron[component] = pron
+                pure_groups.append(PureGroup(pron, chars, component))
+    # for comp in sorted(pure_comps_to_pron.keys()
+    #     pass
+    return sorted(pure_groups, key=lambda pg: (-len(pg.chars), pg.pron))
+
+
+def get_phonetic_regularities(char_to_prons, ids):
     # component -> pronunciation -> character
     regularities = defaultdict(lambda: defaultdict(set))
     pronunciation_to_chars = defaultdict(set)
     # TODO: character -> candidate regularity components
     no_pron_chars = set()
-    unknown_comps = set()
-    for char, char_prons in char_to_readings.items():
+    for char, char_prons in char_to_prons.items():
         if not char_prons:
             no_pron_chars.add(char)
             continue
@@ -144,9 +183,6 @@ def get_phonetic_regularities(char_to_readings, ids):
                 if component in BLACKLIST:
                     continue
                 regularities[component][char_pron].add(char)
-                # if component not in unihan:
-                #     unknown_comps.add(component)
-                #     continue
 
     # delete the characters with only themselves in the value
     comps_to_delete = []
@@ -165,7 +201,7 @@ def get_phonetic_regularities(char_to_readings, ids):
     for pron_to_char in regularities.values():
         for chars in pron_to_char.values():
             chars_with_regularities |= chars
-    no_regularities = char_to_readings.keys() - no_pron_chars - chars_with_regularities
+    no_regularities = char_to_prons.keys() - no_pron_chars - chars_with_regularities
 
     # get the characters which have a unique reading
     unique_readings = {}
@@ -173,12 +209,16 @@ def get_phonetic_regularities(char_to_readings, ids):
         if len(chars) == 1:
             unique_readings[pron] = next(iter(chars))
 
-    return regularities, no_regularities, no_pron_chars, unique_readings, unknown_comps
+    pure_groups = _get_pure_groups(regularities, char_to_prons)
+    return regularities, no_regularities, no_pron_chars, unique_readings, pure_groups
 
 
 def _format_json(data):
     return json.dumps(
-        OrderedDict(sorted(data.items())), cls=SetEncoder, ensure_ascii=False, indent=2
+        data,
+        cls=CustomJsonEncoder,
+        ensure_ascii=False,
+        indent=2,
     )
 
 
@@ -188,7 +228,7 @@ def main():
     # unihan = _read_unihan()
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
-    char_to_readings, joyo_radicals = _read_joyo()
+    char_to_prons, joyo_radicals = _read_joyo()
     # char_set = _find_joyo(unihan)
     ids = _read_ids()
     for char, rad in joyo_radicals.items():
@@ -199,13 +239,12 @@ def main():
         no_regularities,
         no_pron_chars,
         unique_readings,
-        unknown_comps,
-    ) = get_phonetic_regularities(char_to_readings, ids)
+        pure_groups,
+    ) = get_phonetic_regularities(char_to_prons, ids)
     log.info(f"Found {len(regularities)} candidate pattern components")
     log.info(
         f"Found {sum([len(prons) for prons in regularities.values()])} candidate pronunciation patterns"
     )
-    log.info(f"{len(unknown_comps)} components not found in unihan: {unknown_comps}")
     log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
     log.info(
         f"{len(no_regularities)} characters with no regularities: {no_regularities}"
@@ -213,13 +252,79 @@ def main():
     log.info(
         f"{len(unique_readings)} characters with unique readings: {unique_readings}"
     )
-    print(_format_json(regularities))
+    log.info(f"{len(pure_groups)} potential pure groups")
+    print(_format_json(pure_groups))
+    print(_format_json(OrderedDict(sorted(regularities.items()))))
 
-    # Next issues:
-    # * look at Heisig for un-classified chars to determine next step
+    # Next: warn if char is itself a component and triggers different usages (will have to save one-offs!):
+    #   {
+    #     "pron": "シ",
+    #     "chars": [
+    #       "市",
+    #       "師"
+    #     ],
+    #     "component": "巾"
+    #   },
+    # * following should be joined:
+    #       {
+    #     "pron": "ショウ",
+    #     "chars": [
+    #       "掌",
+    #       "賞"
+    #     ],
+    #     "component": "𫩠"
+    #   },
+    #     {
+    #     "pron": "ショウ",
+    #     "chars": [
+    #       "賞",
+    #       "償"
+    #     ],
+    #     "component": "賞"
+    #   },
+
+    # issues:
+    # *
     # * try extracting component combos for better coverage?
     # * sprinkle in exceptions to get the numbers down
     # * hou and bou, kaku and gaku, etc. are similar and can be combined in "similar pronunciation" groups
+    #   "半": {
+    #     "ハン": [
+    #       "伴",
+    #       "畔",
+    #       "半",
+    #       "判"
+    #     ],
+    #     "バン": [
+    #       "伴",
+    #       "判"
+    #     ]
+    #   },
+    # * uses wrong IDS:
+
+
+#   {
+#     "pron": "セイ",
+#     "chars": [
+#       "政",
+#       "整"
+#     ],
+#     "component": "攴"
+#   },
+# * wrong, probably because we're only taking single pronunciations for now
+#       "牛": {
+#     "セイ": [
+#       "牲",
+#       "制"
+#     ]
+#   },
+
+# * Extract pure groups with multiple pronunciations
+# * Extract semi-pure and mixed groups
+
+# Other needs:
+# write to data directory with dedicated files (unique readings, no readings, etc.)
+# create human-curated acceptance file
 
 
 if __name__ == "__main__":
