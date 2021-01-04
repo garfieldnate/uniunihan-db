@@ -2,26 +2,18 @@
 import csv
 import dataclasses
 import json
-import logging
-import os
 import re
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Set
+from typing import DefaultDict, Dict, List, Set
 
-# TODO: putting logging config in shared file
-logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
-    format="[%(levelname)s] %(name)s: %(message)s",
-)
-log = logging.getLogger(__name__)
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
 
-PROJECT_DIR = Path(__file__).parents[1]
+log = configure_logging(__name__)
 
-DATA_DIR = PROJECT_DIR / "data"
-GENERATED_DATA_DIR = DATA_DIR / "generated"
-INCLUDED_DATA_DIR = DATA_DIR / "included"
+OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
+OUTPUT_DIR.mkdir(exist_ok=True)
+
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
 UNENCODED_DC_REGEX = r"[①-⑳]"
@@ -59,7 +51,7 @@ BLACKLIST = set(
         "糹",
         "阝",
         "飠",
-        "口",  # could technically be useful, but appears way to often so block for now
+        "口",  # could technically be useful, but appears way too often so block for now
     ]
 )
 
@@ -139,36 +131,48 @@ class PureGroup:
     # warnings: [str]
 
 
-def _get_pure_groups(regularities, char_to_prons):
-    # TODO next: extract pure groups (start with components with one pronunciation, take largest group of chars with one pronunciation)
+def _get_pure_groups(index):
     pure_groups = []
     pure_comps_to_pron = {}
 
-    for component, pron_to_chars in regularities.items():
+    for component, pron_to_chars in index.regularities.items():
         if len(pron_to_chars) == 1:
             pron = next(iter(pron_to_chars.keys()))
             chars = pron_to_chars[pron]
 
             all_have_one_pron = True
             for char in chars:
-                if len(char_to_prons[char]) != 1:
+                if len(index.char_to_prons[char]) != 1:
                     all_have_one_pron = False
                     break
             if all_have_one_pron:
-                # print(
-                #     f"Found pure group with {1} pronunciation! {component}/{pron}:{chars}"
-                # )
                 pure_comps_to_pron[component] = pron
                 pure_groups.append(PureGroup(pron, chars, component))
-    # for comp in sorted(pure_comps_to_pron.keys()
-    #     pass
     return sorted(pure_groups, key=lambda pg: (-len(pg.chars), pg.pron))
+
+
+@dataclass
+class Index:
+    # char -> pronuncitions
+    char_to_prons: Dict[str, List[str]]
+    # component -> pronunciation -> chars with component and pronunciation
+    comp_pron_char: DefaultDict[str, DefaultDict[str, List[str]]]
+    # pronuncation -> all chars with that pronunciation
+    pron_to_chars: Dict[str, List[str]]
+    # same as comp_pron_char, but removes unique component/pronunciation mappings
+    regularities: DefaultDict[str, DefaultDict[str, List[str]]]
+    # unique pronunciations and their corresponding character
+    unique_pron_to_char: Dict[str, str]
+    # characters without any pronunciations
+    no_pron_chars: List[str]
+    # characters for which no regularities could be found (but do not have unique readings)
+    no_regularity_chars: List[str]
 
 
 def get_phonetic_regularities(char_to_prons, ids):
     # component -> pronunciation -> character
-    regularities = defaultdict(lambda: defaultdict(set))
-    pronunciation_to_chars = defaultdict(set)
+    comp_pron_char = defaultdict(lambda: defaultdict(set))
+    pron_to_chars = defaultdict(set)
     # TODO: character -> candidate regularity components
     no_pron_chars = set()
     for char, char_prons in char_to_prons.items():
@@ -176,41 +180,48 @@ def get_phonetic_regularities(char_to_prons, ids):
             no_pron_chars.add(char)
             continue
         for char_pron in char_prons:
-            pronunciation_to_chars[char_pron].add(char)
-            regularities[char][char_pron].add(char)
+            pron_to_chars[char_pron].add(char)
+            comp_pron_char[char][char_pron].add(char)
             #  TODO: be smarter about creating components if needed
             for component in ids[char]:
                 if component in BLACKLIST:
                     continue
-                regularities[component][char_pron].add(char)
+                comp_pron_char[component][char_pron].add(char)
 
-    # delete the characters with only themselves in the value
-    comps_to_delete = []
-    for component, pron_to_chars in regularities.items():
-        prons_to_delete = [k for k, v in pron_to_chars.items() if len(v) == 1]
-        for k in prons_to_delete:
-            # log.info(k)
-            del pron_to_chars[k]
-        if not len(pron_to_chars):
-            comps_to_delete.append(component)
-    for k in comps_to_delete:
-        del regularities[k]
-
-    # get the list of characters for which no regularities could be found
+    # the list of characters for which regularities were found
     chars_with_regularities = set()
-    for pron_to_char in regularities.values():
-        for chars in pron_to_char.values():
-            chars_with_regularities |= chars
-    no_regularities = char_to_prons.keys() - no_pron_chars - chars_with_regularities
+    # filter out unique comp -> pron mappings
+    regularities = defaultdict(lambda: defaultdict(set))
+    for comp, p2c in comp_pron_char.items():
+        for pron, chars in p2c.items():
+            if len(chars) > 1:
+                regularities[comp][pron] = chars
+                chars_with_regularities.update(chars)
 
     # get the characters which have a unique reading
     unique_readings = {}
-    for pron, chars in pronunciation_to_chars.items():
+    for pron, chars in pron_to_chars.items():
         if len(chars) == 1:
             unique_readings[pron] = next(iter(chars))
 
-    pure_groups = _get_pure_groups(regularities, char_to_prons)
-    return regularities, no_regularities, no_pron_chars, unique_readings, pure_groups
+    # get the list of characters for which no regularities could be found;
+    # exclude those with unique or no readings
+    no_regularities = (
+        char_to_prons.keys()
+        - chars_with_regularities
+        - no_pron_chars
+        - set(unique_readings.values())
+    )
+
+    return Index(
+        char_to_prons,
+        comp_pron_char,
+        pron_to_chars,
+        regularities,
+        unique_readings,
+        no_pron_chars,
+        no_regularities,
+    )
 
 
 def _format_json(data):
@@ -229,34 +240,35 @@ def main():
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
     char_to_prons, joyo_radicals = _read_joyo()
-    # char_set = _find_joyo(unihan)
     ids = _read_ids()
     for char, rad in joyo_radicals.items():
         ids[char] = ids[char] + rad
 
-    (
-        regularities,
-        no_regularities,
-        no_pron_chars,
-        unique_readings,
-        pure_groups,
-    ) = get_phonetic_regularities(char_to_prons, ids)
-    log.info(f"Found {len(regularities)} candidate pattern components")
+    index = get_phonetic_regularities(char_to_prons, ids)
+    pure_group_candidates = _get_pure_groups(index)
+
+    log.info(f"Found {len(index.regularities)} candidate pattern components")
     log.info(
-        f"Found {sum([len(prons) for prons in regularities.values()])} candidate pronunciation patterns"
+        f"Found {sum([len(prons) for prons in index.regularities.values()])} candidate pronunciation patterns"
     )
-    log.info(f"{len(no_pron_chars)} characters with no pronunciations: {no_pron_chars}")
-    log.info(
-        f"{len(no_regularities)} characters with no regularities: {no_regularities}"
-    )
-    log.info(
-        f"{len(unique_readings)} characters with unique readings: {unique_readings}"
-    )
-    log.info(f"{len(pure_groups)} potential pure groups")
-    print(_format_json(pure_groups))
-    print(_format_json(OrderedDict(sorted(regularities.items()))))
+    log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
+    log.info(f"{len(index.no_regularity_chars)} characters with no regularities")
+    log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
+    log.info(f"{len(pure_group_candidates)} potential pure groups")
+
+    with open(OUTPUT_DIR / "pure_group_candidates.json", "w") as f:
+        f.write(_format_json(pure_group_candidates))
+    with open(OUTPUT_DIR / "all_regularities.json", "w") as f:
+        f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
+    with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
+        f.write(_format_json(index.no_regularity_chars))
+    with open(OUTPUT_DIR / "unique_readings.json", "w") as f:
+        f.write(_format_json(index.unique_pron_to_char))
+    with open(OUTPUT_DIR / "no_readings.json", "w") as f:
+        f.write(_format_json(index.no_pron_chars))
 
     # Next: warn if char is itself a component and triggers different usages (will have to save one-offs!):
+
     #   {
     #     "pron": "シ",
     #     "chars": [
@@ -323,7 +335,6 @@ def main():
 # * Extract semi-pure and mixed groups
 
 # Other needs:
-# write to data directory with dedicated files (unique readings, no readings, etc.)
 # create human-curated acceptance file
 
 

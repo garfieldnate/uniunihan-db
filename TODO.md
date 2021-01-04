@@ -32,6 +32,7 @@ Prediction experiments:
     - HSK (simplified): http://www.chinesetest.cn/userfiles/file/HSK/HSK-2012.xls
     - Seems that frequency lists and class lists are for simplified only. Here's a traditional-simplified converter: https://github.com/berniey/hanziconv/blob/master/hanziconv/charmap.py (Apache 2.0)
     - Ach! Unihan has Hong Kong grade levels included already!
+    - Kanken
 * Investigate https://github.com/nieldlr/hanzi
     - how does determinePhoneticRegularity work? It's essential the Heisig chapter grouping. Can we use this to build a better decision tree?
 * Investigate https://github.com/cburgmer/cjklib

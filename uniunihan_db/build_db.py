@@ -1,42 +1,27 @@
 import dataclasses
 import json
-import logging
-import os
 import zipfile
-from pathlib import Path
 
 import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
 from .lingua import japanese, mandarin
+from .util import GENERATED_DATA_DIR, configure_logging
 
-PROJECT_DIR = Path(__file__).parents[1]
-DATA_DIR = PROJECT_DIR / "data" / "generated"
-DATA_DIR.mkdir(exist_ok=True)
-LOG_FILE = DATA_DIR / "log.txt"
-
-UNIHAN_FILE = DATA_DIR / "unihan.json"
-UNIHAN_AUGMENTATION_FILE = DATA_DIR / "unihan_augmentation.json"
+UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
+UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
 
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
-CJKV_IDS_ZIP_FILE = DATA_DIR / "cjkvi-ids-master.zip"
-CJKV_IDS_DIR = DATA_DIR / "cjkvi-ids-master"
+CJKV_IDS_ZIP_FILE = GENERATED_DATA_DIR / "cjkvi-ids-master.zip"
+CJKV_IDS_DIR = GENERATED_DATA_DIR / "cjkvi-ids-master"
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
 )
-JUN_DA_CHAR_FREQ_FILE = DATA_DIR / "jun_da_char.tsv"
+JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 
-logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
-    format="[%(levelname)s] %(name)s: %(message)s",
-)
-log = logging.getLogger(__name__)
-
-fh = logging.FileHandler(LOG_FILE, mode="w")
-fh.setLevel(logging.WARN)
-log.addHandler(fh)
+log = configure_logging(__name__)
 
 
 def unihan_download():
@@ -79,7 +64,7 @@ def cjkvi_ids_download():
         log.info(f"{CJKV_IDS_DIR.name} already exists; skipping unzip")
     else:
         with zipfile.ZipFile(CJKV_IDS_ZIP_FILE, "r") as zip_ref:
-            zip_ref.extractall(DATA_DIR)
+            zip_ref.extractall(GENERATED_DATA_DIR)
 
 
 def jun_da_char_freq_download():

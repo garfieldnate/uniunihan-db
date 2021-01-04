@@ -1,34 +1,15 @@
 import csv
 import dataclasses
 import json
-import logging
-import os
 import re
 from collections import defaultdict
-from pathlib import Path
 
 from opencc import OpenCC
 
 from .lingua import japanese, mandarin
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
 
-# TODO: put constants in shared file
-PROJECT_DIR = Path(__file__).parents[1]
-
-DATA_DIR = PROJECT_DIR / "data"
-GENERATED_DATA_DIR = DATA_DIR / "generated"
-INCLUDED_DATA_DIR = DATA_DIR / "included"
-LOG_FILE = GENERATED_DATA_DIR / "log.txt"
-
-# TODO: putting logging config in shared file
-logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
-    format="[%(levelname)s] %(name)s: %(message)s",
-)
-log = logging.getLogger(__name__)
-
-fh = logging.FileHandler(LOG_FILE, mode="w")
-fh.setLevel(logging.WARN)
-log.addHandler(fh)
+log = configure_logging(__name__)
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
 UNENCODED_DC_REGEX = r"[①-⑳]"
