@@ -52,6 +52,7 @@ BLACKLIST = set(
         "阝",
         "飠",
         "口",  # could technically be useful, but appears way too often so block for now
+        "厶",
     ]
 )
 
@@ -128,17 +129,20 @@ class PureGroup:
     pron: str
     chars: Set[str]
     component: str
-    # warnings: [str]
+    warnings: List[str]
 
 
 def _get_pure_groups(index):
     pure_groups = []
     pure_comps_to_pron = {}
 
-    for component, pron_to_chars in index.regularities.items():
+    for component, pron_to_chars in index.comp_pron_char.items():
+        # only components with one pronunciation (for now)
         if len(pron_to_chars) == 1:
             pron = next(iter(pron_to_chars.keys()))
             chars = pron_to_chars[pron]
+            if len(chars) < 2:
+                continue
 
             all_have_one_pron = True
             for char in chars:
@@ -147,7 +151,12 @@ def _get_pure_groups(index):
                     break
             if all_have_one_pron:
                 pure_comps_to_pron[component] = pron
-                pure_groups.append(PureGroup(pron, chars, component))
+                warnings = []
+                for c in index.comp_to_char[component]:
+                    if c not in chars:
+                        warnings.append(f"See also {c}/{index.char_to_prons[c]}")
+
+                pure_groups.append(PureGroup(pron, chars, component, warnings))
     return sorted(pure_groups, key=lambda pg: (-len(pg.chars), pg.pron))
 
 
@@ -157,8 +166,12 @@ class Index:
     char_to_prons: Dict[str, List[str]]
     # component -> pronunciation -> chars with component and pronunciation
     comp_pron_char: DefaultDict[str, DefaultDict[str, List[str]]]
+    # component -> chars containing it
+    comp_to_char: DefaultDict[str, Set[str]]
+    # char -> components it contains
+    char_to_comp: Dict[str, str]
     # pronuncation -> all chars with that pronunciation
-    pron_to_chars: Dict[str, List[str]]
+    pron_to_chars: Dict[str, Set[str]]
     # same as comp_pron_char, but removes unique component/pronunciation mappings
     regularities: DefaultDict[str, DefaultDict[str, List[str]]]
     # unique pronunciations and their corresponding character
@@ -173,9 +186,12 @@ def get_phonetic_regularities(char_to_prons, ids):
     # component -> pronunciation -> character
     comp_pron_char = defaultdict(lambda: defaultdict(set))
     pron_to_chars = defaultdict(set)
+    comp_to_char = defaultdict(set)
     # TODO: character -> candidate regularity components
     no_pron_chars = set()
     for char, char_prons in char_to_prons.items():
+        for component in ids[char]:
+            comp_to_char[component].add(char)
         if not char_prons:
             no_pron_chars.add(char)
             continue
@@ -216,6 +232,8 @@ def get_phonetic_regularities(char_to_prons, ids):
     return Index(
         char_to_prons,
         comp_pron_char,
+        comp_to_char,
+        ids,
         pron_to_chars,
         regularities,
         unique_readings,
@@ -257,7 +275,11 @@ def main():
     log.info(f"{len(pure_group_candidates)} potential pure groups")
 
     with open(OUTPUT_DIR / "pure_group_candidates.json", "w") as f:
-        f.write(_format_json(pure_group_candidates))
+        f.write(
+            _format_json(
+                sorted(pure_group_candidates, key=lambda pg: (pg.component, pg.pron))
+            )
+        )
     with open(OUTPUT_DIR / "all_regularities.json", "w") as f:
         f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
     with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
