@@ -4,7 +4,8 @@ import dataclasses
 import json
 import re
 from collections import OrderedDict, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import IntEnum
 from typing import DefaultDict, Dict, List, Set
 
 from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
@@ -82,6 +83,7 @@ BLACKLIST = set(
         "寸",
         "頁",
         "示",
+        "礻",
     ]
 )
 
@@ -153,40 +155,82 @@ def _read_ids():
     return ids
 
 
+# Taken from Heisig volume 2
+class PurityType(IntEnum):
+    PURE = 1
+    SEMI_PURE = 2
+    MIXED_A = 3
+    MIXED_B = 4
+    MIXED_C = 5
+    NONE = 6
+
+
 @dataclass
-class PureGroup:
-    pron: str
-    chars: Set[str]
+class ComponentGroup:
     component: str
-    warnings: List[str]
+    prons_to_chars: Dict[str, Set[str]]
+    num_chars: int
+    warnings: List[str] = field(default_factory=list)
 
 
-def _get_pure_groups(index):
-    pure_groups = []
-    pure_comps_to_pron = {}
+def _get_component_group_candidates(index):
+    candidate_groups = defaultdict(list)
 
     for component, pron_to_chars in index.comp_pron_char.items():
-        # only components with one pronunciation (for now)
-        if len(pron_to_chars) == 1:
-            pron = next(iter(pron_to_chars.keys()))
-            chars = pron_to_chars[pron]
-            if len(chars) < 2:
-                continue
+        all_chars = set()
+        for chars in pron_to_chars.values():
+            all_chars.update(chars)
 
-            all_have_one_pron = True
-            for char in chars:
-                if len(index.char_to_prons[char]) != 1:
-                    all_have_one_pron = False
-                    break
-            if all_have_one_pron:
-                pure_comps_to_pron[component] = pron
-                warnings = []
-                for c in index.comp_to_char[component]:
-                    if c not in chars:
-                        warnings.append(f"See also {c}/{index.char_to_prons[c]}")
+        pron_counts = defaultdict(int)
+        for char in all_chars:
+            for pron in index.char_to_prons[char]:
+                pron_counts[pron] += 1
+        # skip combinations with no regularities
+        if not any(count > 1 for count in pron_counts.values()):
+            continue
 
-                pure_groups.append(PureGroup(pron, chars, component, warnings))
-    return sorted(pure_groups, key=lambda pg: (-len(pg.chars), pg.pron))
+        # if num_prons > 10:
+        #     # too noisy to learn much
+        #     print(f"Skipping {component} because {pron_counts}")  # ({pron_to_chars})")
+        #     continue
+
+        complex_pron_to_chars = defaultdict(set)
+        for c in all_chars:
+            complex_pron_to_chars[",".join(index.char_to_prons[c])].add(c)
+        num_prons = len(complex_pron_to_chars)
+
+        num_exceptions = 0
+        for chars in complex_pron_to_chars.values():
+            if len(chars) == 1:
+                num_exceptions += 1
+
+        purity_type = PurityType.NONE
+        if num_prons == 1:
+            purity_type = PurityType.PURE
+        elif num_prons == 2 and num_exceptions == 1:
+            purity_type = PurityType.SEMI_PURE
+        elif len(all_chars) >= 4:
+            if num_prons == 2:
+                purity_type = PurityType.MIXED_A
+            elif num_prons == 3:
+                purity_type = PurityType.MIXED_B
+            else:
+                purity_type = PurityType.MIXED_C
+
+        candidate_group = ComponentGroup(
+            component,
+            # sort pronunciations by number of characters
+            OrderedDict(
+                sorted(complex_pron_to_chars.items(), key=lambda item: -len(item[1]))
+            ),
+            len(all_chars),
+        )
+        candidate_groups[purity_type].append(candidate_group)
+
+    for groups in candidate_groups.values():
+        groups.sort(key=lambda g: (-g.num_chars))
+
+    return OrderedDict(sorted(candidate_groups.items(), key=lambda item: item[0]))
 
 
 @dataclass
@@ -258,6 +302,9 @@ def get_phonetic_regularities(char_to_prons, ids):
         - set(unique_readings.values())
     )
 
+    # ensure that pronunciations are ordered deterministically in char_to_prons dictionary
+    char_to_prons = {k: sorted(v) for k, v in char_to_prons.items()}
+
     return Index(
         char_to_prons,
         comp_pron_char,
@@ -292,23 +339,16 @@ def main():
         ids[char] = ids[char] + rad
 
     index = get_phonetic_regularities(char_to_prons, ids)
-    pure_group_candidates = _get_pure_groups(index)
+    group_candidates = _get_component_group_candidates(index)
 
     log.info(f"Found {len(index.regularities)} candidate pattern components")
-    log.info(
-        f"Found {sum([len(prons) for prons in index.regularities.values()])} candidate pronunciation patterns"
-    )
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(index.no_regularity_chars)} characters with no regularities")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
-    log.info(f"{len(pure_group_candidates)} potential pure groups")
+    log.info(f"{sum([len(g) for g in group_candidates.values()])} potential groups")
 
-    with open(OUTPUT_DIR / "pure_group_candidates.json", "w") as f:
-        f.write(
-            _format_json(
-                sorted(pure_group_candidates, key=lambda pg: (pg.component, pg.pron))
-            )
-        )
+    with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
+        f.write(_format_json(group_candidates))
     with open(OUTPUT_DIR / "all_regularities.json", "w") as f:
         f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
     with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
@@ -318,37 +358,8 @@ def main():
     with open(OUTPUT_DIR / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
 
-    # Next: warn if char is itself a component and triggers different usages (will have to save one-offs!):
-
-    #   {
-    #     "pron": "シ",
-    #     "chars": [
-    #       "市",
-    #       "師"
-    #     ],
-    #     "component": "巾"
-    #   },
-    # * following should be joined:
-    #       {
-    #     "pron": "ショウ",
-    #     "chars": [
-    #       "掌",
-    #       "賞"
-    #     ],
-    #     "component": "𫩠"
-    #   },
-    #     {
-    #     "pron": "ショウ",
-    #     "chars": [
-    #       "賞",
-    #       "償"
-    #     ],
-    #     "component": "賞"
-    #   },
-
     # issues:
-    # *
-    # * try extracting component combos for better coverage?
+    # * try extracting component combos or component positions for better coverage?
     # * sprinkle in exceptions to get the numbers down
     # * hou and bou, kaku and gaku, etc. are similar and can be combined in "similar pronunciation" groups
     #   "半": {
@@ -381,9 +392,6 @@ def main():
 #       "制"
 #     ]
 #   },
-
-# * Extract pure groups with multiple pronunciations
-# * Extract semi-pure and mixed groups
 
 # Other needs:
 # create human-curated acceptance file

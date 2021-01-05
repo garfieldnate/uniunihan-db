@@ -1,33 +1,13 @@
 # TODO
 
-Next:
+Next: post-processing of groups
 
-for comp:
-    sum pronunciations
-    sum chars
-    if len(chars) > sum(pronunciations):
-        make group_candidate
-        if all chars have same pronunciation list:
-            group is pure
-        if all chars have same pronunciation except one:
-            group is semi-pure
-        if > 4= chars and (at least two have same reading):
-            mixed
-                A: 2 readings only
-                B: 3 chars with common reading, 2 exceptions
-                C: left-overs
-
-group_candidate:
-    pure: boolean
-
-    get_type():
-        if pure:
-            return 'PURE'
-
-        if all chars
-        num_prons
-        num_chars
-        if
+* detect if character occurs in multiple groups
+    - remove exceptional, keep regular
+* read list of common vocab and move exceptions to that list (leave behind note)
+* for unclassified chars:
+    - get most common word from dictionary
+    - order chars by commonness of that word
 
 
 
