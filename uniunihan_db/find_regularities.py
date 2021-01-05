@@ -54,6 +54,7 @@ BLACKLIST = set(
         "阝",
         "阜",
         "飠",
+        "食",
         "口",  # could technically be useful, but appears way too often so block for now
         "厶",
         "水",
@@ -84,6 +85,8 @@ BLACKLIST = set(
         "頁",
         "示",
         "礻",
+        "弓",
+        "山",
     ]
 )
 
@@ -169,68 +172,89 @@ class PurityType(IntEnum):
 class ComponentGroup:
     component: str
     prons_to_chars: Dict[str, Set[str]]
-    num_chars: int
+    chars: List[str]
     warnings: List[str] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.num_prons = len(self.prons_to_chars)
+
+        self.exceptions = set()
+        for chars in self.prons_to_chars.values():
+            if len(chars) == 1:
+                self.exceptions.add(next(iter(chars)))
+
+        self.purity_type = PurityType.NONE
+        if self.num_prons == 1:
+            self.purity_type = PurityType.PURE
+        elif self.num_prons == 2 and len(self.exceptions) == 1:
+            self.purity_type = PurityType.SEMI_PURE
+        elif len(self.chars) >= 4:
+            if self.num_prons == 2:
+                self.purity_type = PurityType.MIXED_A
+            elif self.num_prons == 3:
+                self.purity_type = PurityType.MIXED_B
+            else:
+                self.purity_type = PurityType.MIXED_C
+
+    def remove(self, char):
+        print(f"Removing {char} from {self.component}")
 
 
 def _get_component_group_candidates(index):
     candidate_groups = defaultdict(list)
 
     for component, pron_to_chars in index.comp_pron_char.items():
+        # skip combinations with no regularities
+        if not any(len(chars) > 1 for chars in pron_to_chars.values()):
+            continue
+
         all_chars = set()
         for chars in pron_to_chars.values():
             all_chars.update(chars)
 
-        pron_counts = defaultdict(int)
-        for char in all_chars:
-            for pron in index.char_to_prons[char]:
-                pron_counts[pron] += 1
-        # skip combinations with no regularities
-        if not any(count > 1 for count in pron_counts.values()):
-            continue
-
-        # if num_prons > 10:
-        #     # too noisy to learn much
-        #     print(f"Skipping {component} because {pron_counts}")  # ({pron_to_chars})")
-        #     continue
-
-        complex_pron_to_chars = defaultdict(set)
-        for c in all_chars:
-            complex_pron_to_chars[",".join(index.char_to_prons[c])].add(c)
-        num_prons = len(complex_pron_to_chars)
-
-        num_exceptions = 0
-        for chars in complex_pron_to_chars.values():
-            if len(chars) == 1:
-                num_exceptions += 1
-
-        purity_type = PurityType.NONE
-        if num_prons == 1:
-            purity_type = PurityType.PURE
-        elif num_prons == 2 and num_exceptions == 1:
-            purity_type = PurityType.SEMI_PURE
-        elif len(all_chars) >= 4:
-            if num_prons == 2:
-                purity_type = PurityType.MIXED_A
-            elif num_prons == 3:
-                purity_type = PurityType.MIXED_B
-            else:
-                purity_type = PurityType.MIXED_C
-
         candidate_group = ComponentGroup(
             component,
             # sort pronunciations by number of characters
-            OrderedDict(
-                sorted(complex_pron_to_chars.items(), key=lambda item: -len(item[1]))
-            ),
-            len(all_chars),
+            OrderedDict(sorted(pron_to_chars.items(), key=lambda item: -len(item[1]))),
+            all_chars,
         )
-        candidate_groups[purity_type].append(candidate_group)
+        candidate_groups[candidate_group.purity_type].append(candidate_group)
 
     for groups in candidate_groups.values():
-        groups.sort(key=lambda g: (-g.num_chars))
+        groups.sort(key=lambda g: (-len(g.chars)))
 
     return OrderedDict(sorted(candidate_groups.items(), key=lambda item: item[0]))
+
+
+def _post_process_group_candidates(group_candidates):
+    char_to_group = defaultdict(list)
+    for purity_type, groups in group_candidates.items():
+        for group in groups:
+            for c in group.chars:
+                char_to_group[c].append(group)
+
+    # Groups of groups:
+    # If char is component of a group, it should be removed from other groups
+    # If char is regular in some groups but not others, it should be removed from the irregular groups
+    # "Regular" meaning another character shares one of its pronunciations
+    # If component contains another group's component, they should be considered for combination
+    # rule would be complex, so just write a warning
+    for char, groups in char_to_group.items():
+        if len(groups) > 1:
+            if any(char == g.component for g in groups):
+                for g in groups:
+                    if char != g.component:
+                        g.remove(char)
+            # if any(char not in g.exceptions for g in groups):
+            #     for g in groups:
+            #         if char in g.exceptions:
+            #             g.remove(char)
+            # else:
+            #     g.warnings.append(f'Character {char} was in other ')
+            for g in groups:
+                g.warnings.append(
+                    f"Character {char} appears in multiple groups ({char in g.exceptions})"
+                )
 
 
 @dataclass
@@ -255,7 +279,7 @@ class Index:
     no_regularity_chars: List[str]
 
 
-def get_phonetic_regularities(char_to_prons, ids):
+def _index(char_to_prons, ids):
     # component -> pronunciation -> character
     comp_pron_char = defaultdict(lambda: defaultdict(set))
     pron_to_chars = defaultdict(set)
@@ -338,14 +362,18 @@ def main():
     for char, rad in joyo_radicals.items():
         ids[char] = ids[char] + rad
 
-    index = get_phonetic_regularities(char_to_prons, ids)
+    index = _index(char_to_prons, ids)
     group_candidates = _get_component_group_candidates(index)
+    _post_process_group_candidates(group_candidates)
 
-    log.info(f"Found {len(index.regularities)} candidate pattern components")
+    log.info(
+        f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
+    )
+    for purity_type, groups in group_candidates.items():
+        log.info(f"    {len(groups)} potential groups of type {purity_type}")
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(index.no_regularity_chars)} characters with no regularities")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
-    log.info(f"{sum([len(g) for g in group_candidates.values()])} potential groups")
 
     with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
         f.write(_format_json(group_candidates))
