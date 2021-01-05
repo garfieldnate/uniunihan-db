@@ -2,6 +2,34 @@
 
 Next:
 
+for comp:
+    sum pronunciations
+    sum chars
+    if len(chars) > sum(pronunciations):
+        make group_candidate
+        if all chars have same pronunciation list:
+            group is pure
+        if all chars have same pronunciation except one:
+            group is semi-pure
+        if > 4= chars and (at least two have same reading):
+            mixed
+                A: 2 readings only
+                B: 3 chars with common reading, 2 exceptions
+                C: left-overs
+
+group_candidate:
+    pure: boolean
+
+    get_type():
+        if pure:
+            return 'PURE'
+
+        if all chars
+        num_prons
+        num_chars
+        if
+
+
 
 Prediction experiments:
 - components -> Japanese (sanity check with Heisig)
