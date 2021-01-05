@@ -87,6 +87,10 @@ BLACKLIST = set(
         "礻",
         "弓",
         "山",
+        "尸",
+        "囗",
+        "禾",
+        "石",
     ]
 )
 
@@ -154,7 +158,7 @@ def _read_ids():
             breakdown = re.sub(IDC_REGEX, "", breakdown)
             # remove unencoded DC's
             breakdown = re.sub(UNENCODED_DC_REGEX, "", breakdown)
-            ids[r[1]] = breakdown
+            ids[r[1]] = set(breakdown)
     return ids
 
 
@@ -165,7 +169,7 @@ class PurityType(IntEnum):
     MIXED_A = 3
     MIXED_B = 4
     MIXED_C = 5
-    NONE = 6
+    NO_PATTERN = 6
 
 
 @dataclass
@@ -183,8 +187,11 @@ class ComponentGroup:
             if len(chars) == 1:
                 self.exceptions.add(next(iter(chars)))
 
-        self.purity_type = PurityType.NONE
-        if self.num_prons == 1:
+        self.purity_type = PurityType.NO_PATTERN
+        if len(self.chars) == len(self.exceptions):
+            # T_T must have destroyed the group somehow
+            pass
+        elif self.num_prons == 1:
             self.purity_type = PurityType.PURE
         elif self.num_prons == 2 and len(self.exceptions) == 1:
             self.purity_type = PurityType.SEMI_PURE
@@ -197,12 +204,25 @@ class ComponentGroup:
                 self.purity_type = PurityType.MIXED_C
 
     def remove(self, char):
-        print(f"Removing {char} from {self.component}")
+        self.chars.remove(char)
+        to_delete = []
+        for pron, chars in self.prons_to_chars.items():
+            chars.discard(char)
+            if not chars:
+                to_delete.append(pron)
+        for pron in to_delete:
+            del self.prons_to_chars[pron]
+
+        self.__post_init__()
+
+        self.warn(f"Removed {char}")
+
+    def warn(self, message):
+        self.warnings.append(message)
 
 
 def _get_component_group_candidates(index):
-    candidate_groups = defaultdict(list)
-
+    candidate_groups = []
     for component, pron_to_chars in index.comp_pron_char.items():
         # skip combinations with no regularities
         if not any(len(chars) > 1 for chars in pron_to_chars.values()):
@@ -218,43 +238,70 @@ def _get_component_group_candidates(index):
             OrderedDict(sorted(pron_to_chars.items(), key=lambda item: -len(item[1]))),
             all_chars,
         )
-        candidate_groups[candidate_group.purity_type].append(candidate_group)
+        candidate_groups.append(candidate_group)
 
-    for groups in candidate_groups.values():
-        groups.sort(key=lambda g: (-len(g.chars)))
-
-    return OrderedDict(sorted(candidate_groups.items(), key=lambda item: item[0]))
+    return candidate_groups
 
 
 def _post_process_group_candidates(group_candidates):
-    char_to_group = defaultdict(list)
-    for purity_type, groups in group_candidates.items():
-        for group in groups:
-            for c in group.chars:
-                char_to_group[c].append(group)
+    # char -> groups containing it
+    char_to_groups = defaultdict(list)
+    for group in group_candidates:
+        for c in group.chars:
+            char_to_groups[c].append(group)
 
+    # When a char exists in several groups, we need to decide which group it should belong to.
     # Groups of groups:
-    # If char is component of a group, it should be removed from other groups
     # If char is regular in some groups but not others, it should be removed from the irregular groups
     # "Regular" meaning another character shares one of its pronunciations
     # If component contains another group's component, they should be considered for combination
-    # rule would be complex, so just write a warning
-    for char, groups in char_to_group.items():
+    # - rule would be complex, so just write a warning
+    for char, groups in char_to_groups.items():
+        # if char occurs in more than one candidate group
         if len(groups) > 1:
+
+            # If char is itself a component of a candidate group, then it should only belong to that group
             if any(char == g.component for g in groups):
+                removed = False
                 for g in groups:
                     if char != g.component:
+                        if len(g.chars) == 2:
+                            g.warn(
+                                f"Consider merging with {char} group (moving just {char} would destroy this group)"
+                            )
+                        else:
+                            log.debug(
+                                f"Removing {char} from {g.component}:{g.chars} because it's already a component"
+                            )
+                            g.remove(char)
+                            removed = True
+                # The char was removed from all but one group, so we can stop looking at groups for this char
+                if removed:
+                    continue
+
+            # if char is regular in some groups
+            if any(char not in g.exceptions for g in groups):
+                # remove it from any groups where it is exceptional
+                for g in groups:
+                    if char in g.exceptions:
                         g.remove(char)
-            # if any(char not in g.exceptions for g in groups):
-            #     for g in groups:
-            #         if char in g.exceptions:
-            #             g.remove(char)
-            # else:
-            #     g.warnings.append(f'Character {char} was in other ')
-            for g in groups:
-                g.warnings.append(
-                    f"Character {char} appears in multiple groups ({char in g.exceptions})"
-                )
+            else:
+                group_string = ",".join([g.component for g in groups])
+                for g in groups:
+                    g.warn(
+                        f"Character {char} is in multiple groups ({group_string}) but never irregular"
+                    )
+
+    # Organize and sort the groups for easier inspection
+    purity_to_group = defaultdict(list)
+    for gc in group_candidates:
+        # purity_type is updated automatically by CandidateGroup, so we may have some groups that are no longer viable
+        if gc.purity_type != PurityType.NO_PATTERN:
+            purity_to_group[gc.purity_type].append(gc)
+    for groups in purity_to_group.values():
+        groups.sort(key=lambda g: (-len(g.chars)))
+
+    return OrderedDict(sorted(purity_to_group.items(), key=lambda item: item[0]))
 
 
 @dataclass
@@ -359,12 +406,12 @@ def main():
     # _, char_set = _read_hsk(6)
     char_to_prons, joyo_radicals = _read_joyo()
     ids = _read_ids()
-    for char, rad in joyo_radicals.items():
-        ids[char] = ids[char] + rad
+    # for char, rad in joyo_radicals.items():
+    #     ids[char].add(rad)
 
     index = _index(char_to_prons, ids)
     group_candidates = _get_component_group_candidates(index)
-    _post_process_group_candidates(group_candidates)
+    group_candidates = _post_process_group_candidates(group_candidates)
 
     log.info(
         f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
@@ -389,30 +436,9 @@ def main():
     # issues:
     # * try extracting component combos or component positions for better coverage?
     # * sprinkle in exceptions to get the numbers down
-    # * hou and bou, kaku and gaku, etc. are similar and can be combined in "similar pronunciation" groups
-    #   "半": {
-    #     "ハン": [
-    #       "伴",
-    #       "畔",
-    #       "半",
-    #       "判"
-    #     ],
-    #     "バン": [
-    #       "伴",
-    #       "判"
-    #     ]
-    #   },
     # * uses wrong IDS:
 
 
-#   {
-#     "pron": "セイ",
-#     "chars": [
-#       "政",
-#       "整"
-#     ],
-#     "component": "攴"
-#   },
 # * wrong, probably because we're only taking single pronunciations for now
 #       "牛": {
 #     "セイ": [
