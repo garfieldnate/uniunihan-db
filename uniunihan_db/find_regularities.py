@@ -427,6 +427,11 @@ def main():
         - set(index.unique_pron_to_char.values())
     )
 
+    exceptional_chars = set()
+    for groups in group_candidates.values():
+        for g in groups:
+            exceptional_chars.update(g.exceptions)
+
     log.info(
         f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
     )
@@ -434,6 +439,7 @@ def main():
         log.info(f"    {len(groups)} potential groups of type {purity_type}")
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(no_regularity_chars)} characters with no regularities")
+    log.info(f"{len(exceptional_chars)} characters listed as exceptions")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
     with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
@@ -442,6 +448,8 @@ def main():
         f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
     with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
         f.write(_format_json(no_regularity_chars))
+    with open(OUTPUT_DIR / "exceptions.json", "w") as f:
+        f.write(_format_json(exceptional_chars))
     with open(OUTPUT_DIR / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(OUTPUT_DIR / "no_readings.json", "w") as f:
