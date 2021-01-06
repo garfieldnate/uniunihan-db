@@ -115,8 +115,9 @@ class CustomJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def _read_joyo():
-    log.info("Loading joyo data...")
+def _read_joyo(use_old_glyphs=True):
+    # Using the old forms of the characters can find more regularities
+    log.info(f"Loading joyo ({'old' if use_old_glyphs else 'new'} glyph) data...")
     chars = {}
     radicals = {}
     with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
@@ -127,8 +128,10 @@ def _read_joyo():
             # remove empty readings;
             # forget about parenthesized readings; focus on the main reading for pattern finding
             readings = [yomi for yomi in readings if yomi and "（" not in yomi]
-            chars[r["new"]] = readings
-            radicals[r["new"]] = r["radical"]
+            char = r["old"] or r["new"]
+            for c in char:
+                chars[c] = readings
+                radicals[c] = r["radical"]
 
     return chars, radicals
 
