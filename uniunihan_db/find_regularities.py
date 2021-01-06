@@ -413,13 +413,24 @@ def main():
     group_candidates = _get_component_group_candidates(index)
     group_candidates = _post_process_group_candidates(group_candidates)
 
+    all_regular_chars = set()
+    for groups in group_candidates.values():
+        for g in groups:
+            all_regular_chars.update(g.chars)
+    no_regularity_chars = (
+        char_to_prons.keys()
+        - all_regular_chars
+        - index.no_pron_chars
+        - set(index.unique_pron_to_char.values())
+    )
+
     log.info(
         f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
     )
     for purity_type, groups in group_candidates.items():
         log.info(f"    {len(groups)} potential groups of type {purity_type}")
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
-    log.info(f"{len(index.no_regularity_chars)} characters with no regularities")
+    log.info(f"{len(no_regularity_chars)} characters with no regularities")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
     with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
@@ -427,7 +438,7 @@ def main():
     with open(OUTPUT_DIR / "all_regularities.json", "w") as f:
         f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
     with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
-        f.write(_format_json(index.no_regularity_chars))
+        f.write(_format_json(no_regularity_chars))
     with open(OUTPUT_DIR / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(OUTPUT_DIR / "no_readings.json", "w") as f:
@@ -435,17 +446,7 @@ def main():
 
     # issues:
     # * try extracting component combos or component positions for better coverage?
-    # * sprinkle in exceptions to get the numbers down
-    # * uses wrong IDS:
 
-
-# * wrong, probably because we're only taking single pronunciations for now
-#       "牛": {
-#     "セイ": [
-#       "牲",
-#       "制"
-#     ]
-#   },
 
 # Other needs:
 # create human-curated acceptance file
