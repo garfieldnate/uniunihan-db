@@ -1,8 +1,7 @@
 # TODO
 
-Next:
+Next: Use word pronunciations to provide examples for readings
 
-* read list of common vocab and move exceptions to that list (leave behind note)
 * for unclassified chars:
     - get most common word from dictionary
     - order chars by commonness of that word

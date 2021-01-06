@@ -165,6 +165,23 @@ def _read_ids():
     return ids
 
 
+def _read_jp_netflix(max_words):
+    log.info("Loading Netflix frequency list...")
+    char_to_words = defaultdict(list)
+    with open(INCLUDED_DATA_DIR / "jp_Netflix10K.txt") as f:
+        num_words = 0
+        for line in f.readlines():
+            if not line.startswith("#"):
+                line = line.strip()
+                # TODO: organize by reading
+                for c in line:
+                    char_to_words[c].append(line)
+                num_words += 1
+                if num_words == max_words:
+                    break
+    return char_to_words
+
+
 # Taken from Heisig volume 2
 class PurityType(IntEnum):
     PURE = 1
@@ -307,6 +324,18 @@ def _post_process_group_candidates(group_candidates):
     return OrderedDict(sorted(purity_to_group.items(), key=lambda item: item[0]))
 
 
+def _move_exceptions_to_vocab(candidate_groups, char_to_words):
+    for groups in candidate_groups.values():
+        for group in groups:
+            for c in group.exceptions:
+                if c in char_to_words:
+                    group.warn(
+                        f"Consider moving {c} to common vocab {char_to_words[c]}"
+                    )
+    # TODO: add vocab based on pronunciations
+    return []
+
+
 @dataclass
 class Index:
     # char -> pronuncitions
@@ -319,14 +348,10 @@ class Index:
     char_to_comp: Dict[str, str]
     # pronuncation -> all chars with that pronunciation
     pron_to_chars: Dict[str, Set[str]]
-    # same as comp_pron_char, but removes unique component/pronunciation mappings
-    regularities: DefaultDict[str, DefaultDict[str, List[str]]]
     # unique pronunciations and their corresponding character
     unique_pron_to_char: Dict[str, str]
     # characters without any pronunciations
     no_pron_chars: List[str]
-    # characters for which no regularities could be found (but do not have unique readings)
-    no_regularity_chars: List[str]
 
 
 def _index(char_to_prons, ids):
@@ -367,15 +392,6 @@ def _index(char_to_prons, ids):
         if len(chars) == 1:
             unique_readings[pron] = next(iter(chars))
 
-    # get the list of characters for which no regularities could be found;
-    # exclude those with unique or no readings
-    no_regularities = (
-        char_to_prons.keys()
-        - chars_with_regularities
-        - no_pron_chars
-        - set(unique_readings.values())
-    )
-
     # ensure that pronunciations are ordered deterministically in char_to_prons dictionary
     char_to_prons = {k: sorted(v) for k, v in char_to_prons.items()}
 
@@ -385,10 +401,8 @@ def _index(char_to_prons, ids):
         comp_to_char,
         ids,
         pron_to_chars,
-        regularities,
         unique_readings,
         no_pron_chars,
-        no_regularities,
     )
 
 
@@ -409,12 +423,15 @@ def main():
     # _, char_set = _read_hsk(6)
     char_to_prons, joyo_radicals = _read_joyo()
     ids = _read_ids()
+    high_freq = _read_jp_netflix(1000)
+    # all_freq = _read_jp_netflix(10_000)
     # for char, rad in joyo_radicals.items():
     #     ids[char].add(rad)
 
     index = _index(char_to_prons, ids)
     group_candidates = _get_component_group_candidates(index)
     group_candidates = _post_process_group_candidates(group_candidates)
+    _move_exceptions_to_vocab(group_candidates, high_freq)
 
     all_regular_chars = set()
     for groups in group_candidates.values():
@@ -444,8 +461,6 @@ def main():
 
     with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
         f.write(_format_json(group_candidates))
-    with open(OUTPUT_DIR / "all_regularities.json", "w") as f:
-        f.write(_format_json(OrderedDict(sorted(index.regularities.items()))))
     with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
         f.write(_format_json(no_regularity_chars))
     with open(OUTPUT_DIR / "exceptions.json", "w") as f:
