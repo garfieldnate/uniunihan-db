@@ -1,9 +1,7 @@
 # TODO
 
-Next: post-processing of groups
+Next:
 
-* detect if character occurs in multiple groups
-    - remove exceptional, keep regular
 * read list of common vocab and move exceptions to that list (leave behind note)
 * for unclassified chars:
     - get most common word from dictionary
