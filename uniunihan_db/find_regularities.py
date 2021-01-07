@@ -8,13 +8,11 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import DefaultDict, Dict, List, Set
 
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
 
 log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
-OUTPUT_DIR.mkdir(exist_ok=True)
-
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
 UNENCODED_DC_REGEX = r"[①-⑳]"
@@ -69,8 +67,8 @@ BLACKLIST = set(
         "貝",
         "女",
         "刀",
-        "金",
-        "十",
+        "金",  # although 銀 is close
+        "十",  # except 汁
         "田",  # except maybe 電
         "力",
         "火",
@@ -165,21 +163,23 @@ def _read_ids():
     return ids
 
 
-def _read_jp_netflix(max_words):
+def _read_jp_netflix(aligner, max_words=1_000_000):
     log.info("Loading Netflix frequency list...")
-    char_to_words = defaultdict(list)
+    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
     with open(INCLUDED_DATA_DIR / "jp_Netflix10K.txt") as f:
         num_words = 0
         for line in f.readlines():
             if not line.startswith("#"):
                 line = line.strip()
-                # TODO: organize by reading
-                for c in line:
-                    char_to_words[c].append(line)
-                num_words += 1
-                if num_words == max_words:
-                    break
-    return char_to_words
+                surface, pronunciation = line.split("\t")
+                alignment = aligner.align(surface, pronunciation)
+                if alignment:
+                    for c, pron in alignment.items():
+                        char_to_pron_to_words[c][pron].append(surface)
+                    num_words += 1
+                    if num_words == max_words:
+                        break
+    return char_to_pron_to_words
 
 
 # Taken from Heisig volume 2
@@ -202,10 +202,10 @@ class ComponentGroup:
     def __post_init__(self):
         self.num_prons = len(self.prons_to_chars)
 
-        self.exceptions = set()
-        for chars in self.prons_to_chars.values():
+        self.exceptions = {}
+        for pron, chars in self.prons_to_chars.items():
             if len(chars) == 1:
-                self.exceptions.add(next(iter(chars)))
+                self.exceptions[pron] = next(iter(chars))
 
         self.purity_type = PurityType.NO_PATTERN
         if len(self.chars) == len(self.exceptions):
@@ -270,6 +270,8 @@ def _post_process_group_candidates(group_candidates):
         for c in group.chars:
             char_to_groups[c].append(group)
 
+    warnings_per_char = defaultdict(set)
+
     # When a char exists in several groups, we need to decide which group it should belong to.
     # Groups of groups:
     # If char is regular in some groups but not others, it should be removed from the irregular groups
@@ -289,6 +291,9 @@ def _post_process_group_candidates(group_candidates):
                             g.warn(
                                 f"Consider merging with {char} group (moving just {char} would destroy this group)"
                             )
+                            warnings_per_char[
+                                "Consider moving char into group represented by itself"
+                            ].add(char)
                         else:
                             log.debug(
                                 f"Removing {char} from {g.component}:{g.chars} because it's already a component"
@@ -300,10 +305,10 @@ def _post_process_group_candidates(group_candidates):
                     continue
 
             # if char is regular in some groups
-            if any(char not in g.exceptions for g in groups):
+            if any(char not in g.exceptions.values() for g in groups):
                 # remove it from any groups where it is exceptional
                 for g in groups:
-                    if char in g.exceptions:
+                    if char in g.exceptions.values():
                         g.remove(char)
             else:
                 group_string = ",".join([g.component for g in groups])
@@ -311,6 +316,9 @@ def _post_process_group_candidates(group_candidates):
                     g.warn(
                         f"Character {char} is in multiple groups ({group_string}) but never irregular"
                     )
+                    warnings_per_char[
+                        "Character in multiple groups but never irregular"
+                    ].add(char)
 
     # Organize and sort the groups for easier inspection
     purity_to_group = defaultdict(list)
@@ -321,19 +329,23 @@ def _post_process_group_candidates(group_candidates):
     for groups in purity_to_group.values():
         groups.sort(key=lambda g: (-len(g.chars)))
 
-    return OrderedDict(sorted(purity_to_group.items(), key=lambda item: item[0]))
+    return (
+        OrderedDict(sorted(purity_to_group.items(), key=lambda item: item[0])),
+        warnings_per_char,
+    )
 
 
-def _move_exceptions_to_vocab(candidate_groups, char_to_words):
+def _move_exceptions_to_vocab(candidate_groups, char_to_pron_to_words):
+    prons_to_move = defaultdict(list)
     for groups in candidate_groups.values():
         for group in groups:
-            for c in group.exceptions:
-                if c in char_to_words:
+            for pron, c in group.exceptions.items():
+                if c in char_to_pron_to_words and pron in char_to_pron_to_words[c]:
                     group.warn(
-                        f"Consider moving {c} to common vocab {char_to_words[c]}"
+                        f"Consider moving exceptional {c}/{pron} to common vocab {char_to_pron_to_words[c][pron]}"
                     )
-    # TODO: add vocab based on pronunciations
-    return []
+                    prons_to_move[c].append(pron)
+    return prons_to_move
 
 
 @dataclass
@@ -422,16 +434,19 @@ def main():
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
     char_to_prons, joyo_radicals = _read_joyo()
+    aligner = Aligner(char_to_prons)
     ids = _read_ids()
-    high_freq = _read_jp_netflix(1000)
+    high_freq = _read_jp_netflix(aligner, 1000)
     # all_freq = _read_jp_netflix(10_000)
     # for char, rad in joyo_radicals.items():
     #     ids[char].add(rad)
 
     index = _index(char_to_prons, ids)
     group_candidates = _get_component_group_candidates(index)
-    group_candidates = _post_process_group_candidates(group_candidates)
-    _move_exceptions_to_vocab(group_candidates, high_freq)
+    group_candidates, warnings_per_char = _post_process_group_candidates(
+        group_candidates
+    )
+    prons_to_move = _move_exceptions_to_vocab(group_candidates, high_freq)
 
     all_regular_chars = set()
     for groups in group_candidates.values():
@@ -447,28 +462,42 @@ def main():
     exceptional_chars = set()
     for groups in group_candidates.values():
         for g in groups:
-            exceptional_chars.update(g.exceptions)
+            exceptional_chars.update(g.exceptions.values())
+
+    log.info("Warnings:")
+    log.info(
+        f"    {sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
+    )
+    for warning, chars in warnings_per_char.items():
+        log.info(f"    {warning}: {len(chars)} chars")
 
     log.info(
         f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
     )
     for purity_type, groups in group_candidates.items():
         log.info(f"    {len(groups)} potential groups of type {purity_type}")
+
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(no_regularity_chars)} characters with no regularities")
-    log.info(f"{len(exceptional_chars)} characters listed as exceptions")
+    log.info(f"{len(exceptional_chars)} characters listed only as exceptions")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
-    with open(OUTPUT_DIR / "group_candidates.json", "w") as f:
+    lang = "jp"
+    out_dir = OUTPUT_DIR / lang
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    with open(out_dir / "group_candidates.json", "w") as f:
         f.write(_format_json(group_candidates))
-    with open(OUTPUT_DIR / "no_regularities.json", "w") as f:
+    with open(out_dir / "no_regularities.json", "w") as f:
         f.write(_format_json(no_regularity_chars))
-    with open(OUTPUT_DIR / "exceptions.json", "w") as f:
+    with open(out_dir / "exceptions.json", "w") as f:
         f.write(_format_json(exceptional_chars))
-    with open(OUTPUT_DIR / "unique_readings.json", "w") as f:
+    with open(out_dir / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
-    with open(OUTPUT_DIR / "no_readings.json", "w") as f:
+    with open(out_dir / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
+    with open(out_dir / "warnings_per_character.json", "w") as f:
+        f.write(_format_json(warnings_per_char))
 
     # issues:
     # * try extracting component combos or component positions for better coverage?

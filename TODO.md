@@ -1,5 +1,6 @@
 # TODO
 
+Next: test with real char mapping (print for unalignable words); add unit tests
 Next: Use word pronunciations to provide examples for readings
 
 * for unclassified chars:
@@ -29,7 +30,7 @@ Prediction experiments:
     - Cantonese -> Mandarin
 * lib for parsing Syllables:
     - Cantonese
-* convert between simplified and traditional characters
+    - Vietnamese
 * Character lists (grade level, newspaper standard, etc.)
     - generate pronunciation decision trees for subsets
     - https://en.wikisource.org/wiki/Translation:List_of_Frequently_Used_Characters_in_Modern_Chinese#Inferior_frequently_used_characters
@@ -38,8 +39,6 @@ Prediction experiments:
     - Seems that frequency lists and class lists are for simplified only. Here's a traditional-simplified converter: https://github.com/berniey/hanziconv/blob/master/hanziconv/charmap.py (Apache 2.0)
     - Ach! Unihan has Hong Kong grade levels included already!
     - Kanken
-* Investigate https://github.com/nieldlr/hanzi
-    - how does determinePhoneticRegularity work? It's essential the Heisig chapter grouping. Can we use this to build a better decision tree?
 * Investigate https://github.com/cburgmer/cjklib
     - website is long gone, project no longer maintained abandoned, but it looks pretty comprehensive!
     - Can we revive/modernize it? May be a better data source!
