@@ -1,12 +1,13 @@
 # TODO
 
-Next: test with real char mapping (print for unalignable words); add unit tests
-Next: Use word pronunciations to provide examples for readings
+
+Next: Provide highest frequency word for all characters and their pronunciations
 
 * for unclassified chars:
-    - get most common word from dictionary
     - order chars by commonness of that word
 
+
+* Source new datasets for Chinese!
 
 
 Prediction experiments:

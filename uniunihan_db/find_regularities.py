@@ -1,4 +1,5 @@
 # import argparse
+import argparse
 import csv
 import dataclasses
 import json
@@ -91,16 +92,6 @@ BLACKLIST = set(
         "石",
     ]
 )
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument(
-#     "-l",
-#     "--language",
-#     # sanity check against Heisig Volume II
-#     default="jp",
-#     choices=['jp','zh-ZH','zh-HK'],
-#     help="",
-# )
 
 
 class CustomJsonEncoder(json.JSONEncoder):
@@ -428,18 +419,33 @@ def _format_json(data):
 
 
 def main():
-    # args = parser.parse_args()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-l",
+        "--language",
+        # sanity check against Heisig Volume II
+        default="jp",
+        choices=["jp", "zh-ZH", "zh-HK"],
+        help="",
+    )
+
+    args = parser.parse_args()
+
+    ids = _read_ids()
 
     # unihan = _read_unihan()
-    # TODO: allow choosing character set
+    if args.language == "jp":
+        char_to_prons, joyo_radicals = _read_joyo()
+        # for char, rad in joyo_radicals.items():
+        #     ids[char].add(rad)
+        aligner = Aligner(char_to_prons)
+        high_freq = _read_jp_netflix(aligner, 1000)
+    # elif args.language.startswith('zh'):
     # _, char_set = _read_hsk(6)
-    char_to_prons, joyo_radicals = _read_joyo()
-    aligner = Aligner(char_to_prons)
-    ids = _read_ids()
-    high_freq = _read_jp_netflix(aligner, 1000)
-    # all_freq = _read_jp_netflix(10_000)
-    # for char, rad in joyo_radicals.items():
-    #     ids[char].add(rad)
+    else:
+        log.error(f"Cannot handle language {args.language} yet")
+        exit()
 
     index = _index(char_to_prons, ids)
     group_candidates = _get_component_group_candidates(index)
@@ -464,6 +470,8 @@ def main():
         for g in groups:
             exceptional_chars.update(g.exceptions.values())
 
+    # Log statistics about the results
+
     log.info("Warnings:")
     log.info(
         f"    {sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
@@ -482,8 +490,7 @@ def main():
     log.info(f"{len(exceptional_chars)} characters listed only as exceptions")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
-    lang = "jp"
-    out_dir = OUTPUT_DIR / lang
+    out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(out_dir / "group_candidates.json", "w") as f:
