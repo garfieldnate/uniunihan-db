@@ -133,6 +133,32 @@ def _read_unihan():
     return unihan
 
 
+def _get_hk_ed_chars():
+    def get_pron(info):
+        # check all of the available fields in order of usefulness/accuracy
+        if pron := info.get("kHanyuPinlu"):
+            #             print('returning pinlu')
+            return [p["phonetic"] for p in pron]
+        elif pron := info.get("kXHC1983"):
+            #             print('returning 1983')
+            return [p["reading"] for p in pron]
+        elif pron := info.get("kHanyuPinyin"):
+            #             print('returning pinyin!')
+            return [r for p in pron for r in p["readings"]]
+        elif pron := info.get("kMandarin"):
+            print("returning mandarin!")
+            return pron["zh-Hans"]
+        return []
+
+    unihan = _read_unihan()
+    chars = {}
+    for char, info in unihan.items():
+        if "kGradeLevel" in info:
+            prons = get_pron(info)
+            chars[char] = prons
+    return chars
+
+
 def _read_ids():
     log.info("Loading IDS data...")
     ids = {}
@@ -441,8 +467,11 @@ def main():
         #     ids[char].add(rad)
         aligner = Aligner(char_to_prons)
         high_freq = _read_jp_netflix(aligner, 1000)
-    # elif args.language.startswith('zh'):
-    # _, char_set = _read_hsk(6)
+    elif args.language == "zh-HK":
+        char_to_prons = _get_hk_ed_chars()
+        # print(char_to_prons)
+        # get chars to prons from unihan where
+    # elif args.language == 'zh-Zh':
     else:
         log.error(f"Cannot handle language {args.language} yet")
         exit()
