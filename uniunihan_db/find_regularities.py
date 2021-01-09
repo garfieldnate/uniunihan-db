@@ -181,6 +181,28 @@ def _read_ids():
     return ids
 
 
+def _read_ytenx():
+    log.info("Loading phonetic components...")
+    char_to_component = {}
+    with open(
+        GENERATED_DATA_DIR
+        / "ytenx-master"
+        / "ytenx"
+        / "sync"
+        / "dciangx"
+        / "DrienghTriang.txt"
+    ) as f:
+        rows = csv.DictReader(f, delimiter=" ")
+        for r in rows:
+            char = r["#字"]
+            component = r["聲符"]
+            char_to_component[char] = [component]
+            # if char == "彚":
+            #     char = "彙"
+            #     char_to_component[char] = [component]
+    return char_to_component
+
+
 def _read_jp_netflix(aligner, max_words=1_000_000):
     log.info("Loading Netflix frequency list...")
     char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
@@ -382,6 +404,8 @@ class Index:
     unique_pron_to_char: Dict[str, str]
     # characters without any pronunciations
     no_pron_chars: List[str]
+    # characters with no pronunciation components
+    no_comp_chars: Set[str]
 
 
 def _index(char_to_prons, ids):
@@ -389,9 +413,12 @@ def _index(char_to_prons, ids):
     comp_pron_char = defaultdict(lambda: defaultdict(set))
     pron_to_chars = defaultdict(set)
     comp_to_char = defaultdict(set)
-    # TODO: character -> candidate regularity components
+    no_comp_chars = set()
     no_pron_chars = set()
     for char, char_prons in char_to_prons.items():
+        if char not in ids:
+            no_comp_chars.add(char)
+            continue
         for component in ids[char]:
             comp_to_char[component].add(char)
         if not char_prons:
@@ -433,6 +460,7 @@ def _index(char_to_prons, ids):
         pron_to_chars,
         unique_readings,
         no_pron_chars,
+        no_comp_chars,
     )
 
 
@@ -459,7 +487,8 @@ def main():
 
     args = parser.parse_args()
 
-    ids = _read_ids()
+    # ids = _read_ids()
+    ids = _read_ytenx()
 
     # unihan = _read_unihan()
     if args.language == "jp":
@@ -508,6 +537,10 @@ def main():
     )
     for warning, chars in warnings_per_char.items():
         log.info(f"    {warning}: {len(chars)} chars")
+    # Next: fix these
+    log.info(
+        f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
+    )
 
     log.info(
         f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
