@@ -1,7 +1,8 @@
 # TODO
 
+Next: Use ytenx data to assign groups hopefully perfectly
 
-Next: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
+Then: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
 
 * Provide highest frequency word for all characters and their pronunciations
 * for unclassified chars:
@@ -23,7 +24,6 @@ Prediction experiments:
 
 ## Tasks
 
-* Change out IDS for https://github.com/BYVoid/ytenx/blob/master/ytenx/sync/dciangx/DrienghTriang.txt
 * Convert to frequency list to traditional characters so we have traditional frequency list (roughly)
 * generate decision trees with accuracy stats for pronunciations:
     - components -> Japanese (check against Heisig)

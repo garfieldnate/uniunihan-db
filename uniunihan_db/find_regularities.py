@@ -16,6 +16,7 @@ log = configure_logging(__name__)
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
 IDC_REGEX = r"[\u2FF0-\u2FFB]"
+# TODO: try running with these no removed
 UNENCODED_DC_REGEX = r"[①-⑳]"
 
 # none of these are phonetic characters

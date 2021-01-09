@@ -13,8 +13,12 @@ UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
 
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
-CJKV_IDS_ZIP_FILE = GENERATED_DATA_DIR / "cjkvi-ids-master.zip"
-CJKV_IDS_DIR = GENERATED_DATA_DIR / "cjkvi-ids-master"
+CJKVI_IDS_ZIP_FILE = GENERATED_DATA_DIR / "cjkvi-ids-master.zip"
+CJKVI_IDS_DIR = GENERATED_DATA_DIR / "cjkvi-ids-master"
+
+YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
+YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
+YTENX_DIR = GENERATED_DATA_DIR / "ytenx-master"
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
@@ -48,22 +52,43 @@ def unihan_download():
 
 
 def cjkvi_ids_download():
-    """Download and unzip the CJKV IDS database."""
+    """Download and unzip the CJKV IDS data."""
     # download
-    if CJKV_IDS_ZIP_FILE.exists() and CJKV_IDS_ZIP_FILE.stat().st_size > 0:
-        log.info(f"{CJKV_IDS_ZIP_FILE.name} already exists; skipping download")
+    if CJKVI_IDS_ZIP_FILE.exists() and CJKVI_IDS_ZIP_FILE.stat().st_size > 0:
+        log.info(f"{CJKVI_IDS_ZIP_FILE.name} already exists; skipping download")
     else:
-        log.info(f"Downloading CJKV-IDS to {CJKV_IDS_ZIP_FILE}...")
+        log.info(f"Downloading CJKV-IDS to {CJKVI_IDS_ZIP_FILE}...")
         r = requests.get(CJKVI_IDS_URL, stream=True)
-        with open(CJKV_IDS_ZIP_FILE, "wb") as fd:
+        with open(CJKVI_IDS_ZIP_FILE, "wb") as fd:
             for chunk in r.iter_content(chunk_size=128):
                 fd.write(chunk)
 
     # unzip
-    if CJKV_IDS_DIR.exists() and CJKV_IDS_DIR.is_dir():
-        log.info(f"{CJKV_IDS_DIR.name} already exists; skipping unzip")
+    if CJKVI_IDS_DIR.exists() and CJKVI_IDS_DIR.is_dir():
+        log.info(f"{CJKVI_IDS_DIR.name} already exists; skipping unzip")
     else:
-        with zipfile.ZipFile(CJKV_IDS_ZIP_FILE, "r") as zip_ref:
+        with zipfile.ZipFile(CJKVI_IDS_ZIP_FILE, "r") as zip_ref:
+            zip_ref.extractall(GENERATED_DATA_DIR)
+
+
+def ytenx_download():
+    """Download and unzip the ytenx rhyming data."""
+    # TODO: duplicated code with cjkvi_ids_download
+    # download
+    if YTENX_ZIP_FILE.exists() and YTENX_ZIP_FILE.stat().st_size > 0:
+        log.info(f"{YTENX_ZIP_FILE.name} already exists; skipping download")
+    else:
+        log.info(f"Downloading ytenx rhyming data to {YTENX_ZIP_FILE}...")
+        r = requests.get(YTENX_URL, stream=True)
+        with open(YTENX_ZIP_FILE, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    # unzip
+    if YTENX_DIR.exists() and YTENX_DIR.is_dir():
+        log.info(f"{YTENX_DIR.name} already exists; skipping unzip")
+    else:
+        with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
 
 
@@ -160,6 +185,7 @@ def expand_unihan():
 def main():
     unihan_download()
     cjkvi_ids_download()
+    ytenx_download()
     jun_da_char_freq_download()
 
     expand_unihan()
