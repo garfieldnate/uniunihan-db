@@ -1,8 +1,9 @@
 # TODO
 
 
-Next: Provide highest frequency word for all characters and their pronunciations
+Next: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
 
+* Provide highest frequency word for all characters and their pronunciations
 * for unclassified chars:
     - order chars by commonness of that word
 
@@ -22,7 +23,8 @@ Prediction experiments:
 
 ## Tasks
 
-* Convert to Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
+* Change out IDS for https://github.com/BYVoid/ytenx/blob/master/ytenx/sync/dciangx/DrienghTriang.txt
+* Convert to frequency list to traditional characters so we have traditional frequency list (roughly)
 * generate decision trees with accuracy stats for pronunciations:
     - components -> Japanese (check against Heisig)
     - components -> Mandarin
@@ -73,8 +75,11 @@ Prediction experiments:
 
 ## Questions/Needs
 
+* Try this phono-semantic character data instead of IDS: https://github.com/cjkvi/cjkvi-ids/issues/84
 * Legal character classifications (grade levels, Jouyou, etc.)
 * DB for on readings by period (go-on, kan-on, tou-on, etc.)
+* DB for historical kun'yomi
+    - (very) partial dataset: https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/gendaikana/huhyo_i.html
 * unihan kun'yomi don't indicate okurigana!
 * historical spellings, with wi, we, ye, etc. for Japanese
 
