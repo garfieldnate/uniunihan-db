@@ -1,6 +1,6 @@
 # TODO
 
-Next: Use ytenx data to assign groups hopefully perfectly
+Next: Fix missing chars in ytenx; create reverse kCompatibilityVariant index
 
 Then: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
 
@@ -95,7 +95,6 @@ Prediction experiments:
 * Unihan does not indicate where okurigana in a kun'yomi begin
 * Would be great if unihan-etl (or better yet, Unihan itself!) structurized the (traditional variant of X), (non-classical variant of X), (same as X), etc. in the `kDefinition` field.
     - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
-* unihan_etl uses arrays for several fields that should not be arrays, such as `kJoyoKanji`, `kKarlgren`, etc. Maybe that's an attempt to future-proof?
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together

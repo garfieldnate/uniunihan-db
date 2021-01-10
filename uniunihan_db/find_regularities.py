@@ -110,6 +110,12 @@ def _read_joyo(use_old_glyphs=True):
     log.info(f"Loading joyo ({'old' if use_old_glyphs else 'new'} glyph) data...")
     chars = {}
     radicals = {}
+    if use_old_glyphs:
+        glyph_type = "old"
+        glyph_type_backup = "new"
+    else:
+        glyph_type = "new"
+        glyph_type_backup = "old"
     with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
@@ -118,7 +124,7 @@ def _read_joyo(use_old_glyphs=True):
             # remove empty readings;
             # forget about parenthesized readings; focus on the main reading for pattern finding
             readings = [yomi for yomi in readings if yomi and "（" not in yomi]
-            char = r["old"] or r["new"]
+            char = r[glyph_type] or r[glyph_type_backup]
             for c in char:
                 chars[c] = readings
                 radicals[c] = r["radical"]
@@ -134,7 +140,7 @@ def _read_unihan():
     return unihan
 
 
-def _get_hk_ed_chars():
+def _get_hk_ed_chars(unihan):
     def get_pron(info):
         # check all of the available fields in order of usefulness/accuracy
         if pron := info.get("kHanyuPinlu"):
@@ -151,7 +157,6 @@ def _get_hk_ed_chars():
             return pron["zh-Hans"]
         return []
 
-    unihan = _read_unihan()
     chars = {}
     for char, info in unihan.items():
         if "kGradeLevel" in info:
@@ -181,7 +186,7 @@ def _read_ids():
     return ids
 
 
-def _read_ytenx():
+def _read_ytenx(unihan):
     log.info("Loading phonetic components...")
     char_to_component = {}
     with open(
@@ -197,9 +202,30 @@ def _read_ytenx():
             char = r["#字"]
             component = r["聲符"]
             char_to_component[char] = [component]
-            # if char == "彚":
-            #     char = "彙"
-            #     char_to_component[char] = [component]
+
+    log.info("Addding phonetic components for variants...")
+    variant_to_component = {}
+    for char in char_to_component:
+        # TODO: address duplication
+        if sem_variants := unihan.get(char, {}).get("kSemanticVariant"):
+            # print(f"Found {sem_variants} for {char}")
+            for s in sem_variants:
+                if s not in char_to_component:
+                    variant_to_component[s] = char_to_component[char]
+        if z_variants := unihan.get(char, {}).get("kZVariant"):
+            # print(f"Found {z_variants} for {char}")
+            for s in z_variants:
+                if s not in char_to_component:
+                    variant_to_component[s] = char_to_component[char]
+        if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
+            print(f"Found {comp_variant} for {char}")
+            if comp_variant not in char_to_component:
+                variant_to_component[comp_variant] = char_to_component[char]
+        elif char == "頻":
+            print('Didn"t find variant for 頻')
+
+    char_to_component.update(variant_to_component)
+
     return char_to_component
 
 
@@ -488,17 +514,19 @@ def main():
     args = parser.parse_args()
 
     # ids = _read_ids()
-    ids = _read_ytenx()
+    unihan = _read_unihan()
+    ids = _read_ytenx(unihan)
 
     # unihan = _read_unihan()
     if args.language == "jp":
-        char_to_prons, joyo_radicals = _read_joyo()
+        # old glyphs give a better matching with non-Japanese datasets
+        char_to_prons, joyo_radicals = _read_joyo(use_old_glyphs=True)
         # for char, rad in joyo_radicals.items():
         #     ids[char].add(rad)
         aligner = Aligner(char_to_prons)
         high_freq = _read_jp_netflix(aligner, 1000)
     elif args.language == "zh-HK":
-        char_to_prons = _get_hk_ed_chars()
+        char_to_prons = _get_hk_ed_chars(unihan)
         # print(char_to_prons)
         # get chars to prons from unihan where
     # elif args.language == 'zh-Zh':

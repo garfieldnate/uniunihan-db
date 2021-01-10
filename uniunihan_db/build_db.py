@@ -47,6 +47,30 @@ def unihan_download():
     log.info("Converting unihan data to dictionary format...")
     unihan_dict = {entry["char"]: entry for entry in unihan}
 
+    log.info("Simplifying variant fields...")
+    for d in unihan_dict.values():
+        # TODO: address duplication below
+        # TODO: write reverse compatibility variants, since they are not symmetric
+        if compat_variant := d.get("kCompatibilityVariant"):
+            codepoint = compat_variant[2:]
+            char = chr(int(codepoint, 16))
+            d["kCompatibilityVariant"] = char
+        # https://github.com/cihai/unihan-etl/issues/80#issuecomment-757470998
+        if sem_variants := d.get("kSemanticVariant", []):
+            new_sem_variant = []
+            for s in sem_variants:
+                codepoint = s.split("<")[0][2:]
+                char = chr(int(codepoint, 16))
+                new_sem_variant.append(char)
+            d["kSemanticVariant"] = new_sem_variant
+        if z_variants := d.get("kZVariant", []):
+            new_z_variant = []
+            for z in z_variants:
+                codepoint = z.split("<")[0][2:]
+                char = chr(int(codepoint, 16))
+                new_z_variant.append(char)
+            d["kZVariant"] = new_z_variant
+
     log.info(f"Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
 
