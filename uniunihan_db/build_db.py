@@ -73,6 +73,15 @@ def unihan_download():
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
                 d[field_name] = new_variants
+        # slightly different structure
+        if jinmeiyo := d.get("kJinmeiyoKanji", []):
+            new_variants = []
+            for variant in jinmeiyo:
+                if "U+" in variant:
+                    codepoint = variant[7:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+            d["kJinmeiyoKanji"] = new_variants
 
     log.info(f"Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
@@ -205,8 +214,12 @@ def expand_unihan():
                     )
                     parsed_dict[k] = None
             new_data[key] |= {"kMandarin_parsed": parsed_dict}
-        if comp_variant := entry.get("kCompatibilityVariant"):
-            reverse_compatibilities[comp_variant].append(key)
+        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji"]:
+            if comp_variant := entry.get(field_name):
+                if type(comp_variant) != list:
+                    comp_variant = [comp_variant]
+                for v in comp_variant:
+                    reverse_compatibilities[v].extend(key)
 
     for key, variants in reverse_compatibilities.items():
         new_data[key]["kReverseCompatibilityVariants"] = variants

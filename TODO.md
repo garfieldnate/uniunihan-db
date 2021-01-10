@@ -1,6 +1,6 @@
 # TODO
 
-Next: Fix remaining 30 missing chars in ytenx
+Next: Fix remaining 26 missing chars in ytenx
 
 Then: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
 
@@ -96,7 +96,7 @@ Prediction experiments:
 * Would be great if unihan-etl (or better yet, Unihan itself!) structurized the (traditional variant of X), (non-classical variant of X), (same as X), etc. in the `kDefinition` field.
     - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
 * Unihan entries 彙彚𢑥 do not mention each other as variants
-* Really wish unihan had kyuujitai/sinjitai links; 綠 links to 緑 only in the jinmeiyo kanji field
+* Really wish unihan had kyuujitai/sinjitai links; 綠 links to 緑 only in the jinmeiyo kanji field.
 *
 
 ## Dev Tools

@@ -220,6 +220,7 @@ def _read_ytenx(unihan):
             "kSimplifiedVariant",
             "kTraditionalVariant",
             "kReverseCompatibilityVariants",
+            "kJinmeiyoKanji",
         ]:
             if variants := unihan.get(char, {}).get(field_name):
                 # print(f"Found {variants} for {char}")
