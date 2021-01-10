@@ -59,21 +59,20 @@ def unihan_download():
             codepoint = compat_variant[2:]
             char = chr(int(codepoint, 16))
             d["kCompatibilityVariant"] = char
-        # https://github.com/cihai/unihan-etl/issues/80#issuecomment-757470998
-        if sem_variants := d.get("kSemanticVariant", []):
-            new_sem_variant = []
-            for s in sem_variants:
-                codepoint = s.split("<")[0][2:]
-                char = chr(int(codepoint, 16))
-                new_sem_variant.append(char)
-            d["kSemanticVariant"] = new_sem_variant
-        if z_variants := d.get("kZVariant", []):
-            new_z_variant = []
-            for z in z_variants:
-                codepoint = z.split("<")[0][2:]
-                char = chr(int(codepoint, 16))
-                new_z_variant.append(char)
-            d["kZVariant"] = new_z_variant
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+        ]:
+            if variants := d.get(field_name, []):
+                new_variants = []
+                for v in variants:
+                    # https://github.com/cihai/unihan-etl/issues/80#issuecomment-757470998
+                    codepoint = v.split("<")[0][2:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+                d[field_name] = new_variants
 
     log.info(f"Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)

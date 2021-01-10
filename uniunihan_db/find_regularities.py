@@ -214,25 +214,22 @@ def _read_ytenx(unihan):
     variant_to_component = {}
     for char in char_to_component:
         # TODO: address duplication
-        if sem_variants := unihan.get(char, {}).get("kSemanticVariant"):
-            # print(f"Found {sem_variants} for {char}")
-            for s in sem_variants:
-                if s not in char_to_component:
-                    variant_to_component[s] = char_to_component[char]
-        if z_variants := unihan.get(char, {}).get("kZVariant"):
-            # print(f"Found {z_variants} for {char}")
-            for s in z_variants:
-                if s not in char_to_component:
-                    variant_to_component[s] = char_to_component[char]
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+            "kReverseCompatibilityVariants",
+        ]:
+            if variants := unihan.get(char, {}).get(field_name):
+                # print(f"Found {variants} for {char}")
+                for c in variants:
+                    if c not in char_to_component:
+                        variant_to_component[c] = char_to_component[char]
         if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
             # print(f"Found {comp_variant} for {char}")
             if comp_variant not in char_to_component:
                 variant_to_component[comp_variant] = char_to_component[char]
-        if reverse_comps := unihan.get(char, {}).get("kReverseCompatibilityVariants"):
-            # print(f"Found {reverse_comps} for {char}")
-            for c in reverse_comps:
-                if c not in char_to_component:
-                    variant_to_component[c] = char_to_component[char]
         elif char == "頻":
             print('Didn"t find variant for 頻')
 
