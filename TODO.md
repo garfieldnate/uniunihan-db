@@ -1,12 +1,13 @@
 # TODO
 
-Next: Fix remaining 26 missing chars in ytenx
 
-Then: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
+Next: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
 
 * Provide highest frequency word for all characters and their pronunciations
 * for unclassified chars:
     - order chars by commonness of that word
+
+* Get rid of IDS code. ytenx makes it obsolete!
 
 
 * Source new datasets for Chinese!
@@ -97,7 +98,10 @@ Prediction experiments:
     - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
 * Unihan entries 彙彚𢑥 do not mention each other as variants
 * Really wish unihan had kyuujitai/sinjitai links; 綠 links to 緑 only in the jinmeiyo kanji field.
-*
+* Unihan: relationship between 駄 and 馱 not given; between 瓶 and 甁, too (sinjitai/kyuujitai)
+* Unihan: relationship between 栃𣜜櫔 not given
+* Unihan: missing relationship between 顏顔, 匂匈
+
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together

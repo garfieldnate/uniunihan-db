@@ -209,6 +209,9 @@ def _read_ytenx(unihan):
             char = r["#字"]
             component = r["聲符"]
             char_to_component[char] = [component]
+    with open(INCLUDED_DATA_DIR / "ytenx_ammendment.json") as f:
+        extra_char_to_components = json.load(f)
+        char_to_component.update(extra_char_to_components)
 
     log.info("Addding phonetic components for variants...")
     variant_to_component = {}
