@@ -7,7 +7,7 @@ Next: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.Pinyi
 * for unclassified chars:
     - order chars by commonness of that word
 
-* Get rid of IDS code. ytenx makes it obsolete!
+* Get rid of component guessing code. ytenx makes it obsolete!
 
 
 * Source new datasets for Chinese!
