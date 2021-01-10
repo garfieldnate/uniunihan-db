@@ -137,6 +137,13 @@ def _read_unihan():
     # TODO: read path from constants file
     with open(GENERATED_DATA_DIR / "unihan.json") as f:
         unihan = json.load(f)
+
+    log.info("Loading reverse compatibility variants...")
+    with open(GENERATED_DATA_DIR / "reverse_compatibility_variants.json") as f:
+        reverse_compat_variants = json.load(f)
+    for char, variants in reverse_compat_variants.items():
+        unihan[char]["kReverseCompatibilityVariants"] = variants
+
     return unihan
 
 
@@ -218,9 +225,14 @@ def _read_ytenx(unihan):
                 if s not in char_to_component:
                     variant_to_component[s] = char_to_component[char]
         if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
-            print(f"Found {comp_variant} for {char}")
+            # print(f"Found {comp_variant} for {char}")
             if comp_variant not in char_to_component:
                 variant_to_component[comp_variant] = char_to_component[char]
+        if reverse_comps := unihan.get(char, {}).get("kReverseCompatibilityVariants"):
+            # print(f"Found {reverse_comps} for {char}")
+            for c in reverse_comps:
+                if c not in char_to_component:
+                    variant_to_component[c] = char_to_component[char]
         elif char == "頻":
             print('Didn"t find variant for 頻')
 

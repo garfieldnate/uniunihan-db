@@ -1,6 +1,6 @@
 # TODO
 
-Next: Fix missing chars in ytenx; create reverse kCompatibilityVariant index
+Next: Fix remaining 36 missing chars in ytenx
 
 Then: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words and chars have same pronunciation strings.
 

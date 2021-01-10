@@ -1,6 +1,7 @@
 import dataclasses
 import json
 import zipfile
+from collections import defaultdict
 
 import requests
 from unihan_etl.process import Packager as unihan_packager
@@ -11,6 +12,9 @@ from .util import GENERATED_DATA_DIR, configure_logging
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
+REVERSE_COMPAT_VARIANTS_FILE = (
+    GENERATED_DATA_DIR / "reverse_compatibility_variants.json"
+)
 
 CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
 CJKVI_IDS_ZIP_FILE = GENERATED_DATA_DIR / "cjkvi-ids-master.zip"
@@ -153,7 +157,8 @@ def jun_da_char_freq_download():
 def expand_unihan():
     """Expand Unihan DB with the following data:
     * Kana and IME spellings for Japanese on'yomi
-    * On'yomi and Mandarin syllable analyses (for testing purposes)"""
+    * On'yomi and Mandarin syllable analyses (for testing purposes)
+    * Reverse compatibility variant references"""
 
     log.info("Reading in Unihan DB...")
     with open(UNIHAN_FILE) as f:
@@ -162,6 +167,7 @@ def expand_unihan():
 
     log.info("Expanding Unihan data...")
     new_data = {}
+    reverse_compatibilities = defaultdict(list)
     for key, entry in unihan.items():
         new_data[key] = {}
         if on_list := entry.get("kJapaneseOn"):
@@ -200,6 +206,17 @@ def expand_unihan():
                     )
                     parsed_dict[k] = None
             new_data[key] |= {"kMandarin_parsed": parsed_dict}
+        if comp_variant := entry.get("kCompatibilityVariant"):
+            reverse_compatibilities[comp_variant].append(key)
+
+    for key, variants in reverse_compatibilities.items():
+        new_data[key]["kReverseCompatibilityVariants"] = variants
+
+    log.info(
+        f"Writing reverse compatibility variants to {REVERSE_COMPAT_VARIANTS_FILE.name}..."
+    )
+    with open(REVERSE_COMPAT_VARIANTS_FILE, "w") as f:
+        json.dump(reverse_compatibilities, f, indent=2, ensure_ascii=False)
 
     log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
     with open(UNIHAN_AUGMENTATION_FILE, "w") as f:
