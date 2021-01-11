@@ -393,23 +393,27 @@ def main():
             exceptional_chars.update(g.exceptions.values())
 
     # Log statistics about the results
-    log.info("Warnings:")
-    log.info(
-        f"    {sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
-    )
-    for warning, chars in warnings_per_char.items():
-        log.info(f"    {warning}: {len(chars)} chars")
+    if warnings_per_char:
+        log.info("Warnings:")
+        for warning, chars in warnings_per_char.items():
+            log.info(f"    {warning}: {len(chars)} chars")
 
+    log.info(
+        f"{sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
+    )
     log.info(
         f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
     )
 
-    log.info(f"{sum([len(g) for g in purity_type_to_groups.values()])} total groups:")
-    for purity_type, groups in purity_type_to_groups.items():
-        log.info(f"    {len(groups)} groups of type {purity_type}")
-
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
+
+    log.info(f"{sum([len(g) for g in purity_type_to_groups.values()])} total groups:")
+    for purity_type, groups in purity_type_to_groups.items():
+        num_chars = sum(len(g.chars) for g in groups)
+        log.info(
+            f"    {len(groups)} {purity_type.name} groups ({num_chars} characters)"
+        )
 
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
