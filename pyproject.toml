@@ -35,9 +35,7 @@ testpaths = ["tests"]
 
 [tool.poetry.scripts]
 build-db = "uniunihan_db.build_db:main"
-# > data/features.json
-features = "uniunihan_db.feature_extraction:main"
-find_regularities = "uniunihan_db.find_regularities:main"
+find-regularities = "uniunihan_db.find_regularities:main"
 # test = "pre-commit run --all-files"
 
 [tool.isort]

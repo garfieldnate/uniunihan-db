@@ -1,6 +1,6 @@
 # UniUnihan Database
 
-I've always wanted the ultimate unihan database.
+I've always wanted the ultimate Chinese character database.
 
 ## Goals
 
@@ -49,6 +49,10 @@ I know it's dumb... I'm looking into it.
 
 A VSCode settings file is included which contains configurations for all of the linting and formatting tools installed.
 
-Building the database:
+Pre-compilation of data sources:
 
-    poetry build-db
+    poetry run build-db
+
+Analysis of characters for one language (in flux; will probably be a learner's dictionary output of some kind):
+
+    poetry run find-regularities
