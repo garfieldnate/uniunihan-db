@@ -1,3 +1,4 @@
+import csv
 import dataclasses
 import json
 import zipfile
@@ -8,7 +9,7 @@ from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
 from .lingua import japanese, mandarin
-from .util import GENERATED_DATA_DIR, configure_logging
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
@@ -20,12 +21,27 @@ YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
 YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
 
+PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "chars_to_components.tsv"
+
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
 )
 JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 
 log = configure_logging(__name__)
+
+# lazy load this, since it's a lot of data
+UNIHAN_DICT = None
+
+
+def get_unihan():
+    global UNIHAN_DICT
+    if not UNIHAN_DICT:
+        log.info("Reading in Unihan DB...")
+        with open(UNIHAN_FILE) as f:
+            UNIHAN_DICT = json.load(f)
+        log.info(f"Read {len(UNIHAN_DICT)} characters from Unihan DB")
+    return UNIHAN_DICT
 
 
 def unihan_download():
@@ -90,7 +106,8 @@ def unihan_download():
 
     log.info(f"Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
-    return unihan_dict
+    global UNIHAN_DICT
+    UNIHAN_DICT = unihan_dict
 
 
 def ytenx_download():
@@ -111,6 +128,66 @@ def ytenx_download():
     else:
         with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
+
+
+def write_phonetic_components():
+    """Extract and augment the phonetic component data in ytenx"""
+
+    if (
+        PHONETIC_COMPONENTS_FILE.exists()
+        and PHONETIC_COMPONENTS_FILE.stat().st_size > 0
+    ):
+        log.info(f"{PHONETIC_COMPONENTS_FILE.name} already exists; skipping creation")
+        return
+
+    reverse_equivalents = get_reverse_equivalent_chars()
+
+    log.info("Loading phonetic components from ytenx...")
+    char_to_component = {}
+    with open(YTENX_DIR / "ytenx" / "sync" / "dciangx" / "DrienghTriang.txt") as f:
+        rows = csv.DictReader(f, delimiter=" ")
+        for r in rows:
+            char = r["#字"]
+            component = r["聲符"]
+            char_to_component[char] = component
+    with open(INCLUDED_DATA_DIR / "ytenx_ammendment.json") as f:
+        extra_char_to_components = json.load(f)
+        char_to_component.update(extra_char_to_components)
+
+    log.info("Addding phonetic components for variants...")
+    unihan = get_unihan()
+    variant_to_component = {}
+    for char in char_to_component:
+        # TODO: address duplication
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+            "kReverseCompatibilityVariants",
+            "kJinmeiyoKanji",
+            "kJoyoKanji",
+        ]:
+            if variants := unihan.get(char, {}).get(field_name):
+                for c in variants:
+                    if c not in char_to_component:
+                        variant_to_component[c] = char_to_component[char]
+        for c in reverse_equivalents.get(char, []):
+            if c not in char_to_component:
+                variant_to_component[c] = char_to_component[char]
+        if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
+            if comp_variant not in char_to_component:
+                variant_to_component[comp_variant] = char_to_component[char]
+
+    log.info(f"Writing phonetic components to {PHONETIC_COMPONENTS_FILE}")
+    char_to_component.update(variant_to_component)
+    with open(PHONETIC_COMPONENTS_FILE, "w") as f:
+        f.write("character\tcomponent\n")
+        for character, component in char_to_component.items():
+            f.write(f"{character}\t{component}\n")
+        log.info(f"Wrote {len(char_to_component)} character/component pairs")
+
+    return char_to_component
 
 
 def jun_da_char_freq_download():
@@ -147,17 +224,29 @@ def jun_da_char_freq_download():
                         f.write("\n")
 
 
-def expand_unihan(unihan=None):
+def get_reverse_equivalent_chars():
+    unihan = get_unihan()
+
+    log.info("Constructing reverse character equivalence index...")
+    reverse_equivalents = defaultdict(list)
+    for char, entry in unihan.items():
+        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
+            if comp_variant := entry.get(field_name):
+                if type(comp_variant) != list:
+                    comp_variant = [comp_variant]
+                for v in comp_variant:
+                    reverse_equivalents[v].extend(char)
+
+    return reverse_equivalents
+
+
+def expand_unihan():
     """Expand Unihan DB with the following data:
     * Kana and IME spellings for Japanese on'yomi
     * On'yomi and Mandarin syllable analyses (for testing purposes)
     * Reverse compatibility variant references"""
 
-    if not unihan:
-        log.info("Reading in Unihan DB...")
-        with open(UNIHAN_FILE) as f:
-            unihan = json.load(f)
-        log.info(f"Read {len(unihan)} characters from Unihan DB")
+    unihan = get_unihan()
 
     log.info("Expanding Unihan data...")
     new_data = {}
@@ -213,20 +302,19 @@ def expand_unihan(unihan=None):
     log.info(
         f"Writing reverse compatibility variants to {REVERSE_COMPAT_VARIANTS_FILE.name}..."
     )
-    with open(REVERSE_COMPAT_VARIANTS_FILE, "w") as f:
-        json.dump(reverse_compatibilities, f, indent=2, ensure_ascii=False)
+    export_json(reverse_compatibilities, REVERSE_COMPAT_VARIANTS_FILE)
 
     log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
-    with open(UNIHAN_AUGMENTATION_FILE, "w") as f:
-        json.dump(new_data, f, indent=2, ensure_ascii=False)
+    export_json(new_data, UNIHAN_AUGMENTATION_FILE)
 
 
 def main():
-    unihan = unihan_download()
+    unihan_download()
     ytenx_download()
+    write_phonetic_components()
     jun_da_char_freq_download()
 
-    expand_unihan(unihan)
+    expand_unihan()
 
 
 if __name__ == "__main__":

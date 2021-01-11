@@ -57,12 +57,6 @@ def _read_unihan():
     with open(GENERATED_DATA_DIR / "unihan.json") as f:
         unihan = json.load(f)
 
-    log.info("Loading reverse compatibility variants...")
-    with open(GENERATED_DATA_DIR / "reverse_compatibility_variants.json") as f:
-        reverse_compat_variants = json.load(f)
-    for char, variants in reverse_compat_variants.items():
-        unihan[char]["kReverseCompatibilityVariants"] = variants
-
     return unihan
 
 
@@ -94,47 +88,12 @@ def _get_hk_ed_chars(unihan):
 def _read_ytenx(unihan):
     log.info("Loading phonetic components...")
     char_to_component = {}
-    with open(
-        GENERATED_DATA_DIR
-        / "ytenx-master"
-        / "ytenx"
-        / "sync"
-        / "dciangx"
-        / "DrienghTriang.txt"
-    ) as f:
-        rows = csv.DictReader(f, delimiter=" ")
+    with open(GENERATED_DATA_DIR / "chars_to_components.tsv") as f:
+        rows = csv.DictReader(f, delimiter="\t")
         for r in rows:
-            char = r["#字"]
-            component = r["聲符"]
+            char = r["character"]
+            component = r["component"]
             char_to_component[char] = component
-    with open(INCLUDED_DATA_DIR / "ytenx_ammendment.json") as f:
-        extra_char_to_components = json.load(f)
-        char_to_component.update(extra_char_to_components)
-
-    log.info("Addding phonetic components for variants...")
-    variant_to_component = {}
-    for char in char_to_component:
-        # TODO: address duplication
-        for field_name in [
-            "kSemanticVariant",
-            "kZVariant",
-            "kSimplifiedVariant",
-            "kTraditionalVariant",
-            "kReverseCompatibilityVariants",
-            "kJinmeiyoKanji",
-            "kJoyoKanji",
-        ]:
-            if variants := unihan.get(char, {}).get(field_name):
-                # print(f"Found {variants} for {char}")
-                for c in variants:
-                    if c not in char_to_component:
-                        variant_to_component[c] = char_to_component[char]
-        if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
-            # print(f"Found {comp_variant} for {char}")
-            if comp_variant not in char_to_component:
-                variant_to_component[comp_variant] = char_to_component[char]
-
-    char_to_component.update(variant_to_component)
 
     return char_to_component
 
