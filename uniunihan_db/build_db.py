@@ -16,13 +16,9 @@ REVERSE_COMPAT_VARIANTS_FILE = (
     GENERATED_DATA_DIR / "reverse_compatibility_variants.json"
 )
 
-CJKVI_IDS_URL = "https://github.com/cjkvi/cjkvi-ids/archive/master.zip"
-CJKVI_IDS_ZIP_FILE = GENERATED_DATA_DIR / "cjkvi-ids-master.zip"
-CJKVI_IDS_DIR = GENERATED_DATA_DIR / "cjkvi-ids-master"
-
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
-YTENX_DIR = GENERATED_DATA_DIR / "ytenx-master"
+YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
@@ -82,34 +78,23 @@ def unihan_download():
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
             d["kJinmeiyoKanji"] = new_variants
+        if joyo := d.get("kJoyoKanji"):
+            new_variants = []
+            for variant in joyo:
+                if "U+" in variant:
+                    codepoint = variant[2:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+            log.info(f"Adding joyo variants: {new_variants}")
+            d["kJoyoKanji"] = new_variants
 
     log.info(f"Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
-
-
-def cjkvi_ids_download():
-    """Download and unzip the CJKV IDS data."""
-    # download
-    if CJKVI_IDS_ZIP_FILE.exists() and CJKVI_IDS_ZIP_FILE.stat().st_size > 0:
-        log.info(f"{CJKVI_IDS_ZIP_FILE.name} already exists; skipping download")
-    else:
-        log.info(f"Downloading CJKV-IDS to {CJKVI_IDS_ZIP_FILE}...")
-        r = requests.get(CJKVI_IDS_URL, stream=True)
-        with open(CJKVI_IDS_ZIP_FILE, "wb") as fd:
-            for chunk in r.iter_content(chunk_size=128):
-                fd.write(chunk)
-
-    # unzip
-    if CJKVI_IDS_DIR.exists() and CJKVI_IDS_DIR.is_dir():
-        log.info(f"{CJKVI_IDS_DIR.name} already exists; skipping unzip")
-    else:
-        with zipfile.ZipFile(CJKVI_IDS_ZIP_FILE, "r") as zip_ref:
-            zip_ref.extractall(GENERATED_DATA_DIR)
+    return unihan_dict
 
 
 def ytenx_download():
     """Download and unzip the ytenx rhyming data."""
-    # TODO: duplicated code with cjkvi_ids_download
     # download
     if YTENX_ZIP_FILE.exists() and YTENX_ZIP_FILE.stat().st_size > 0:
         log.info(f"{YTENX_ZIP_FILE.name} already exists; skipping download")
@@ -162,16 +147,17 @@ def jun_da_char_freq_download():
                         f.write("\n")
 
 
-def expand_unihan():
+def expand_unihan(unihan=None):
     """Expand Unihan DB with the following data:
     * Kana and IME spellings for Japanese on'yomi
     * On'yomi and Mandarin syllable analyses (for testing purposes)
     * Reverse compatibility variant references"""
 
-    log.info("Reading in Unihan DB...")
-    with open(UNIHAN_FILE) as f:
-        unihan = json.load(f)
-    log.info(f"Read {len(unihan)} characters from Unihan DB")
+    if not unihan:
+        log.info("Reading in Unihan DB...")
+        with open(UNIHAN_FILE) as f:
+            unihan = json.load(f)
+        log.info(f"Read {len(unihan)} characters from Unihan DB")
 
     log.info("Expanding Unihan data...")
     new_data = {}
@@ -214,7 +200,7 @@ def expand_unihan():
                     )
                     parsed_dict[k] = None
             new_data[key] |= {"kMandarin_parsed": parsed_dict}
-        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji"]:
+        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
             if comp_variant := entry.get(field_name):
                 if type(comp_variant) != list:
                     comp_variant = [comp_variant]
@@ -236,12 +222,11 @@ def expand_unihan():
 
 
 def main():
-    unihan_download()
-    cjkvi_ids_download()
+    unihan = unihan_download()
     ytenx_download()
     jun_da_char_freq_download()
 
-    expand_unihan()
+    expand_unihan(unihan)
 
 
 if __name__ == "__main__":

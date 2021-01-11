@@ -31,7 +31,5 @@
     "//": "Unihan missed 顏 variant",
     "顔": "彦",
     "//": "Unihan missed 匈 variant",
-    "匂": "凶",
-    "//": "Could get 叱 from kJoyoKanji field, but is it worth the effort?",
-    "𠮟": "七"
+    "匂": "凶"
 }

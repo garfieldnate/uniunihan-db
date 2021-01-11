@@ -3,7 +3,6 @@ import argparse
 import csv
 import dataclasses
 import json
-import re
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass, field
 from enum import IntEnum
@@ -14,85 +13,6 @@ from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logg
 log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
-
-IDC_REGEX = r"[\u2FF0-\u2FFB]"
-# TODO: try running with these no removed
-UNENCODED_DC_REGEX = r"[①-⑳]"
-
-# none of these are phonetic characters
-BLACKLIST: Set[str] = set(
-    [
-        # "一",
-        # "八",
-        # "辶",
-        # "艹",
-        # "扌",
-        # "宀",
-        # "亻",
-        # "人",
-        # "𠂉",
-        # "氵",
-        # "𭕄",
-        # "䒑",
-        # "丨",
-        # "丬",
-        # "丶",
-        # "丷",
-        # "丿",
-        # "亍",
-        # "亠",
-        # "冂",
-        # "冖",
-        # "彳",
-        # "忄",
-        # "日",
-        # "月",
-        # "木",  # except maybe 朴?
-        # "疒",
-        # "广",
-        # "糹",
-        # "阝",
-        # "阜",
-        # "飠",
-        # "食",
-        # "口",  # could technically be useful, but appears way too often so block for now
-        # "厶",
-        # "水",
-        # "手",
-        # "心",
-        # "言",
-        # "糸",
-        # "土",
-        # "辵",
-        # "艸",
-        # "肉",
-        # "貝",
-        # "女",
-        # "刀",
-        # "金",  # although 銀 is close
-        # "十",  # except 汁
-        # "田",  # except maybe 電
-        # "力",
-        # "火",
-        # "刂",
-        # "犬",
-        # "大",
-        # "竹",
-        # "王",
-        # "攵",
-        # "衣",
-        # "寸",
-        # "頁",
-        # "示",
-        # "礻",
-        # "弓",
-        # "山",
-        # "尸",
-        # "囗",
-        # "禾",
-        # "石",
-    ]
-)
 
 
 class CustomJsonEncoder(json.JSONEncoder):
@@ -172,27 +92,6 @@ def _get_hk_ed_chars(unihan):
     return chars
 
 
-def _read_ids():
-    log.info("Loading IDS data...")
-    ids = {}
-    with open(GENERATED_DATA_DIR / "cjkvi-ids-master" / "ids.txt") as f:
-        rows = csv.reader(f, delimiter="\t")
-        for r in rows:
-            # comments
-            if r[0].startswith("#"):
-                continue
-            # remove country specification and just use first one
-            # TODO: allow specifying country?
-            breakdown = r[2].split("[")[0]
-            # remove IDC's
-            # TODO: this could be useful information for prediction
-            breakdown = re.sub(IDC_REGEX, "", breakdown)
-            # remove unencoded DC's
-            breakdown = re.sub(UNENCODED_DC_REGEX, "", breakdown)
-            ids[r[1]] = set(breakdown)
-    return ids
-
-
 def _read_ytenx(unihan):
     log.info("Loading phonetic components...")
     char_to_component = {}
@@ -208,7 +107,7 @@ def _read_ytenx(unihan):
         for r in rows:
             char = r["#字"]
             component = r["聲符"]
-            char_to_component[char] = [component]
+            char_to_component[char] = component
     with open(INCLUDED_DATA_DIR / "ytenx_ammendment.json") as f:
         extra_char_to_components = json.load(f)
         char_to_component.update(extra_char_to_components)
@@ -224,6 +123,7 @@ def _read_ytenx(unihan):
             "kTraditionalVariant",
             "kReverseCompatibilityVariants",
             "kJinmeiyoKanji",
+            "kJoyoKanji",
         ]:
             if variants := unihan.get(char, {}).get(field_name):
                 # print(f"Found {variants} for {char}")
@@ -234,8 +134,6 @@ def _read_ytenx(unihan):
             # print(f"Found {comp_variant} for {char}")
             if comp_variant not in char_to_component:
                 variant_to_component[comp_variant] = char_to_component[char]
-        elif char == "頻":
-            print('Didn"t find variant for 頻')
 
     char_to_component.update(variant_to_component)
 
@@ -447,7 +345,7 @@ class Index:
     no_comp_chars: Set[str]
 
 
-def _index(char_to_prons, ids):
+def _index(char_to_prons, char_to_comp):
     # component -> pronunciation -> character
     comp_pron_char = defaultdict(lambda: defaultdict(set))
     pron_to_chars = defaultdict(set)
@@ -455,22 +353,18 @@ def _index(char_to_prons, ids):
     no_comp_chars = set()
     no_pron_chars = set()
     for char, char_prons in char_to_prons.items():
-        if char not in ids:
+        if char not in char_to_comp:
             no_comp_chars.add(char)
             continue
-        for component in ids[char]:
-            comp_to_char[component].add(char)
+        component = char_to_comp[char]
+        comp_to_char[component].add(char)
         if not char_prons:
             no_pron_chars.add(char)
             continue
         for char_pron in char_prons:
             pron_to_chars[char_pron].add(char)
             comp_pron_char[char][char_pron].add(char)
-            #  TODO: be smarter about creating components if needed
-            for component in ids[char]:
-                if component in BLACKLIST:
-                    continue
-                comp_pron_char[component][char_pron].add(char)
+            comp_pron_char[component][char_pron].add(char)
 
     # the list of characters for which regularities were found
     chars_with_regularities = set()
@@ -495,7 +389,7 @@ def _index(char_to_prons, ids):
         char_to_prons,
         comp_pron_char,
         comp_to_char,
-        ids,
+        char_to_comp,
         pron_to_chars,
         unique_readings,
         no_pron_chars,
@@ -526,16 +420,13 @@ def main():
 
     args = parser.parse_args()
 
-    # ids = _read_ids()
     unihan = _read_unihan()
-    ids = _read_ytenx(unihan)
+    char_to_comp = _read_ytenx(unihan)
 
     # unihan = _read_unihan()
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets
         char_to_prons, joyo_radicals = _read_joyo(use_old_glyphs=True)
-        # for char, rad in joyo_radicals.items():
-        #     ids[char].add(rad)
         aligner = Aligner(char_to_prons)
         high_freq = _read_jp_netflix(aligner, 1000)
     elif args.language == "zh-HK":
@@ -547,7 +438,7 @@ def main():
         log.error(f"Cannot handle language {args.language} yet")
         exit()
 
-    index = _index(char_to_prons, ids)
+    index = _index(char_to_prons, char_to_comp)
     group_candidates = _get_component_group_candidates(index)
     group_candidates, warnings_per_char = _post_process_group_candidates(
         group_candidates
