@@ -1,10 +1,8 @@
 # TODO
 
 Current topic: ytenx migration
-* Get rid of most component guessing code
-* Reduce size of ytenx_ammendment.json by using jihthex/JihThex.csv and ThaJihThex.csv
-* Keep groups with only exceptional readings (as long as they have at least two characters)
 * Write phonetic components as one big file during build-db step
+* Reduce size of ytenx_ammendment.json by using jihthex/JihThex.csv and ThaJihThex.csv
 
 ***
 

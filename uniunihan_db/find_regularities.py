@@ -1,4 +1,3 @@
-# import argparse
 import argparse
 import csv
 import dataclasses
@@ -159,14 +158,22 @@ def _read_jp_netflix(aligner, max_words=1_000_000):
     return char_to_pron_to_words
 
 
-# Taken from Heisig volume 2
+# Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
 class PurityType(IntEnum):
     PURE = 1
     SEMI_PURE = 2
+    # At least 4 chars, only 2 pronunciations
     MIXED_A = 3
+    # At least 4 chars, only 3 pronunciations
     MIXED_B = 4
+    # At least 4 chars, at least 1 shared pronunciation
     MIXED_C = 5
-    NO_PATTERN = 6
+    # At least one shared pronunciation
+    MIXED_D = 6
+    # Multiple characters, no pattern found
+    NO_PATTERN = 7
+    # Only one character in the group
+    SINGLETON = 8
 
 
 @dataclass
@@ -185,9 +192,9 @@ class ComponentGroup:
                 self.exceptions[pron] = next(iter(chars))
 
         self.purity_type = PurityType.NO_PATTERN
-        if len(self.chars) == len(self.exceptions):
-            # T_T must have destroyed the group somehow
-            pass
+
+        if len(self.chars) == 1:
+            self.purity_type = PurityType.SINGLETON
         elif self.num_prons == 1:
             self.purity_type = PurityType.PURE
         elif self.num_prons == 2 and len(self.exceptions) == 1:
@@ -197,8 +204,10 @@ class ComponentGroup:
                 self.purity_type = PurityType.MIXED_A
             elif self.num_prons == 3:
                 self.purity_type = PurityType.MIXED_B
-            else:
+            elif len(self.exceptions) != self.num_prons:
                 self.purity_type = PurityType.MIXED_C
+        elif len(self.exceptions) != self.num_prons:
+            self.purity_type = PurityType.MIXED_D
 
     def remove(self, char):
         self.chars.remove(char)
@@ -218,91 +227,37 @@ class ComponentGroup:
         self.warnings.append(message)
 
 
-def _get_component_group_candidates(index):
-    candidate_groups = []
+def _get_component_groups(index):
+    groups = []
     for component, pron_to_chars in index.comp_pron_char.items():
-        # skip combinations with no regularities
-        if not any(len(chars) > 1 for chars in pron_to_chars.values()):
-            continue
-
         all_chars = set()
         for chars in pron_to_chars.values():
             all_chars.update(chars)
 
-        candidate_group = ComponentGroup(
+        group = ComponentGroup(
             component,
             # sort pronunciations by number of characters
             OrderedDict(sorted(pron_to_chars.items(), key=lambda item: -len(item[1]))),
             all_chars,
         )
-        candidate_groups.append(candidate_group)
+        groups.append(group)
 
-    return candidate_groups
+    return groups
 
 
-def _post_process_group_candidates(group_candidates):
+def _post_process_groups(groups):
     # char -> groups containing it
-    char_to_groups = defaultdict(list)
-    for group in group_candidates:
+    char_to_group = {}
+    for group in groups:
         for c in group.chars:
-            char_to_groups[c].append(group)
+            char_to_group[c] = group
 
     warnings_per_char = defaultdict(set)
 
-    # When a char exists in several groups, we need to decide which group it should belong to.
-    # Groups of groups:
-    # If char is regular in some groups but not others, it should be removed from the irregular groups
-    # "Regular" meaning another character shares one of its pronunciations
-    # If component contains another group's component, they should be considered for combination
-    # - rule would be complex, so just write a warning
-    for char, groups in char_to_groups.items():
-        # if char occurs in more than one candidate group
-        if len(groups) > 1:
-
-            # If char is itself a component of a candidate group, then it should only belong to that group
-            if any(char == g.component for g in groups):
-                removed = False
-                for g in groups:
-                    if char != g.component:
-                        if len(g.chars) == 2:
-                            g.warn(
-                                f"Consider merging with {char} group (moving just {char} would destroy this group)"
-                            )
-                            warnings_per_char[
-                                "Consider moving char into group represented by itself"
-                            ].add(char)
-                        else:
-                            log.debug(
-                                f"Removing {char} from {g.component}:{g.chars} because it's already a component"
-                            )
-                            g.remove(char)
-                            removed = True
-                # The char was removed from all but one group, so we can stop looking at groups for this char
-                if removed:
-                    continue
-
-            # if char is regular in some groups
-            if any(char not in g.exceptions.values() for g in groups):
-                # remove it from any groups where it is exceptional
-                for g in groups:
-                    if char in g.exceptions.values():
-                        g.remove(char)
-            else:
-                group_string = ",".join([g.component for g in groups])
-                for g in groups:
-                    g.warn(
-                        f"Character {char} is in multiple groups ({group_string}) but never irregular"
-                    )
-                    warnings_per_char[
-                        "Character in multiple groups but never irregular"
-                    ].add(char)
-
     # Organize and sort the groups for easier inspection
     purity_to_group = defaultdict(list)
-    for gc in group_candidates:
-        # purity_type is updated automatically by CandidateGroup, so we may have some groups that are no longer viable
-        if gc.purity_type != PurityType.NO_PATTERN:
-            purity_to_group[gc.purity_type].append(gc)
+    for gc in groups:
+        purity_to_group[gc.purity_type].append(gc)
     for groups in purity_to_group.values():
         groups.sort(key=lambda g: (-len(g.chars)))
 
@@ -312,9 +267,9 @@ def _post_process_group_candidates(group_candidates):
     )
 
 
-def _move_exceptions_to_vocab(candidate_groups, char_to_pron_to_words):
+def _move_exceptions_to_vocab(purity_type_to_group, char_to_pron_to_words):
     prons_to_move = defaultdict(list)
-    for groups in candidate_groups.values():
+    for groups in purity_type_to_group.values():
         for group in groups:
             for pron, c in group.exceptions.items():
                 if c in char_to_pron_to_words and pron in char_to_pron_to_words[c]:
@@ -363,18 +318,7 @@ def _index(char_to_prons, char_to_comp):
             continue
         for char_pron in char_prons:
             pron_to_chars[char_pron].add(char)
-            comp_pron_char[char][char_pron].add(char)
             comp_pron_char[component][char_pron].add(char)
-
-    # the list of characters for which regularities were found
-    chars_with_regularities = set()
-    # filter out unique comp -> pron mappings
-    regularities = defaultdict(lambda: defaultdict(set))
-    for comp, p2c in comp_pron_char.items():
-        for pron, chars in p2c.items():
-            if len(chars) > 1:
-                regularities[comp][pron] = chars
-                chars_with_regularities.update(chars)
 
     # get the characters which have a unique reading
     unique_readings = {}
@@ -439,61 +383,39 @@ def main():
         exit()
 
     index = _index(char_to_prons, char_to_comp)
-    group_candidates = _get_component_group_candidates(index)
-    group_candidates, warnings_per_char = _post_process_group_candidates(
-        group_candidates
-    )
-    prons_to_move = _move_exceptions_to_vocab(group_candidates, high_freq)
-
-    all_regular_chars = set()
-    for groups in group_candidates.values():
-        for g in groups:
-            all_regular_chars.update(g.chars)
-    no_regularity_chars = (
-        char_to_prons.keys()
-        - all_regular_chars
-        - index.no_pron_chars
-        - set(index.unique_pron_to_char.values())
-    )
+    groups = _get_component_groups(index)
+    purity_type_to_groups, warnings_per_char = _post_process_groups(groups)
+    prons_to_move = _move_exceptions_to_vocab(purity_type_to_groups, high_freq)
 
     exceptional_chars = set()
-    for groups in group_candidates.values():
+    for groups in purity_type_to_groups.values():
         for g in groups:
             exceptional_chars.update(g.exceptions.values())
 
     # Log statistics about the results
-
     log.info("Warnings:")
     log.info(
         f"    {sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
     )
     for warning, chars in warnings_per_char.items():
         log.info(f"    {warning}: {len(chars)} chars")
-    # Next: fix these
+
     log.info(
         f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
     )
 
-    log.info(
-        f"{sum([len(g) for g in group_candidates.values()])} total potential groups:"
-    )
-    for purity_type, groups in group_candidates.items():
-        log.info(f"    {len(groups)} potential groups of type {purity_type}")
+    log.info(f"{sum([len(g) for g in purity_type_to_groups.values()])} total groups:")
+    for purity_type, groups in purity_type_to_groups.items():
+        log.info(f"    {len(groups)} groups of type {purity_type}")
 
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
-    log.info(f"{len(no_regularity_chars)} characters with no regularities")
-    log.info(f"{len(exceptional_chars)} characters listed only as exceptions")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(out_dir / "group_candidates.json", "w") as f:
-        f.write(_format_json(group_candidates))
-    with open(out_dir / "no_regularities.json", "w") as f:
-        f.write(_format_json(no_regularity_chars))
-    with open(out_dir / "exceptions.json", "w") as f:
-        f.write(_format_json(exceptional_chars))
+    with open(out_dir / "groups.json", "w") as f:
+        f.write(_format_json(purity_type_to_groups))
     with open(out_dir / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:

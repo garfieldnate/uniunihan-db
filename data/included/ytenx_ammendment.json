@@ -31,5 +31,7 @@
     "//": "Unihan missed 顏 variant",
     "顔": "彦",
     "//": "Unihan missed 匈 variant",
-    "匂": "凶"
+    "匂": "凶",
+    "//": "Override wrong semantic variant from Unihan (礮); TODO: can we automate this fix?",
+    "砲": "勹"
 }
