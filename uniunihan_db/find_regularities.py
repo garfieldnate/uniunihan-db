@@ -85,7 +85,7 @@ def _get_hk_ed_chars(unihan):
     return chars
 
 
-def _read_ytenx(unihan):
+def _read_phonetic_components(unihan):
     log.info("Loading phonetic components...")
     char_to_component = {}
     with open(GENERATED_DATA_DIR / "chars_to_components.tsv") as f:
@@ -324,7 +324,7 @@ def main():
     args = parser.parse_args()
 
     unihan = _read_unihan()
-    char_to_comp = _read_ytenx(unihan)
+    char_to_comp = _read_phonetic_components(unihan)
 
     # unihan = _read_unihan()
     if args.language == "jp":

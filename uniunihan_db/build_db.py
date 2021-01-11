@@ -13,9 +13,6 @@ from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
-REVERSE_COMPAT_VARIANTS_FILE = (
-    GENERATED_DATA_DIR / "reverse_compatibility_variants.json"
-)
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
@@ -52,7 +49,7 @@ def unihan_download():
         log.info(f"{UNIHAN_FILE.name} already exists; skipping download")
         return
 
-    log.info("Downloading unihan data...")
+    log.info("  Downloading unihan data...")
     p = unihan_packager.from_cli(["-F", "json", "--destination", str(UNIHAN_FILE)])
     p.download()
     # instruct packager to return data instead of writing to file
@@ -60,13 +57,12 @@ def unihan_download():
     p.options["format"] = "python"
     unihan = p.export()
 
-    log.info("Converting unihan data to dictionary format...")
+    log.info("  Converting unihan data to dictionary format...")
     unihan_dict = {entry["char"]: entry for entry in unihan}
 
-    log.info("Simplifying variant fields...")
+    log.info("  Simplifying variant fields...")
     for d in unihan_dict.values():
         # TODO: address duplication below
-        # TODO: write reverse compatibility variants, since they are not symmetric
         if compat_variant := d.get("kCompatibilityVariant"):
             codepoint = compat_variant[2:]
             char = chr(int(codepoint, 16))
@@ -101,10 +97,9 @@ def unihan_download():
                     codepoint = variant[2:]
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
-            log.info(f"Adding joyo variants: {new_variants}")
             d["kJoyoKanji"] = new_variants
 
-    log.info(f"Writing unihan to {UNIHAN_FILE}...")
+    log.info(f"  Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
     global UNIHAN_DICT
     UNIHAN_DICT = unihan_dict
@@ -124,7 +119,7 @@ def ytenx_download():
 
     # unzip
     if YTENX_DIR.exists() and YTENX_DIR.is_dir():
-        log.info(f"{YTENX_DIR.name} already exists; skipping unzip")
+        log.info(f"  {YTENX_DIR.name} already exists; skipping unzip")
     else:
         with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
@@ -140,7 +135,7 @@ def write_phonetic_components():
         log.info(f"{PHONETIC_COMPONENTS_FILE.name} already exists; skipping creation")
         return
 
-    reverse_equivalents = get_reverse_equivalent_chars()
+    variants = get_variants()
 
     log.info("Loading phonetic components from ytenx...")
     char_to_component = {}
@@ -154,38 +149,20 @@ def write_phonetic_components():
         extra_char_to_components = json.load(f)
         char_to_component.update(extra_char_to_components)
 
-    log.info("Addding phonetic components for variants...")
-    unihan = get_unihan()
+    log.info("  Addding phonetic components for variants...")
     variant_to_component = {}
     for char in char_to_component:
-        # TODO: address duplication
-        for field_name in [
-            "kSemanticVariant",
-            "kZVariant",
-            "kSimplifiedVariant",
-            "kTraditionalVariant",
-            "kReverseCompatibilityVariants",
-            "kJinmeiyoKanji",
-            "kJoyoKanji",
-        ]:
-            if variants := unihan.get(char, {}).get(field_name):
-                for c in variants:
-                    if c not in char_to_component:
-                        variant_to_component[c] = char_to_component[char]
-        for c in reverse_equivalents.get(char, []):
+        for c in variants.get(char, []):
             if c not in char_to_component:
                 variant_to_component[c] = char_to_component[char]
-        if comp_variant := unihan.get(char, {}).get("kCompatibilityVariant"):
-            if comp_variant not in char_to_component:
-                variant_to_component[comp_variant] = char_to_component[char]
 
-    log.info(f"Writing phonetic components to {PHONETIC_COMPONENTS_FILE}")
+    log.info(f"  Writing phonetic components to {PHONETIC_COMPONENTS_FILE}")
     char_to_component.update(variant_to_component)
     with open(PHONETIC_COMPONENTS_FILE, "w") as f:
         f.write("character\tcomponent\n")
         for character, component in char_to_component.items():
             f.write(f"{character}\t{component}\n")
-        log.info(f"Wrote {len(char_to_component)} character/component pairs")
+    log.info(f"  Wrote {len(char_to_component)} character/component pairs")
 
     return char_to_component
 
@@ -212,7 +189,7 @@ def jun_da_char_freq_download():
             line = line.split("</pre>")[0]
 
             log.info(
-                f"Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
+                f"  Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
             )
             with open(JUN_DA_CHAR_FREQ_FILE, "w") as f:
                 f.write(
@@ -224,20 +201,38 @@ def jun_da_char_freq_download():
                         f.write("\n")
 
 
-def get_reverse_equivalent_chars():
+def get_variants():
+    log.info("Constructing variants index...")
+
     unihan = get_unihan()
 
-    log.info("Constructing reverse character equivalence index...")
-    reverse_equivalents = defaultdict(list)
+    char_to_variants = defaultdict(set)
     for char, entry in unihan.items():
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+            "kReverseCompatibilityVariants",
+            "kJinmeiyoKanji",
+            "kJoyoKanji",
+            "kCompatibilityVariant",
+        ]:
+            if variants := entry.get(field_name):
+                if type(variants) != list:
+                    variants = [variants]
+                for v in variants:
+                    char_to_variants[char].add(v)
+
+        # These are asymmetrically noted in Unihan, so we need to reverse the mapping direction
         for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
             if comp_variant := entry.get(field_name):
                 if type(comp_variant) != list:
                     comp_variant = [comp_variant]
                 for v in comp_variant:
-                    reverse_equivalents[v].extend(char)
+                    char_to_variants[v].add(char)
 
-    return reverse_equivalents
+    return char_to_variants
 
 
 def expand_unihan():
@@ -266,7 +261,7 @@ def expand_unihan():
                     parsed_list.append(han_syl)
                 except TypeError:
                     log.warn(
-                        f"{entry['char']}/{on}/romanization={ime}: Failed to parse Han syllable!"
+                        f"  {entry['char']}/{on}/romanization={ime}: Failed to parse Han syllable!"
                     )
                     parsed_list.append(None)
                 kana_list.append(kana)
@@ -299,12 +294,7 @@ def expand_unihan():
     for key, variants in reverse_compatibilities.items():
         new_data[key]["kReverseCompatibilityVariants"] = variants
 
-    log.info(
-        f"Writing reverse compatibility variants to {REVERSE_COMPAT_VARIANTS_FILE.name}..."
-    )
-    export_json(reverse_compatibilities, REVERSE_COMPAT_VARIANTS_FILE)
-
-    log.info(f"Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
+    log.info(f"  Writing Unihan augmentations to {UNIHAN_AUGMENTATION_FILE.name}...")
     export_json(new_data, UNIHAN_AUGMENTATION_FILE)
 
 

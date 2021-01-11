@@ -1,7 +1,6 @@
 # TODO
 
 Current topic: ytenx migration
-* Write phonetic components as one big file during build-db step
 * Reduce size of ytenx_ammendment.json by using jihthex/JihThex.csv and ThaJihThex.csv
 
 ***
