@@ -1,16 +1,26 @@
 # TODO
 
+Current topic: ytenx migration
+* Get rid of most component guessing code, IDS download and loading, etc.
+* Reduce size of ytenx_ammendment.json by using jihthex/JihThex.csv and ThaJihThex.csv
+* Keep groups with only exceptional readings (as long as they have at least two characters)
+* Write phonetic components as one big file during build-db step
+
+***
+
+Topic: Mandarin support
 
 Next: Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
+
+Topic: dictionary output improvement
+
 
 * Provide highest frequency word for all characters and their pronunciations
 * for unclassified chars:
     - order chars by commonness of that word
+* provide historical spellings for Japanese characters
 
-* Get rid of component guessing code. ytenx makes it obsolete!
 
-
-* Source new datasets for Chinese!
 
 
 Prediction experiments:
