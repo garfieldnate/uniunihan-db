@@ -37,7 +37,7 @@ def get_unihan():
         log.info("Reading in Unihan DB...")
         with open(UNIHAN_FILE) as f:
             UNIHAN_DICT = json.load(f)
-        log.info(f"Read {len(UNIHAN_DICT)} characters from Unihan DB")
+        log.info(f"  Read {len(UNIHAN_DICT)} characters from Unihan DB")
     return UNIHAN_DICT
 
 
@@ -145,7 +145,7 @@ def write_phonetic_components():
             char = r["#字"]
             component = r["聲符"]
             char_to_component[char] = component
-    with open(INCLUDED_DATA_DIR / "ytenx_ammendment.json") as f:
+    with open(INCLUDED_DATA_DIR / "manual_components.json") as f:
         extra_char_to_components = json.load(f)
         char_to_component.update(extra_char_to_components)
 
@@ -155,9 +155,9 @@ def write_phonetic_components():
         for c in variants.get(char, []):
             if c not in char_to_component:
                 variant_to_component[c] = char_to_component[char]
+    char_to_component.update(variant_to_component)
 
     log.info(f"  Writing phonetic components to {PHONETIC_COMPONENTS_FILE}")
-    char_to_component.update(variant_to_component)
     with open(PHONETIC_COMPONENTS_FILE, "w") as f:
         f.write("character\tcomponent\n")
         for character, component in char_to_component.items():
@@ -202,10 +202,10 @@ def jun_da_char_freq_download():
 
 
 def get_variants():
+    unihan = get_unihan()
     log.info("Constructing variants index...")
 
-    unihan = get_unihan()
-
+    log.info("  Reading variants from unihan...")
     char_to_variants = defaultdict(set)
     for char, entry in unihan.items():
         for field_name in [
@@ -231,6 +231,23 @@ def get_variants():
                     comp_variant = [comp_variant]
                 for v in comp_variant:
                     char_to_variants[v].add(char)
+
+    log.info("  Reading variants from ytenx...")
+    with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "JihThex.csv") as f:
+        rows = csv.DictReader(f)
+        for r in rows:
+            char = r["#字"]
+            for field in ["全等", "語義交疊", "簡體", "繁體"]:
+                if variants := r[field]:
+                    for v in variants:
+                        char_to_variants[char].add(v)
+    with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "ThaJihThex.csv") as f:
+        rows = csv.DictReader(f)
+        for r in rows:
+            char = r["#字"]
+            if variants := r["其他異體"]:
+                for v in variants:
+                    char_to_variants[char].add(v)
 
     return char_to_variants
 
