@@ -3,11 +3,11 @@ import csv
 import dataclasses
 import json
 from collections import OrderedDict, defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import IntEnum
 from typing import DefaultDict, Dict, List, Set
 
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging  # Aligner
 
 log = configure_logging(__name__)
 
@@ -19,7 +19,7 @@ class CustomJsonEncoder(json.JSONEncoder):
         if isinstance(obj, set):
             return list(obj)
         elif dataclasses.is_dataclass(obj):
-            return dataclasses.asdict(obj)
+            return vars(obj)
 
         return json.JSONEncoder.default(self, obj)
 
@@ -140,10 +140,9 @@ class ComponentGroup:
     component: str
     prons_to_chars: Dict[str, Set[str]]
     chars: List[str]
-    warnings: List[str] = field(default_factory=list)
 
     def __post_init__(self):
-        self.num_prons = len(self.prons_to_chars)
+        num_prons = len(self.prons_to_chars)
 
         self.exceptions = {}
         for pron, chars in self.prons_to_chars.items():
@@ -154,36 +153,19 @@ class ComponentGroup:
 
         if len(self.chars) == 1:
             self.purity_type = PurityType.SINGLETON
-        elif self.num_prons == 1:
+        elif num_prons == 1:
             self.purity_type = PurityType.PURE
-        elif self.num_prons == 2 and len(self.exceptions) == 1:
+        elif num_prons == 2 and len(self.exceptions) == 1:
             self.purity_type = PurityType.SEMI_PURE
         elif len(self.chars) >= 4:
-            if self.num_prons == 2:
+            if num_prons == 2:
                 self.purity_type = PurityType.MIXED_A
-            elif self.num_prons == 3:
+            elif num_prons == 3:
                 self.purity_type = PurityType.MIXED_B
-            elif len(self.exceptions) != self.num_prons:
+            elif len(self.exceptions) != num_prons:
                 self.purity_type = PurityType.MIXED_C
-        elif len(self.exceptions) != self.num_prons:
+        elif len(self.exceptions) != num_prons:
             self.purity_type = PurityType.MIXED_D
-
-    def remove(self, char):
-        self.chars.remove(char)
-        to_delete = []
-        for pron, chars in self.prons_to_chars.items():
-            chars.discard(char)
-            if not chars:
-                to_delete.append(pron)
-        for pron in to_delete:
-            del self.prons_to_chars[pron]
-
-        self.__post_init__()
-
-        self.warn(f"Removed {char}")
-
-    def warn(self, message):
-        self.warnings.append(message)
 
 
 def _get_component_groups(index):
@@ -201,42 +183,8 @@ def _get_component_groups(index):
         )
         groups.append(group)
 
-    return groups
-
-
-def _post_process_groups(groups):
-    # char -> groups containing it
-    char_to_group = {}
-    for group in groups:
-        for c in group.chars:
-            char_to_group[c] = group
-
-    warnings_per_char = defaultdict(set)
-
     # Organize and sort the groups for easier inspection
-    purity_to_group = defaultdict(list)
-    for gc in groups:
-        purity_to_group[gc.purity_type].append(gc)
-    for groups in purity_to_group.values():
-        groups.sort(key=lambda g: (-len(g.chars)))
-
-    return (
-        OrderedDict(sorted(purity_to_group.items(), key=lambda item: item[0])),
-        warnings_per_char,
-    )
-
-
-def _move_exceptions_to_vocab(purity_type_to_group, char_to_pron_to_words):
-    prons_to_move = defaultdict(list)
-    for groups in purity_type_to_group.values():
-        for group in groups:
-            for pron, c in group.exceptions.items():
-                if c in char_to_pron_to_words and pron in char_to_pron_to_words[c]:
-                    group.warn(
-                        f"Consider moving exceptional {c}/{pron} to common vocab {char_to_pron_to_words[c][pron]}"
-                    )
-                    prons_to_move[c].append(pron)
-    return prons_to_move
+    return sorted(groups, key=lambda g: (g.purity_type, -len(g.chars)))
 
 
 @dataclass
@@ -330,8 +278,8 @@ def main():
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets
         char_to_prons, joyo_radicals = _read_joyo(use_old_glyphs=True)
-        aligner = Aligner(char_to_prons)
-        high_freq = _read_jp_netflix(aligner, 1000)
+        # aligner = Aligner(char_to_prons)
+        # high_freq = _read_jp_netflix(aligner, 1000)
     elif args.language == "zh-HK":
         char_to_prons = _get_hk_ed_chars(unihan)
         # print(char_to_prons)
@@ -343,55 +291,36 @@ def main():
 
     index = _index(char_to_prons, char_to_comp)
     groups = _get_component_groups(index)
-    purity_type_to_groups, warnings_per_char = _post_process_groups(groups)
-    prons_to_move = _move_exceptions_to_vocab(purity_type_to_groups, high_freq)
 
+    purity_to_chars = defaultdict(set)
+    purity_to_groups = defaultdict(int)
     exceptional_chars = set()
-    for groups in purity_type_to_groups.values():
-        for g in groups:
-            exceptional_chars.update(g.exceptions.values())
+    for g in groups:
+        purity_to_chars[g.purity_type].update(g.chars)
+        purity_to_groups[g.purity_type] += 1
+        exceptional_chars.update(g.exceptions.values())
 
-    # Log statistics about the results
-    if warnings_per_char:
-        log.info("Warnings:")
-        for warning, chars in warnings_per_char.items():
-            log.info(f"    {warning}: {len(chars)} chars")
-
-    log.info(
-        f"{sum(len(chars) for chars in prons_to_move.values())} pronunciation/character combos suggested to move to common words"
-    )
     log.info(
         f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
     )
-
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
-    log.info(f"{sum([len(g) for g in purity_type_to_groups.values()])} total groups:")
-    for purity_type, groups in purity_type_to_groups.items():
-        num_chars = sum(len(g.chars) for g in groups)
+    log.info(f"{len(groups)} total groups:")
+    for purity_type in PurityType:
         log.info(
-            f"    {len(groups)} {purity_type.name} groups ({num_chars} characters)"
+            f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
         )
 
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(out_dir / "groups.json", "w") as f:
-        f.write(_format_json(purity_type_to_groups))
+        f.write(_format_json(groups))
     with open(out_dir / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
-    with open(out_dir / "warnings_per_character.json", "w") as f:
-        f.write(_format_json(warnings_per_char))
-
-    # issues:
-    # * try extracting component combos or component positions for better coverage?
-
-
-# Other needs:
-# create human-curated acceptance file
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ Topic: final dictionary output
 Topic: Japanese Support
 
 * provide historical spellings for Japanese characters
+* when outputting group components, get Japanese glyphs where appropriate
 
 Topic: Korean Support
 
