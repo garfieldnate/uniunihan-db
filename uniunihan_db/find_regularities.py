@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import DefaultDict, Dict, List, Set
 
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging  # Aligner
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
 
 log = configure_logging(__name__)
 
@@ -248,6 +248,25 @@ def _index(char_to_prons, char_to_comp):
     )
 
 
+def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
+    """char_to_prons: dict character -> iterable of pronunciations
+    char_to_pron_to_words: dict character -> pronunciation -> list
+    of vocab sorted by frequency of use"""
+
+    found_words = []
+    missing_words = []
+    prons_to_move = defaultdict(list)
+    for char, prons in char_to_prons.items():
+        for p in prons:
+            if _ := char_to_pron_to_words.get(char, {}).get(p):
+                found_words.append(f"{char}/{p}")
+                prons_to_move[char].append(p)
+            else:
+                missing_words.append(f"{char}/{p}")
+
+    return found_words, missing_words
+
+
 def _format_json(data):
     return json.dumps(
         data,
@@ -258,7 +277,6 @@ def _format_json(data):
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-l",
@@ -278,8 +296,11 @@ def main():
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets
         char_to_prons, joyo_radicals = _read_joyo(use_old_glyphs=True)
-        # aligner = Aligner(char_to_prons)
-        # high_freq = _read_jp_netflix(aligner, 1000)
+        aligner = Aligner(char_to_prons)
+        char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
+        found_words, missing_words = _get_vocab_per_char_pron(
+            char_to_prons, char_to_pron_to_vocab
+        )
     elif args.language == "zh-HK":
         char_to_prons = _get_hk_ed_chars(unihan)
         # print(char_to_prons)
@@ -312,15 +333,20 @@ def main():
             f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
         )
 
+    log.info(
+        f"Found words for {len(found_words)}/{len(found_words) + len(missing_words)} words"
+    )
+
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
-
     with open(out_dir / "groups.json", "w") as f:
         f.write(_format_json(groups))
     with open(out_dir / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
+    with open(out_dir / "missing_words.json", "w") as f:
+        f.write(_format_json(missing_words))
 
 
 if __name__ == "__main__":

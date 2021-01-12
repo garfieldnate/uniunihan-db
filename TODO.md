@@ -13,6 +13,9 @@ Topic: final dictionary output
 
 Topic: Japanese Support
 
+* Use new char glyphs to find words
+    - More complex char and/or word representations, or just another index?
+* Find larger frequency list
 * provide historical spellings for Japanese characters
 * when outputting group components, get Japanese glyphs where appropriate
 
