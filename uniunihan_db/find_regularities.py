@@ -24,17 +24,10 @@ class CustomJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def _read_joyo(use_old_glyphs=True):
-    # Using the old forms of the characters can find more regularities
-    log.info(f"Loading joyo ({'old' if use_old_glyphs else 'new'} glyph) data...")
-    chars = {}
-    radicals = {}
-    if use_old_glyphs:
-        glyph_type = "old"
-        glyph_type_backup = "new"
-    else:
-        glyph_type = "new"
-        glyph_type_backup = "old"
+def _read_joyo():
+    log.info("Loading joyo data...")
+    new_char_to_prons = {}
+    old_char_to_prons = {}
     with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
@@ -43,12 +36,13 @@ def _read_joyo(use_old_glyphs=True):
             # remove empty readings;
             # forget about parenthesized readings; focus on the main reading for pattern finding
             readings = [yomi for yomi in readings if yomi and "（" not in yomi]
-            char = r[glyph_type] or r[glyph_type_backup]
-            for c in char:
-                chars[c] = readings
-                radicals[c] = r["radical"]
+            for c in r["new"]:
+                new_char_to_prons[c] = readings
+            # old glyph same as new glyph when missing
+            for c in r["old"] or r["new"]:
+                old_char_to_prons[c] = readings
 
-    return chars, radicals
+    return old_char_to_prons, new_char_to_prons
 
 
 def _read_unihan():
@@ -85,7 +79,7 @@ def _get_hk_ed_chars(unihan):
     return chars
 
 
-def _read_phonetic_components(unihan):
+def _read_phonetic_components():
     log.info("Loading phonetic components...")
     char_to_component = {}
     with open(GENERATED_DATA_DIR / "chars_to_components.tsv") as f:
@@ -289,19 +283,19 @@ def main():
 
     args = parser.parse_args()
 
-    unihan = _read_unihan()
-    char_to_comp = _read_phonetic_components(unihan)
+    char_to_comp = _read_phonetic_components()
 
-    # unihan = _read_unihan()
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets
-        char_to_prons, joyo_radicals = _read_joyo(use_old_glyphs=True)
-        aligner = Aligner(char_to_prons)
+        # new glyphs are matchable against modern word lists
+        char_to_prons, new_char_to_prons = _read_joyo()
+        aligner = Aligner(new_char_to_prons)
         char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
         found_words, missing_words = _get_vocab_per_char_pron(
-            char_to_prons, char_to_pron_to_vocab
+            new_char_to_prons, char_to_pron_to_vocab
         )
     elif args.language == "zh-HK":
+        unihan = _read_unihan()
         char_to_prons = _get_hk_ed_chars(unihan)
         # print(char_to_prons)
         # get chars to prons from unihan where
@@ -347,6 +341,8 @@ def main():
         f.write(_format_json(index.no_pron_chars))
     with open(out_dir / "missing_words.json", "w") as f:
         f.write(_format_json(missing_words))
+    with open(out_dir / "found_words.json", "w") as f:
+        f.write(_format_json(found_words))
 
 
 if __name__ == "__main__":

@@ -13,11 +13,10 @@ Topic: final dictionary output
 
 Topic: Japanese Support
 
-* Use new char glyphs to find words
-    - More complex char and/or word representations, or just another index?
 * Find larger frequency list
 * provide historical spellings for Japanese characters
 * when outputting group components, get Japanese glyphs where appropriate
+* possibly add Unihan pronunciations when missing from Joyo
 
 Topic: Korean Support
 
@@ -110,6 +109,7 @@ Prediction experiments:
 * verify vscode integration
 * Standalone build script
 * Dockerfile
+* Faster-to-load format than JSON? Is pickle better?
 
 ## Technical Questions
 * Should we use importlib or something intead of Path(__file__).parents[1]?
