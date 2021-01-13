@@ -45,6 +45,22 @@ def _read_joyo():
     return old_char_to_prons, new_char_to_prons
 
 
+def _read_edict_freq(aligner):
+    log.info("Loading EDICT frequency list...")
+    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    with open(GENERATED_DATA_DIR / "edict-freq.tsv") as f:
+        num_words = 0
+        for line in f.readlines():
+            line = line.strip()
+            surface, pronunciation = line.split("\t")
+            alignment = aligner.align(surface, pronunciation)
+            if alignment:
+                for c, pron in alignment.items():
+                    char_to_pron_to_words[c][pron].append(surface)
+                num_words += 1
+    return char_to_pron_to_words
+
+
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
@@ -290,7 +306,8 @@ def main():
         # new glyphs are matchable against modern word lists
         char_to_prons, new_char_to_prons = _read_joyo()
         aligner = Aligner(new_char_to_prons)
-        char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
+        # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
+        char_to_pron_to_vocab = _read_edict_freq(aligner)
         found_words, missing_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
         )

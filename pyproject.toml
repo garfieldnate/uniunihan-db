@@ -24,6 +24,7 @@ requests = "^2.24.0"
 opencc-python-reimplemented = "^0.1.6"
 scikit-learn = "^0.24.0"
 matplotlib = "^3.3.3"
+jaconv = "^0.2.4"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153

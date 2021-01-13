@@ -13,10 +13,18 @@ Topic: final dictionary output
 
 Topic: Japanese Support
 
-* Find larger frequency list
+* Find larger frequency list:
+    * EDICT freq from http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz
+    - Quick check that it contains all kanji
+    - if not, try updating aligner for use with kana and letters
+    - if enough, add download and CSV conversion to build_db
+        - and load the CSV in find_regularities
+* Possibly add kana support to aligner to find more common words
+* allow っ to be a wildcard
 * provide historical spellings for Japanese characters
 * when outputting group components, get Japanese glyphs where appropriate
 * possibly add Unihan pronunciations when missing from Joyo
+* Possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Korean Support
 
