@@ -45,6 +45,22 @@ def _read_joyo():
     return old_char_to_prons, new_char_to_prons
 
 
+def _read_edict_freq(aligner):
+    log.info("Loading EDICT frequency list...")
+    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    with open(GENERATED_DATA_DIR / "edict-freq.tsv") as f:
+        num_words = 0
+        for line in f.readlines():
+            line = line.strip()
+            surface, surface_normalized, pronunciation, frequency = line.split("\t")
+            alignment = aligner.align(surface_normalized, pronunciation)
+            if alignment:
+                for c, pron in alignment.items():
+                    char_to_pron_to_words[c][pron].append(surface)
+                num_words += 1
+    return char_to_pron_to_words
+
+
 def _read_unihan():
     log.info("Loading unihan data...")
     # TODO: read path from constants file
@@ -252,8 +268,8 @@ def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
     prons_to_move = defaultdict(list)
     for char, prons in char_to_prons.items():
         for p in prons:
-            if _ := char_to_pron_to_words.get(char, {}).get(p):
-                found_words.append(f"{char}/{p}")
+            if word := char_to_pron_to_words.get(char, {}).get(p):
+                found_words.append(f"{char}/{p}: {word}")
                 prons_to_move[char].append(p)
             else:
                 missing_words.append(f"{char}/{p}")
@@ -290,7 +306,8 @@ def main():
         # new glyphs are matchable against modern word lists
         char_to_prons, new_char_to_prons = _read_joyo()
         aligner = Aligner(new_char_to_prons)
-        char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
+        # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
+        char_to_pron_to_vocab = _read_edict_freq(aligner)
         found_words, missing_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
         )
@@ -339,8 +356,6 @@ def main():
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
-    with open(out_dir / "missing_words.json", "w") as f:
-        f.write(_format_json(missing_words))
     with open(out_dir / "found_words.json", "w") as f:
         f.write(_format_json(found_words))
 

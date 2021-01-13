@@ -1,9 +1,11 @@
 import csv
 import dataclasses
 import json
+import tarfile
 import zipfile
 from collections import defaultdict
 
+import jaconv
 import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
@@ -17,6 +19,11 @@ UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
 YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
+
+EDICT_FREQ_URL = "http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz"
+EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"
+EDICT_FREQ_DIR = EDICT_FREQ_TARBALL.with_suffix("").with_suffix("")
+SIMPLIFIED_EDICT_FREQ = GENERATED_DATA_DIR / "edict-freq.tsv"
 
 PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "chars_to_components.tsv"
 
@@ -123,6 +130,58 @@ def ytenx_download():
     else:
         with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
+
+
+def edict_freq_download():
+    """Download, unzip and reformat Utsumi Hiroshi's frequency-annotated EDICT"""
+
+    # download
+    if EDICT_FREQ_TARBALL.exists() and EDICT_FREQ_TARBALL.stat().st_size > 0:
+        log.info(f"{EDICT_FREQ_TARBALL.name} already exists; skipping download")
+    else:
+        log.info(
+            f"Downloading frequency-annotated EDICT to {EDICT_FREQ_TARBALL.name}..."
+        )
+        r = requests.get(EDICT_FREQ_URL, stream=True)
+        with open(EDICT_FREQ_TARBALL, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    # unzip
+    if EDICT_FREQ_DIR.exists() and EDICT_FREQ_DIR.is_dir():
+        log.info(f"  {EDICT_FREQ_DIR.name} already exists; skipping decompress")
+    else:
+        tar = tarfile.open(EDICT_FREQ_TARBALL, "r:gz")
+        tar.extractall(GENERATED_DATA_DIR)
+        tar.close()
+
+
+def edict_freq_format():
+    """Write a simplified version of the edict frequency document"""
+
+    log.info(f"Simplifying data in {EDICT_FREQ_DIR.name}...")
+    words = []
+    with open(EDICT_FREQ_DIR / "edict-freq-20081002") as f:
+        for line in f.readlines()[1:]:
+            word = line.split(" ")[0]
+            word_normalized = jaconv.hira2kata(word)
+            freq = int(line.split("#")[-1][:-2])
+            if "[" not in line:
+                # line contains no kanji
+                continue
+            pron = line.split("[")[1].split("]")[0]
+            # use Katakana to match other phonetic sources
+            pron_katakana = jaconv.hira2kata(pron)
+            # negative frequency to sort descending
+            words.append((-freq, word, word_normalized, pron_katakana))
+
+    log.info(f"  Writing {SIMPLIFIED_EDICT_FREQ.name}...")
+    with open(SIMPLIFIED_EDICT_FREQ, "w") as f:
+        for entry in sorted(words):
+            f.write("\t".join(entry[1:]))
+            f.write("\t")
+            f.write(str(-entry[0]))
+            f.write("\n")
 
 
 def write_phonetic_components():
@@ -318,10 +377,12 @@ def expand_unihan():
 def main():
     unihan_download()
     ytenx_download()
+    edict_freq_download()
+    edict_freq_format()
     write_phonetic_components()
     jun_da_char_freq_download()
 
-    expand_unihan()
+    # expand_unihan()
 
 
 if __name__ == "__main__":
