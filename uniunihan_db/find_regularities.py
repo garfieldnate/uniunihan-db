@@ -58,6 +58,11 @@ def _read_edict_freq(aligner):
                 for c, pron in alignment.items():
                     char_to_pron_to_words[c][pron].append(surface)
                 num_words += 1
+            if surface == "伴走":
+                print(alignment)
+                print(line)
+                print(surface)
+                print(pronunciation)
     return char_to_pron_to_words
 
 

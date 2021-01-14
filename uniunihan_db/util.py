@@ -31,8 +31,17 @@ def configure_logging(name):
 class Aligner:
     """A word/furigana character aligner"""
 
+    rendaku = {
+        "ハ": "バ",
+        "ヒ": "ビ",
+        "フ": "ブ",
+        "へ": "ベ",
+        "ホ": "ボ",
+    }
+
     def __init__(self, char_to_prons):
         self.char_to_prons = char_to_prons
+        self.sokuon = "ッ"
 
     def align(self, s, p):
         """Recursively construct a char->pronunciation mapping for the characters in s and the pronunciation in p.
@@ -40,13 +49,23 @@ class Aligner:
         that each character in s has one pronunciation in p."""
         if s:
             char = s[0]
-            for pron in self.char_to_prons.get(char, []):
+            # reverse sort to get dakuon spellings first gives more exact pronunciations for characters with matching pronunciations with and without dakuon
+            for pron in sorted(self.char_to_prons.get(char, []), reverse=True):
+                matched_pron = None
                 if p.startswith(pron):
+                    matched_pron = pron
+                elif p.startswith(pron[:-1] + self.sokuon):
+                    matched_pron = pron[:-1] + self.sokuon
+                elif pron[0] in Aligner.rendaku.keys() and p.startswith(
+                    Aligner.rendaku[pron[0]] + pron[1:]
+                ):
+                    matched_pron = Aligner.rendaku[pron[0]] + pron[1:]
+                if matched_pron:
                     # base case: this character must map to this pronunciation
-                    if len(p) == len(pron):
+                    if len(p) == len(matched_pron):
                         return {char: pron}
                     # recurse to see if this pronunciation gives a viable alignment
-                    if alignment := self.align(s[1:], p.removeprefix(pron)):
+                    if alignment := self.align(s[1:], p.removeprefix(matched_pron)):
                         # if successful, add this char->pron mapping to the alignment and return it
                         alignment[char] = pron
                         return alignment

@@ -1,6 +1,6 @@
 # The joyo (Japan general use) kanji with their meanings and readings.
 # are subsets of Unihan deemed to be general use (e.g. obscure meanings and readings are left out).
-# Copied from https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji, which was copied from https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/pdf/joyokanjihyo_20101130.
+# Copied from https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji, which was copied from https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/pdf/joyokanjihyo_20101130.pdf.
 number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1,亜,亞,二,7,S,,sub-,ア,
 2,哀,,口,9,S,,pathetic,アイ,あわ-れ|あわ-れむ
@@ -1636,7 +1636,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1632,拍,,手,8,S,,clap,ハク|（ヒョウ）
 1633,泊,,水,8,S,,overnight,ハク,と-まる|と-める
 1634,迫,,辵,8,S,,urge,ハク,せま-る
-1635,剝,,刀,10,S,2010,peel,ハク,は-がす|は-ぐ|は-がれる|は-げる
+1635,剥,剝,刀,10,S,2010,peel,ハク,は-がす|は-ぐ|は-がれる|は-げる
 1636,舶,,舟,11,S,,liner,ハク,
 1637,博,,十,12,4,,Dr.,ハク|（バク）
 1638,薄,,艸,16,S,,dilute,ハク,うす-い|うす-める|うす-まる|うす-らぐ|うす-れる
