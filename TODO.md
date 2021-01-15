@@ -1,5 +1,12 @@
 # TODO
 
+Topic: groupings
+
+* Add method for getting characters in nice order
+    - order most numerous readings;
+    - return in groups until none left
+* Possibly replace ytenx with phonetic series from Wikipedia
+
 Topic: Mandarin support
 
 * Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
@@ -9,11 +16,14 @@ Topic: Mandarin support
 Topic: final dictionary output
 
 * Output final data (json) per char in desired order
+    - group membership, exceptional status
+    - alternate forms
+    - keyword(s)
     - pronunciations with example high-frequency words
+        - pronunciation
+        - English meaning
         - possibly with word frequency score
     - possibly historical pronunciations
-    - group membership
-    - exceptional status
 * for singleton chars:
     - order chars by commonness of that word
 
@@ -31,12 +41,6 @@ Topic: Vietnamese Support
 
 * Get word frequency list
 * Get han tu spellings for words
-
-Topic: groupings
-
-* Group characters in sub-headings (or mark exceptional)
-    - how does Heisig do it?
-* Possibly replace ytenx with phonetic series from Wikipedia
 
 ## Tasks
 

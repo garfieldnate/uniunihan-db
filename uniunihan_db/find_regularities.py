@@ -4,9 +4,9 @@ import dataclasses
 import json
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
-from enum import IntEnum
 from typing import DefaultDict, Dict, List, Set
 
+from .component_group import ComponentGroup, PurityType
 from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
 
 log = configure_logging(__name__)
@@ -127,69 +127,13 @@ def _read_jp_netflix(aligner, max_words=1_000_000):
     return char_to_pron_to_words
 
 
-# Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
-class PurityType(IntEnum):
-    PURE = 1
-    SEMI_PURE = 2
-    # At least 4 chars, only 2 pronunciations
-    MIXED_A = 3
-    # At least 4 chars, only 3 pronunciations
-    MIXED_B = 4
-    # At least 4 chars, at least 1 shared pronunciation
-    MIXED_C = 5
-    # At least one shared pronunciation
-    MIXED_D = 6
-    # Multiple characters, no pattern found
-    NO_PATTERN = 7
-    # Only one character in the group
-    SINGLETON = 8
-
-
-@dataclass
-class ComponentGroup:
-    component: str
-    prons_to_chars: Dict[str, Set[str]]
-    chars: List[str]
-
-    def __post_init__(self):
-        num_prons = len(self.prons_to_chars)
-
-        self.exceptions = {}
-        for pron, chars in self.prons_to_chars.items():
-            if len(chars) == 1:
-                self.exceptions[pron] = next(iter(chars))
-
-        self.purity_type = PurityType.NO_PATTERN
-
-        if len(self.chars) == 1:
-            self.purity_type = PurityType.SINGLETON
-        elif num_prons == 1:
-            self.purity_type = PurityType.PURE
-        elif num_prons == 2 and len(self.exceptions) == 1:
-            self.purity_type = PurityType.SEMI_PURE
-        elif len(self.chars) >= 4:
-            if num_prons == 2:
-                self.purity_type = PurityType.MIXED_A
-            elif num_prons == 3:
-                self.purity_type = PurityType.MIXED_B
-            elif len(self.exceptions) != num_prons:
-                self.purity_type = PurityType.MIXED_C
-        elif len(self.exceptions) != num_prons:
-            self.purity_type = PurityType.MIXED_D
-
-
 def _get_component_groups(index):
     groups = []
     for component, pron_to_chars in index.comp_pron_char.items():
-        all_chars = set()
-        for chars in pron_to_chars.values():
-            all_chars.update(chars)
-
         group = ComponentGroup(
             component,
             # sort pronunciations by number of characters
             OrderedDict(sorted(pron_to_chars.items(), key=lambda item: -len(item[1]))),
-            all_chars,
         )
         groups.append(group)
 
