@@ -52,11 +52,19 @@ def _read_edict_freq(aligner):
         num_words = 0
         for line in f.readlines():
             line = line.strip()
-            surface, surface_normalized, pronunciation, frequency = line.split("\t")
+            surface, surface_normalized, pronunciation, english, frequency = line.split(
+                "\t"
+            )
             alignment = aligner.align(surface_normalized, pronunciation)
             if alignment:
+                word = {
+                    "surface": surface,
+                    "pron": pronunciation,
+                    "freq": int(frequency),
+                    "en": english,
+                }
                 for c, pron in alignment.items():
-                    char_to_pron_to_words[c][pron].append(surface)
+                    char_to_pron_to_words[c][pron].append(word)
                 num_words += 1
     return char_to_pron_to_words
 
@@ -207,18 +215,18 @@ def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
     char_to_pron_to_words: dict character -> pronunciation -> list
     of vocab sorted by frequency of use"""
 
-    found_words = []
+    char_to_words = defaultdict(lambda: defaultdict(list))
     missing_words = []
     prons_to_move = defaultdict(list)
     for char, prons in char_to_prons.items():
         for p in prons:
             if word := char_to_pron_to_words.get(char, {}).get(p):
-                found_words.append(f"{char}/{p}: {word}")
+                char_to_words[char][p].extend(word)
                 prons_to_move[char].append(p)
             else:
                 missing_words.append(f"{char}/{p}")
 
-    return found_words, missing_words
+    return char_to_words, missing_words
 
 
 def _format_json(data):
@@ -252,7 +260,7 @@ def main():
         aligner = Aligner(new_char_to_prons)
         # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
-        found_words, missing_words = _get_vocab_per_char_pron(
+        char_to_words, missing_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
         )
     elif args.language == "zh-HK":
@@ -288,9 +296,7 @@ def main():
             f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
         )
 
-    log.info(
-        f"Found words for {len(found_words)}/{len(found_words) + len(missing_words)} words"
-    )
+    log.info(f"Missing words for {len(missing_words)} char/pron pairs")
 
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -300,8 +306,38 @@ def main():
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:
         f.write(_format_json(index.no_pron_chars))
-    with open(out_dir / "found_words.json", "w") as f:
-        f.write(_format_json(found_words))
+
+    # FINAL OUTPUT
+    log.info("Constructing final output...")
+    final = []
+    for g in groups:
+        cluster_entries = []
+
+        for cluster in g.get_char_presentation():
+            cluster_entry = {}
+            for c in cluster:
+                pron_to_vocab = char_to_words[c]
+                vocab_entry = {}
+                for pron, vocab_list in pron_to_vocab.items():
+                    # find a multi-char word if possible
+                    try:
+                        vocab_entry[pron] = next(
+                            filter(lambda v: len(v["surface"]) > 1, vocab_list)
+                        )
+                    except StopIteration:
+                        vocab_entry[pron] = vocab_list[0]
+                c_entry = {"prons": list(pron_to_vocab.keys()), "vocab": vocab_entry}
+                cluster_entry[c] = c_entry
+            cluster_entries.append(cluster_entry)
+        group_entry = {
+            "component": g.component,
+            "clusters": cluster_entries,
+            "purity": g.purity_type.name,
+        }
+        final.append(group_entry)
+
+    with open(out_dir / "final_output.json", "w") as f:
+        f.write(_format_json(final))
 
 
 if __name__ == "__main__":

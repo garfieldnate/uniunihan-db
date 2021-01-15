@@ -2,7 +2,7 @@
 
 Topic: groupings
 
-* Move pronunciation grouping into ComponentGroup
+* possibly move pronunciation grouping into ComponentGroup
 * Possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
@@ -14,14 +14,11 @@ Topic: Mandarin support
 Topic: final dictionary output
 
 * Output final data (json) per char in desired order
-    - group membership, exceptional status
-    - alternate forms
-    - keyword(s)
-    - pronunciations with example high-frequency words
-        - pronunciation
-        - English meaning
-        - possibly with word frequency score
-    - possibly historical pronunciations
+    - new dict for char data:
+        - keyword
+        - standard and alternate forms
+        - possibly historical pronunciations
+            - may require new data type
 * for singleton chars:
     - order chars by commonness of that word
 

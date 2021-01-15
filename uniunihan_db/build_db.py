@@ -166,6 +166,7 @@ def edict_freq_format():
             word = line.split(" ")[0]
             word_normalized = jaconv.hira2kata(word)
             freq = int(line.split("#")[-1][:-2])
+            english = "/".join(line.split("/")[1:-2])
             if "[" not in line:
                 # line contains no kanji
                 continue
@@ -173,7 +174,7 @@ def edict_freq_format():
             # use Katakana to match other phonetic sources
             pron_katakana = jaconv.hira2kata(pron)
             # negative frequency to sort descending
-            words.append((-freq, word, word_normalized, pron_katakana))
+            words.append((-freq, word, word_normalized, pron_katakana, english))
 
     log.info(f"  Writing {SIMPLIFIED_EDICT_FREQ.name}...")
     with open(SIMPLIFIED_EDICT_FREQ, "w") as f:
