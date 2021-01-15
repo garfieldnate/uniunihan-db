@@ -3,28 +3,24 @@
 Topic: Mandarin support
 
 * Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
+* Provide simplified character along with traditional
+* Get 三体 chapter 1 word list
 
 Topic: final dictionary output
 
 * Output final data (json) per char in desired order
-* Provide highest frequency word for all characters and their pronunciations
+    - pronunciations with example high-frequency words
+        - possibly with word frequency score
+    - possibly historical pronunciations
+    - group membership
+    - exceptional status
 * for singleton chars:
     - order chars by commonness of that word
 
 Topic: Japanese Support
 
-* Find larger frequency list:
-    * EDICT freq from http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz
-    - Quick check that it contains all kanji
-    - if not, try updating aligner for use with kana and letters
-    - if enough, add download and CSV conversion to build_db
-        - and load the CSV in find_regularities
-* Possibly add kana support to aligner to find more common words
-* allow っ to be a wildcard
-* provide historical spellings for Japanese characters
-* when outputting group components, get Japanese glyphs where appropriate
+* possibly get Japanese glyph alternatives for components
 * possibly add Unihan pronunciations when missing from Joyo
-* Possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Korean Support
 
@@ -35,6 +31,12 @@ Topic: Vietnamese Support
 
 * Get word frequency list
 * Get han tu spellings for words
+
+Topic: groupings
+
+* Group characters in sub-headings (or mark exceptional)
+    - how does Heisig do it?
+* Possibly replace ytenx with phonetic series from Wikipedia
 
 ## Tasks
 

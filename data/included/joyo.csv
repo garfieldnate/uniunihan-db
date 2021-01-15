@@ -1,6 +1,9 @@
 # The joyo (Japan general use) kanji with their meanings and readings.
 # are subsets of Unihan deemed to be general use (e.g. obscure meanings and readings are left out).
-# Copied from https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji, which was copied from https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/pdf/joyokanjihyo_20101130.
+# Copied from https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji, which was copied from https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/pdf/joyokanjihyo_20101130.pdf.
+# 𠮟, 塡, 剝, 頰 have been moved to the "old" field, with 叱, 填, 剥, 頬 in
+# the "new" field; this reflects usage better, and these characters are
+# listed as acceptable substitutes in the original government document.
 number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1,亜,亞,二,7,S,,sub-,ア,
 2,哀,,口,9,S,,pathetic,アイ,あわ-れ|あわ-れむ
@@ -831,7 +834,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 827,識,,言,19,5,,discriminating,シキ,
 828,軸,,車,12,S,,axis,ジク,
 829,七,,一,2,1,,seven,シチ,なな|なな-つ|（なの）
-830,𠮟,,口,5,S,2010,scold,シツ,しか-る
+# 𠮟 is the official one, but it's usually replaced by 叱
+830,叱,𠮟,口,5,S,2010,scold,シツ,しか-る
 831,失,,大,5,4,,lose,シツ,うしな-う
 832,室,,宀,9,2,,room,シツ,むろ
 833,疾,,疒,10,S,,rapidly,シツ,
@@ -1480,7 +1484,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1476,展,,尸,10,6,,expand,テン,
 1477,添,,水,11,S,,annexed,テン,そ-える|そ-う
 1478,転,轉,車,11,3,,revolve,テン,ころ-がる|ころ-げる|ころ-がす|ころ-ぶ
-1479,塡,,土,13,S,2010,fill in,テン,
+# 塡 is the official one, but it's usually replaced by 填
+1479,填,塡,土,13,S,2010,fill in,テン,
 1480,田,,田,5,1,,rice paddy,デン,た
 1481,伝,傳,人,6,4,,transmit,デン,つた-わる|つた-える|つた-う
 1482,殿,,殳,13,S,,Mr.,デン|テン,との|どの
@@ -1636,7 +1641,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1632,拍,,手,8,S,,clap,ハク|（ヒョウ）
 1633,泊,,水,8,S,,overnight,ハク,と-まる|と-める
 1634,迫,,辵,8,S,,urge,ハク,せま-る
-1635,剝,,刀,10,S,2010,peel,ハク,は-がす|は-ぐ|は-がれる|は-げる
+# 剝 is the official one, but it's usually replaced by 剥
+1635,剥,剝,刀,10,S,2010,peel,ハク,は-がす|は-ぐ|は-がれる|は-げる
 1636,舶,,舟,11,S,,liner,ハク,
 1637,博,,十,12,4,,Dr.,ハク|（バク）
 1638,薄,,艸,16,S,,dilute,ハク,うす-い|うす-める|うす-まる|うす-らぐ|うす-れる
@@ -1875,7 +1881,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1871,暴,,日,15,5,,outburst,ボウ|（バク）,あば-く|あば-れる
 1872,膨,,肉,16,S,,swell,ボウ,ふく-らむ|ふく-れる
 1873,謀,,言,16,S,,conspire,ボウ|（ム）,はか-る
-1874,頰,,頁,16,S,2010,cheek,,ほお
+# 頰 is the official one, but it's usually replaced by 頬
+1874,頬,頰,頁,16,S,2010,cheek,,ほお
 1875,北,,匕,5,2,,north,ホク,きた
 1876,木,,木,4,1,,tree,ボク|モク,き|（こ）
 1877,朴,,木,6,S,1981,crude,ボク,
