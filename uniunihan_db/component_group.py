@@ -1,6 +1,7 @@
+import copy
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Dict, Set
+from typing import Dict, List
 
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
@@ -26,11 +27,12 @@ class PurityType(IntEnum):
 @dataclass
 class ComponentGroup:
     component: str
-    pron_to_chars: Dict[str, Set[str]]
+    pron_to_chars: Dict[str, List[str]]
 
     def __post_init__(self):
         self.chars = set()
         for chars in self.pron_to_chars.values():
+            chars.sort()
             self.chars.update(chars)
 
         num_prons = len(self.pron_to_chars)
@@ -38,7 +40,7 @@ class ComponentGroup:
         self.exceptions = {}
         for pron, chars in self.pron_to_chars.items():
             if len(chars) == 1:
-                self.exceptions[pron] = next(iter(chars))
+                self.exceptions[pron] = chars[0]
 
         self.purity_type = PurityType.NO_PATTERN
 
@@ -57,3 +59,33 @@ class ComponentGroup:
                 self.purity_type = PurityType.MIXED_C
         elif len(self.exceptions) != num_prons:
             self.purity_type = PurityType.MIXED_D
+
+    def get_char_presentation(self):
+        """Returns a list of lists of characters which share a pronunciation.
+        The lists are sorted by their size and then by the pronunciation which they share."""
+        # sort by most characters and then by pronunciation
+        def sorter(item):
+            return (-len(item[1]), item[0])
+
+        pron_to_chars = copy.deepcopy(self.pron_to_chars)
+        presentation = []
+        while pron_to_chars:
+            # get next group of chars
+            pron, added_chars = min(pron_to_chars.items(), key=sorter)
+            presentation.append(added_chars)
+
+            # delete them from the multimap
+            del pron_to_chars[pron]
+            to_delete = []
+            for pron, chars in pron_to_chars.items():
+                for c in added_chars:
+                    try:
+                        chars.remove(c)
+                    except ValueError:
+                        pass
+                if not chars:
+                    to_delete.append(pron)
+            for pron in to_delete:
+                del pron_to_chars[pron]
+
+        return presentation

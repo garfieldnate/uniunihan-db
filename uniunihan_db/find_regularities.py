@@ -163,7 +163,7 @@ class Index:
 
 def _index(char_to_prons, char_to_comp):
     # component -> pronunciation -> character
-    comp_pron_char = defaultdict(lambda: defaultdict(set))
+    comp_pron_char = defaultdict(lambda: defaultdict(list))
     pron_to_chars = defaultdict(set)
     comp_to_char = defaultdict(set)
     no_comp_chars = set()
@@ -179,7 +179,7 @@ def _index(char_to_prons, char_to_comp):
             continue
         for char_pron in char_prons:
             pron_to_chars[char_pron].add(char)
-            comp_pron_char[component][char_pron].add(char)
+            comp_pron_char[component][char_pron].append(char)
 
     # get the characters which have a unique reading
     unique_readings = {}

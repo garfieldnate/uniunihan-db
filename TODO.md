@@ -2,9 +2,7 @@
 
 Topic: groupings
 
-* Add method for getting characters in nice order
-    - order most numerous readings;
-    - return in groups until none left
+* Move pronunciation grouping into ComponentGroup
 * Possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
