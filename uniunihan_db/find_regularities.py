@@ -243,8 +243,6 @@ class Index:
     comp_to_char: DefaultDict[str, Set[str]]
     # char -> components it contains
     char_to_comp: Dict[str, str]
-    # pronuncation -> all chars with that pronunciation
-    pron_to_chars: Dict[str, Set[str]]
     # unique pronunciations and their corresponding character
     unique_pron_to_char: Dict[str, str]
     # characters without any pronunciations
@@ -257,7 +255,6 @@ def _index(char_to_prons, char_to_comp):
     # component -> pronunciation -> character
     comp_pron_char = defaultdict(lambda: defaultdict(list))
     pron_to_chars = defaultdict(set)
-    comp_to_char = defaultdict(set)
     no_comp_chars = set()
     no_pron_chars = set()
     for char, char_prons in char_to_prons.items():
@@ -265,7 +262,6 @@ def _index(char_to_prons, char_to_comp):
             no_comp_chars.add(char)
             continue
         component = char_to_comp[char]
-        comp_to_char[component].add(char)
         if not char_prons:
             no_pron_chars.add(char)
             continue
@@ -285,9 +281,7 @@ def _index(char_to_prons, char_to_comp):
     return Index(
         char_to_prons,
         comp_pron_char,
-        comp_to_char,
         char_to_comp,
-        pron_to_chars,
         unique_readings,
         no_pron_chars,
         no_comp_chars,
