@@ -1,7 +1,7 @@
 import copy
-from dataclasses import dataclass
+from collections import defaultdict
 from enum import IntEnum
-from typing import Dict, List
+from typing import Dict, Iterable
 
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
@@ -24,16 +24,25 @@ class PurityType(IntEnum):
     SINGLETON = 8
 
 
-@dataclass
 class ComponentGroup:
-    component: str
-    pron_to_chars: Dict[str, List[str]]
+    def __init__(self, component: str, char_to_prons: Dict[str, Iterable[str]]):
+        """component: phonetic component common to all characters in the group
+        char_to_prons: dict[char -> [pronunciations]] for all characters in the group"""
+        self.component = component
 
-    def __post_init__(self):
         self.chars = set()
+        # reverse the char/pron mapping to determine pronunciation regularities
+        self.pron_to_chars = defaultdict(list)
+        for char, prons in char_to_prons.items():
+            self.chars.add(char)
+            for p in prons:
+                self.pron_to_chars[p].append(char)
+        if not self.chars:
+            raise ValueError(f"No characters were provided to group {self.component}")
+
+        # sort chars so that iteration is deterministic
         for chars in self.pron_to_chars.values():
             chars.sort()
-            self.chars.update(chars)
 
         num_prons = len(self.pron_to_chars)
 
@@ -63,7 +72,7 @@ class ComponentGroup:
     def get_char_presentation(self):
         """Returns a list of lists of characters which share a pronunciation.
         The lists are sorted by their size and then by the pronunciation which they share."""
-        # sort by most characters and then by pronunciation
+        # sort by number of characters descending and then orthographically by pronunciation
         def sorter(item):
             return (-len(item[1]), item[0])
 

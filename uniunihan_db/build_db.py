@@ -25,7 +25,7 @@ EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"
 EDICT_FREQ_DIR = EDICT_FREQ_TARBALL.with_suffix("").with_suffix("")
 SIMPLIFIED_EDICT_FREQ = GENERATED_DATA_DIR / "edict-freq.tsv"
 
-PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "chars_to_components.tsv"
+PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "components_to_chars.tsv"
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"
@@ -207,6 +207,7 @@ def write_phonetic_components():
             char_to_component[char] = component
     with open(INCLUDED_DATA_DIR / "manual_components.json") as f:
         extra_char_to_components = json.load(f)
+        del extra_char_to_components["//"]
         char_to_component.update(extra_char_to_components)
 
     log.info("  Addding phonetic components for variants...")
@@ -217,11 +218,17 @@ def write_phonetic_components():
                 variant_to_component[c] = char_to_component[char]
     char_to_component.update(variant_to_component)
 
+    # group by component to make it easier to use
+    component_to_chars = defaultdict(list)
+    for char, component in sorted(char_to_component.items()):
+        component_to_chars[component].append(char)
+
     log.info(f"  Writing phonetic components to {PHONETIC_COMPONENTS_FILE}")
     with open(PHONETIC_COMPONENTS_FILE, "w") as f:
-        f.write("character\tcomponent\n")
-        for character, component in char_to_component.items():
-            f.write(f"{character}\t{component}\n")
+        f.write("component\tcharacters\n")
+        for component, chars in component_to_chars.items():
+            chars = "".join(chars)
+            f.write(f"{component}\t{chars}\n")
     log.info(f"  Wrote {len(char_to_component)} character/component pairs")
 
     return char_to_component

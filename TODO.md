@@ -110,6 +110,7 @@ Prediction experiments:
 * Unihan: relationship between 駄 and 馱 not given; between 瓶 and 甁, too (sinjitai/kyuujitai)
 * Unihan: relationship between 栃𣜜櫔 not given
 * Unihan: missing relationship between 顏顔, 匂匈, 倶俱 (from ytenx JihThex),
+* python json: ignore '//' key everywhere
 
 
 ## Dev Tools

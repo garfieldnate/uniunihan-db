@@ -1,10 +1,9 @@
 import argparse
 import csv
-import dataclasses
 import json
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import DefaultDict, Dict, List, Set
+from typing import Dict, List, Set
 
 from .component_group import ComponentGroup, PurityType
 from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
@@ -73,7 +72,7 @@ class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
             return list(obj)
-        elif dataclasses.is_dataclass(obj):
+        elif isinstance(obj, ComponentGroup):
             return vars(obj)
 
         return json.JSONEncoder.default(self, obj)
@@ -189,15 +188,15 @@ def _get_hk_ed_chars(unihan):
 
 def _read_phonetic_components():
     log.info("Loading phonetic components...")
-    char_to_component = {}
-    with open(GENERATED_DATA_DIR / "chars_to_components.tsv") as f:
+    comp_to_char = {}
+    with open(GENERATED_DATA_DIR / "components_to_chars.tsv") as f:
         rows = csv.DictReader(f, delimiter="\t")
         for r in rows:
-            char = r["character"]
             component = r["component"]
-            char_to_component[char] = component
+            chars = r["characters"]
+            comp_to_char[component] = set(chars)
 
-    return char_to_component
+    return comp_to_char
 
 
 def _read_jp_netflix(aligner, max_words=1_000_000):
@@ -219,30 +218,11 @@ def _read_jp_netflix(aligner, max_words=1_000_000):
     return char_to_pron_to_words
 
 
-def _get_component_groups(index):
-    groups = []
-    for component, pron_to_chars in index.comp_pron_char.items():
-        group = ComponentGroup(
-            component,
-            # sort pronunciations by number of characters
-            OrderedDict(sorted(pron_to_chars.items(), key=lambda item: -len(item[1]))),
-        )
-        groups.append(group)
-
-    # Organize and sort the groups for easier inspection
-    return sorted(groups, key=lambda g: (g.purity_type, -len(g.chars)))
-
-
 @dataclass
 class Index:
+    groups: List[ComponentGroup]
     # char -> pronuncitions
     char_to_prons: Dict[str, List[str]]
-    # component -> pronunciation -> chars with component and pronunciation
-    comp_pron_char: DefaultDict[str, DefaultDict[str, List[str]]]
-    # component -> chars containing it
-    comp_to_char: DefaultDict[str, Set[str]]
-    # char -> components it contains
-    char_to_comp: Dict[str, str]
     # unique pronunciations and their corresponding character
     unique_pron_to_char: Dict[str, str]
     # characters without any pronunciations
@@ -251,40 +231,54 @@ class Index:
     no_comp_chars: Set[str]
 
 
-def _index(char_to_prons, char_to_comp):
-    # component -> pronunciation -> character
-    comp_pron_char = defaultdict(lambda: defaultdict(list))
-    pron_to_chars = defaultdict(set)
-    no_comp_chars = set()
+def _index(char_to_prons, comp_to_char):
+    # Group and classify characters by component
+    chars_assigned_to_a_group = set()
+    groups = []
+    for component, chars in comp_to_char.items():
+        # comp_to_char likely contains way more characters than we need
+        chars = {c for c in chars if c in char_to_prons}
+        if not chars:
+            continue
+        c2p = {c: prons for c, prons in char_to_prons.items() if c in chars}
+        group = ComponentGroup(
+            component,
+            c2p,
+        )
+        groups.append(group)
+        chars_assigned_to_a_group.update(chars)
+
+    # Organize and sort the groups for easier inspection
+    groups.sort(key=lambda g: (g.purity_type, -len(g.chars)))
+
+    # find characters with no assigned group
+    all_chars = set(char_to_prons.keys())
+    chars_with_no_group = all_chars - chars_assigned_to_a_group
+
+    # Find characters with no listed pronunciations
     no_pron_chars = set()
-    for char, char_prons in char_to_prons.items():
-        if char not in char_to_comp:
-            no_comp_chars.add(char)
-            continue
-        component = char_to_comp[char]
-        if not char_prons:
+    for char, prons in char_to_prons.items():
+        if not prons:
             no_pron_chars.add(char)
-            continue
+    no_pron_chars -= chars_with_no_group
+
+    # get unique character readings
+    pron_to_chars = defaultdict(set)
+    for char, char_prons in char_to_prons.items():
         for char_pron in char_prons:
             pron_to_chars[char_pron].add(char)
-            comp_pron_char[component][char_pron].append(char)
-
-    # get the characters which have a unique reading
-    unique_readings = {}
-    for pron, chars in pron_to_chars.items():
-        if len(chars) == 1:
-            unique_readings[pron] = next(iter(chars))
-
-    # ensure that pronunciations are ordered deterministically in char_to_prons dictionary
-    char_to_prons = {k: sorted(v) for k, v in char_to_prons.items()}
+    unique_readings = {
+        pron: next(iter(chars))
+        for pron, chars in pron_to_chars.items()
+        if len(chars) == 1
+    }
 
     return Index(
+        groups,
         char_to_prons,
-        comp_pron_char,
-        char_to_comp,
         unique_readings,
         no_pron_chars,
-        no_comp_chars,
+        chars_with_no_group,
     )
 
 
@@ -329,11 +323,11 @@ def main():
 
     args = parser.parse_args()
 
-    char_to_comp = _read_phonetic_components()
+    comp_to_char = _read_phonetic_components()
 
     if args.language == "jp":
-        # old glyphs give a better matching with non-Japanese datasets
-        # new glyphs are matchable against modern word lists
+        # old glyphs give a better matching with non-Japanese datasets,
+        # and only new glyphs are matchable against modern word lists
         char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
         aligner = Aligner(new_char_to_prons)
         # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
@@ -363,24 +357,22 @@ def main():
         log.error(f"Cannot handle language {args.language} yet")
         exit()
 
-    index = _index(char_to_prons, char_to_comp)
-    groups = _get_component_groups(index)
+    index = _index(char_to_prons, comp_to_char)
 
     purity_to_chars = defaultdict(set)
     purity_to_groups = defaultdict(int)
     exceptional_chars = set()
-    for g in groups:
+    for g in index.groups:
         purity_to_chars[g.purity_type].update(g.chars)
         purity_to_groups[g.purity_type] += 1
         exceptional_chars.update(g.exceptions.values())
-
     log.info(
         f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
     )
     log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
     log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
-    log.info(f"{len(groups)} total groups:")
+    log.info(f"{len(index.groups)} total groups:")
     for purity_type in PurityType:
         log.info(
             f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
@@ -391,7 +383,7 @@ def main():
     out_dir = OUTPUT_DIR / args.language
     out_dir.mkdir(parents=True, exist_ok=True)
     with open(out_dir / "groups.json", "w") as f:
-        f.write(_format_json(groups))
+        f.write(_format_json(index.groups))
     with open(out_dir / "unique_readings.json", "w") as f:
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "no_readings.json", "w") as f:
@@ -400,17 +392,16 @@ def main():
     # FINAL OUTPUT
     log.info("Constructing final output...")
     final = []
-    for g in groups:
+    for g in index.groups:
         cluster_entries = []
-
         for cluster in g.get_char_presentation():
             cluster_entry = {}
             for c in cluster:
                 pron_entries = []
-                pron_to_vocab = char_to_words[c]
+                pron_to_vocab = sorted(char_to_words[c].items())
                 if not pron_to_vocab:
                     raise ValueError(f"Missing pron_to_vocab for {c}")
-                for pron, vocab_list in pron_to_vocab.items():
+                for pron, vocab_list in pron_to_vocab:
                     # find a multi-char word if possible
                     try:
                         vocab = next(
