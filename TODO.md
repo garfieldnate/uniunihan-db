@@ -1,5 +1,8 @@
 # TODO
 
+* Remove unnneeded indexes
+* put language-specific stuff in separate files
+
 Topic: groupings
 
 * possibly move pronunciation grouping into ComponentGroup
@@ -16,15 +19,12 @@ Topic: Mandarin support
 Topic: final dictionary output
 
 * Output final data (json) per char in desired order
-    - new dict for char_pron data:
-        - possibly historical pronunciations
-            - may require new data type
 * for singleton chars:
     - order chars by commonness of their example words
 
 Topic: Japanese Support
 
-* Add historical pronunciations
+* Add kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 * possibly add Unihan pronunciations when missing from Joyo
 

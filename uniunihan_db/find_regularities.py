@@ -94,9 +94,10 @@ def _read_joyo():
                 "kun-yomi": r["kun-yomi"],
                 "grade": r["grade"],
                 "strokes": r["strokes"],
-                "old": r["old"] if r["old"] else None,
                 "new": r["new"],
             }
+            if r["old"]:
+                supplementary_info["old"] = r["old"]
             readings = r["on-yomi"].split("|")
             # remove empty readings;
             # forget about parenthesized readings; focus on the main reading for pattern finding
@@ -134,6 +135,22 @@ def _read_edict_freq(aligner):
                     char_to_pron_to_words[c][pron].append(word)
                 num_words += 1
     return char_to_pron_to_words
+
+
+def _read_historical_on_yomi():
+    log.info("Loading historical on-yomi data...")
+    char_to_new_to_old_pron = defaultdict(dict)
+    with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
+        # filter comments
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
+        for r in rows:
+            modern = r["現代仮名遣い"]
+            historical = r["字音仮名遣い"]
+            chars = r["字"]
+            for c in chars:
+                char_to_new_to_old_pron[c][modern] = historical
+
+    return char_to_new_to_old_pron
 
 
 def _read_unihan():
@@ -333,13 +350,15 @@ def main():
         # convert to old glyphs to match char_to_prons
         old_char_to_words = {}
         for new_char, words in char_to_words.items():
-            for c in char_supplement[new_char]["old"] or []:
+            for c in char_supplement[new_char].get("old", []):
                 old_char_to_words[c] = words
         char_to_words.update(old_char_to_words)
 
         char_to_words.update(JP_VOCAB_OVERRIDE)
         for c in JP_VOCAB_OVERRIDE:
             char_supplement[c]["old"] = c
+
+        char_to_new_to_old_pron = _read_historical_on_yomi()
     elif args.language == "zh-HK":
         unihan = _read_unihan()
         char_to_prons = _get_hk_ed_chars(unihan)
@@ -393,19 +412,24 @@ def main():
         for cluster in g.get_char_presentation():
             cluster_entry = {}
             for c in cluster:
+                pron_entries = []
                 pron_to_vocab = char_to_words[c]
                 if not pron_to_vocab:
                     raise ValueError(f"Missing pron_to_vocab for {c}")
-                vocab_entry = {}
                 for pron, vocab_list in pron_to_vocab.items():
                     # find a multi-char word if possible
                     try:
-                        vocab_entry[pron] = next(
+                        vocab = next(
                             filter(lambda v: len(v["surface"]) > 1, vocab_list)
                         )
                     except StopIteration:
-                        vocab_entry[pron] = vocab_list[0]
-                c_entry = {"prons": list(pron_to_vocab.keys()), "vocab": vocab_entry}
+                        vocab = vocab_list[0]
+                    pron_entry = {"pron": pron, "vocab": vocab}
+                    if old_pron := char_to_new_to_old_pron.get(c, {}).get(pron):
+                        pron_entry["historical"] = old_pron
+                    pron_entries.append(pron_entry)
+
+                c_entry = {"prons": pron_entries}
                 c_entry.update(char_supplement[c])
                 cluster_entry[c] = c_entry
             cluster_entries.append(cluster_entry)
