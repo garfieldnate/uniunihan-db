@@ -28,21 +28,33 @@ def _read_joyo():
     log.info("Loading joyo data...")
     new_char_to_prons = {}
     old_char_to_prons = {}
+    char_to_supplementary_info = {}
     with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
+            # number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
+            supplementary_info = {
+                "keyword": r["English_meaning"],
+                "kun-yomi": r["kun-yomi"],
+                "grade": r["grade"],
+                "strokes": r["strokes"],
+                "old": r["old"] if r["old"] else None,
+                "new": r["new"],
+            }
             readings = r["on-yomi"].split("|")
             # remove empty readings;
             # forget about parenthesized readings; focus on the main reading for pattern finding
             readings = [yomi for yomi in readings if yomi and "（" not in yomi]
             for c in r["new"]:
                 new_char_to_prons[c] = readings
+                char_to_supplementary_info[c] = supplementary_info
             # old glyph same as new glyph when missing
             for c in r["old"] or r["new"]:
                 old_char_to_prons[c] = readings
+                char_to_supplementary_info[c] = supplementary_info
 
-    return old_char_to_prons, new_char_to_prons
+    return old_char_to_prons, new_char_to_prons, char_to_supplementary_info
 
 
 def _read_edict_freq(aligner):
@@ -256,13 +268,19 @@ def main():
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets
         # new glyphs are matchable against modern word lists
-        char_to_prons, new_char_to_prons = _read_joyo()
+        char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
         aligner = Aligner(new_char_to_prons)
         # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
         char_to_words, missing_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
         )
+        # convert to old glyphs to match char_to_prons
+        old_char_to_words = {}
+        for new_char, words in char_to_words.items():
+            for c in char_supplement[new_char]["old"] or []:
+                old_char_to_words[c] = words
+        char_to_words.update(old_char_to_words)
     elif args.language == "zh-HK":
         unihan = _read_unihan()
         char_to_prons = _get_hk_ed_chars(unihan)
@@ -317,6 +335,8 @@ def main():
             cluster_entry = {}
             for c in cluster:
                 pron_to_vocab = char_to_words[c]
+                if not pron_to_vocab:
+                    raise ValueError(f"Missing pron_to_vocab for {c}")
                 vocab_entry = {}
                 for pron, vocab_list in pron_to_vocab.items():
                     # find a multi-char word if possible
@@ -327,6 +347,7 @@ def main():
                     except StopIteration:
                         vocab_entry[pron] = vocab_list[0]
                 c_entry = {"prons": list(pron_to_vocab.keys()), "vocab": vocab_entry}
+                c_entry.update(char_supplement[c])
                 cluster_entry[c] = c_entry
             cluster_entries.append(cluster_entry)
         group_entry = {

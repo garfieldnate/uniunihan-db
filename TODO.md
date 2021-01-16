@@ -3,27 +3,29 @@
 Topic: groupings
 
 * possibly move pronunciation grouping into ComponentGroup
-* Possibly replace ytenx with phonetic series from Wikipedia
+* check for empty chars and pronunciations
+* possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
 
 * Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
 * Provide simplified character along with traditional
+* Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list
 
 Topic: final dictionary output
 
 * Output final data (json) per char in desired order
-    - new dict for char data:
-        - keyword
-        - standard and alternate forms
+    - new dict for char_pron data:
         - possibly historical pronunciations
             - may require new data type
 * for singleton chars:
-    - order chars by commonness of that word
+    - order chars by commonness of their example words
 
 Topic: Japanese Support
 
+* Add historical pronunciations
+* hardcode vocab for 辯辨瓣
 * possibly get Japanese glyph alternatives for components
 * possibly add Unihan pronunciations when missing from Joyo
 
