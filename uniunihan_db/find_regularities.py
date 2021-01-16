@@ -13,6 +13,61 @@ log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
+# These three characters were collapsed in the sinjitai, and we don't have old spellings
+# for vocab, so these have to be specified directly
+JP_VOCAB_OVERRIDE = {
+    "辯": {
+        "ベン": [
+            {
+                "surface": "関西弁",
+                "pron": "カンサイベン",
+                "freq": 42413,
+                "en": "(n) Kansai dialect",
+            }
+        ]
+    },
+    "辨": {
+        "ベン": [
+            {
+                "surface": "弁当",
+                "pron": "ベントウ",
+                "freq": 524433,
+                "en": "(n) bento (Japanese box lunch)",
+            }
+        ]
+    },
+    "瓣": {
+        "ベン": [
+            {
+                "surface": "安全弁",
+                "pron": "アンゼンベン",
+                "freq": 566,
+                "en": "(n) safety valve",
+            }
+        ]
+    },
+    "辦": {
+        "ベン": [
+            {
+                "surface": "合弁会社",
+                "pron": "ゴウベンガイシャ",
+                "freq": 1374,
+                "en": "(n) joint venture or concern",
+            }
+        ]
+    },
+    "辮": {
+        "ベン": [
+            {
+                "surface": "弁髪",
+                "pron": "ベンパツ",
+                "freq": 414,
+                "en": "(n) pigtail/queue",
+            }
+        ]
+    },
+}
+
 
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -281,6 +336,10 @@ def main():
             for c in char_supplement[new_char]["old"] or []:
                 old_char_to_words[c] = words
         char_to_words.update(old_char_to_words)
+
+        char_to_words.update(JP_VOCAB_OVERRIDE)
+        for c in JP_VOCAB_OVERRIDE:
+            char_supplement[c]["old"] = c
     elif args.language == "zh-HK":
         unihan = _read_unihan()
         char_to_prons = _get_hk_ed_chars(unihan)

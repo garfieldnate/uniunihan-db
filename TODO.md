@@ -25,7 +25,6 @@ Topic: final dictionary output
 Topic: Japanese Support
 
 * Add historical pronunciations
-* hardcode vocab for 辯辨瓣
 * possibly get Japanese glyph alternatives for components
 * possibly add Unihan pronunciations when missing from Joyo
 

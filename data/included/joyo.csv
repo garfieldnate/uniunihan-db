@@ -3,7 +3,8 @@
 # Copied from https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji, which was copied from https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/pdf/joyokanjihyo_20101130.pdf.
 # 𠮟, 塡, 剝, 頰 have been moved to the "old" field, with 叱, 填, 剥, 頬 in
 # the "new" field; this reflects usage better, and these characters are
-# listed as acceptable substitutes in the original government document.
+# listed as acceptable substitutes in the original government document.　Additionally,
+# the characters 辦辮 were added to the list of old characters for 弁.
 number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1,亜,亞,二,7,S,,sub-,ア,
 2,哀,,口,9,S,,pathetic,アイ,あわ-れ|あわ-れむ
@@ -1821,7 +1822,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1811,偏,,人,11,S,,partial,ヘン,かたよ-る
 1812,遍,,辵,12,S,,everywhere,ヘン,
 1813,編,,糸,15,5,,compile,ヘン,あ-む
-1814,弁,辨瓣辯,辛瓜辛,5,5,,valve,ベン,
+1814,弁,辨瓣辯辦辮,辛瓜辛,5,5,,valve,ベン,
 1815,便,,人,9,4,,convenience,ベン|ビン,たよ-り
 1816,勉,勉,力,10,3,,exertion,ベン,
 1817,歩,步,止,8,2,,walk,ホ|ブ|（フ）,ある-く|あゆ-む
