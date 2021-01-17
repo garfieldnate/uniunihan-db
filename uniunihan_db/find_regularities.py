@@ -430,6 +430,54 @@ def _print_reports(index, char_to_prons, char_to_words, out_dir):
         f.write(_format_json(sorted(list(missing_words))))
 
 
+def _print_final_output(
+    index, char_to_new_to_old_pron, char_to_words, char_supplement, out_dir
+):
+    log.info("Constructing final output...")
+    final = []
+    for g in index.groups:
+        cluster_entries = []
+        for cluster in g.get_char_presentation():
+            cluster_entry = {}
+            for c in cluster:
+                pron_entries = []
+                for pron in char_supplement[c]["readings"]:
+                    vocab_list = char_to_words[c].get(pron, [])
+                    if vocab_list:
+                        # find a multi-char word if possible
+                        try:
+                            vocab = next(
+                                filter(lambda v: len(v["surface"]) > 1, vocab_list)
+                            )
+                        except StopIteration:
+                            vocab = vocab_list[0]
+                    else:
+                        vocab = None
+                    pron_entry = {
+                        "pron": pron,
+                        "vocab": vocab,
+                        "non-joyo": pron in char_supplement[c]["non-joyo"],
+                    }
+                    if old_pron := char_to_new_to_old_pron.get(c, {}).get(pron):
+                        pron_entry["historical"] = old_pron
+                    pron_entries.append(pron_entry)
+                # put the Joyo pronunciations before the non-joyo ones
+                pron_entries.sort(key=lambda item: (item["non-joyo"], item["pron"]))
+                c_entry = {"prons": pron_entries}
+                c_entry.update(char_supplement[c])
+                cluster_entry[c] = c_entry
+            cluster_entries.append(cluster_entry)
+        group_entry = {
+            "component": g.component,
+            "clusters": cluster_entries,
+            "purity": g.purity_type.name,
+        }
+        final.append(group_entry)
+
+    with open(out_dir / "final_output.json", "w") as f:
+        f.write(_format_json(final))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -483,50 +531,9 @@ def main():
     out_dir = OUTPUT_DIR / args.language
     _print_reports(index, char_to_prons, char_to_words, out_dir)
 
-    # FINAL OUTPUT
-    log.info("Constructing final output...")
-    final = []
-    for g in index.groups:
-        cluster_entries = []
-        for cluster in g.get_char_presentation():
-            cluster_entry = {}
-            for c in cluster:
-                pron_entries = []
-                for pron in char_supplement[c]["readings"]:
-                    vocab_list = char_to_words[c].get(pron, [])
-                    if vocab_list:
-                        # find a multi-char word if possible
-                        try:
-                            vocab = next(
-                                filter(lambda v: len(v["surface"]) > 1, vocab_list)
-                            )
-                        except StopIteration:
-                            vocab = vocab_list[0]
-                    else:
-                        vocab = None
-                    pron_entry = {
-                        "pron": pron,
-                        "vocab": vocab,
-                        "non-joyo": pron in char_supplement[c]["non-joyo"],
-                    }
-                    if old_pron := char_to_new_to_old_pron.get(c, {}).get(pron):
-                        pron_entry["historical"] = old_pron
-                    pron_entries.append(pron_entry)
-                # put the Joyo pronunciations before the non-joyo ones
-                pron_entries.sort(key=lambda item: (item["non-joyo"], item["pron"]))
-                c_entry = {"prons": pron_entries}
-                c_entry.update(char_supplement[c])
-                cluster_entry[c] = c_entry
-            cluster_entries.append(cluster_entry)
-        group_entry = {
-            "component": g.component,
-            "clusters": cluster_entries,
-            "purity": g.purity_type.name,
-        }
-        final.append(group_entry)
-
-    with open(out_dir / "final_output.json", "w") as f:
-        f.write(_format_json(final))
+    _print_final_output(
+        index, char_to_new_to_old_pron, char_to_words, char_supplement, out_dir
+    )
 
 
 if __name__ == "__main__":
