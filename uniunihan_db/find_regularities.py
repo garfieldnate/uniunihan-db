@@ -14,9 +14,9 @@ log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
-# These three characters were collapsed in the sinjitai, and we don't have old spellings
-# for vocab, so these have to be specified directly
 JP_VOCAB_OVERRIDE = {
+    # These five characters were collapsed in the sinjitai, and we don't have old spellings
+    # for vocab, so these have to be specified directly
     "辯": {
         "ベン": [
             {
@@ -67,6 +67,95 @@ JP_VOCAB_OVERRIDE = {
             }
         ]
     },
+    # these two aren't found automatically because of their non-Joyo kanji usage
+    "肘": {
+        "チュウ": [
+            {
+                "surface": "掣肘",
+                "pron": "セイチュウ",
+                "freq": 200,
+                "en": "(n,vs) restraint/restriction/control",
+            },
+        ]
+    },
+    "唄": {
+        "バイ": [
+            {
+                "surface": "梵唄",
+                "pron": "ボンバイ",
+                "freq": 27,
+                "en": "(n) song in praise of Buddhas virtues",
+            },
+        ]
+    },
+    # This character reading is rare enough not to be in EDICT
+    "栃": {
+        "レイ": [
+            {
+                "surface": "帰栃",
+                "pron": "キレイ",
+                "freq": -1,
+                "en": "(n,vs) Returning to Tochigi prefecture",
+            }
+        ]
+    },
+    # These I had to find online somewhere
+    "鍋": {
+        "カ": [
+            {
+                "surface": "コロナ鍋",
+                "pron": "コロナカ",
+                "freq": -1,
+                "en": "(n) A stew with enoki mushrooms sticking out of meatballs to look like the spikes on a Corona virus. Pun with コロナ禍.",
+            },
+            {
+                "surface": "鍋戸",
+                "pron": "カコ",
+                "freq": -1,
+                "en": "(n) Someone who makes salt by boiling seawater in a large pot",
+            },
+        ]
+    },
+    "釜": {
+        "フ": [
+            {
+                "surface": "釜中の魚",
+                "pron": "フチュウノウオ",
+                "freq": -1,
+                "en": "(n) A fish being boiled in a pot; at death's door",
+            },
+        ]
+    },
+    "瀨": {
+        "ライ": [
+            {
+                "surface": "急瀬",
+                "pron": "キュウライ",
+                "freq": -1,
+                "en": "(n) A strait",
+            },
+        ]
+    },
+    "鎌": {
+        "レン": [
+            {
+                "surface": "鎌利",
+                "pron": "レンリ",
+                "freq": -1,
+                "en": "(name) Being as sharp as a sickle",
+            },
+        ]
+    },
+    "裾": {
+        "キョ": [
+            {
+                "surface": "衣裾",
+                "pron": "イキョ",
+                "freq": -1,
+                "en": "(n) The sleeve of a robe",
+            },
+        ]
+    },
 }
 
 
@@ -99,10 +188,15 @@ def _read_joyo():
             }
             if r["old"]:
                 supplementary_info["old"] = r["old"]
-            readings = r["on-yomi"].split("|")
             # remove empty readings;
-            # forget about parenthesized readings; focus on the main reading for pattern finding
-            readings = [yomi for yomi in readings if yomi and "（" not in yomi]
+            readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
+            # note the non-Joyo readings and strip the indicator asterisk
+            supplementary_info["non-joyo"] = [
+                yomi[:-1] for yomi in readings if yomi[-1] == "*"
+            ]
+            readings = [yomi.rstrip("*") for yomi in readings if yomi]
+            supplementary_info["readings"] = sorted(readings)
+
             for c in r["new"]:
                 new_char_to_prons[c] = readings
                 char_to_supplementary_info[c] = supplementary_info
@@ -203,25 +297,6 @@ def _read_phonetic_components():
     return comp_to_char
 
 
-def _read_jp_netflix(aligner, max_words=1_000_000):
-    log.info("Loading Netflix frequency list...")
-    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
-    with open(INCLUDED_DATA_DIR / "jp_Netflix10K.txt") as f:
-        num_words = 0
-        for line in f.readlines():
-            if not line.startswith("#"):
-                line = line.strip()
-                surface, pronunciation = line.split("\t")
-                alignment = aligner.align(surface, pronunciation)
-                if alignment:
-                    for c, pron in alignment.items():
-                        char_to_pron_to_words[c][pron].append(surface)
-                    num_words += 1
-                    if num_words == max_words:
-                        break
-    return char_to_pron_to_words
-
-
 @dataclass
 class Index:
     groups: List[ComponentGroup]
@@ -314,6 +389,47 @@ def _format_json(data):
     )
 
 
+def _print_reports(index, char_to_prons, char_to_words, out_dir):
+    purity_to_chars = defaultdict(set)
+    purity_to_groups = defaultdict(int)
+    exceptional_chars = set()
+    missing_words = set()
+    for g in index.groups:
+        purity_to_chars[g.purity_type].update(g.chars)
+        purity_to_groups[g.purity_type] += 1
+        exceptional_chars.update(g.exceptions.values())
+        for c in g.chars:
+            missing = set(char_to_prons[c]) - set(char_to_words[c].keys())
+            for p in missing:
+                missing_words.add(f"{c}/{p}")
+
+    if index.no_comp_chars:
+        log.warn(
+            f"{len(index.no_comp_chars)} characters with no phonetic component: {index.no_comp_chars}"
+        )
+    if index.no_pron_chars:
+        log.warn(
+            f"{len(index.no_pron_chars)} characters with no pronunciations: {index.no_pron_chars}"
+        )
+    if missing_words:
+        log.warn(f"Missing vocab for {len(missing_words)} char/pron pairs")
+    log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
+
+    log.info(f"{len(index.groups)} total groups:")
+    for purity_type in PurityType:
+        log.info(
+            f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
+        )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with open(out_dir / "groups.json", "w") as f:
+        f.write(_format_json(index.groups))
+    with open(out_dir / "unique_readings.json", "w") as f:
+        f.write(_format_json(index.unique_pron_to_char))
+    with open(out_dir / "missing_words.json", "w") as f:
+        f.write(_format_json(sorted(list(missing_words))))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -330,11 +446,11 @@ def main():
     comp_to_char = _read_phonetic_components()
 
     if args.language == "jp":
+
         # old glyphs give a better matching with non-Japanese datasets,
         # and only new glyphs are matchable against modern word lists
         char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
         aligner = Aligner(new_char_to_prons)
-        # char_to_pron_to_vocab = _read_jp_netflix(aligner, 10000)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
         char_to_words, missing_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
@@ -364,35 +480,8 @@ def main():
         log.error(f"Cannot handle language {args.language} yet")
         exit()
 
-    purity_to_chars = defaultdict(set)
-    purity_to_groups = defaultdict(int)
-    exceptional_chars = set()
-    for g in index.groups:
-        purity_to_chars[g.purity_type].update(g.chars)
-        purity_to_groups[g.purity_type] += 1
-        exceptional_chars.update(g.exceptions.values())
-    log.info(
-        f"{len(index.no_comp_chars)} characters with no phonetic component data: {index.no_comp_chars}"
-    )
-    log.info(f"{len(index.no_pron_chars)} characters with no pronunciations")
-    log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
-
-    log.info(f"{len(index.groups)} total groups:")
-    for purity_type in PurityType:
-        log.info(
-            f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
-        )
-
-    log.info(f"Missing words for {len(missing_words)} char/pron pairs")
-
     out_dir = OUTPUT_DIR / args.language
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "groups.json", "w") as f:
-        f.write(_format_json(index.groups))
-    with open(out_dir / "unique_readings.json", "w") as f:
-        f.write(_format_json(index.unique_pron_to_char))
-    with open(out_dir / "no_readings.json", "w") as f:
-        f.write(_format_json(index.no_pron_chars))
+    _print_reports(index, char_to_prons, char_to_words, out_dir)
 
     # FINAL OUTPUT
     log.info("Constructing final output...")
@@ -403,22 +492,28 @@ def main():
             cluster_entry = {}
             for c in cluster:
                 pron_entries = []
-                pron_to_vocab = sorted(char_to_words[c].items())
-                if not pron_to_vocab:
-                    raise ValueError(f"Missing pron_to_vocab for {c}")
-                for pron, vocab_list in pron_to_vocab:
-                    # find a multi-char word if possible
-                    try:
-                        vocab = next(
-                            filter(lambda v: len(v["surface"]) > 1, vocab_list)
-                        )
-                    except StopIteration:
-                        vocab = vocab_list[0]
-                    pron_entry = {"pron": pron, "vocab": vocab}
+                for pron in char_supplement[c]["readings"]:
+                    vocab_list = char_to_words[c].get(pron, [])
+                    if vocab_list:
+                        # find a multi-char word if possible
+                        try:
+                            vocab = next(
+                                filter(lambda v: len(v["surface"]) > 1, vocab_list)
+                            )
+                        except StopIteration:
+                            vocab = vocab_list[0]
+                    else:
+                        vocab = None
+                    pron_entry = {
+                        "pron": pron,
+                        "vocab": vocab,
+                        "non-joyo": pron in char_supplement[c]["non-joyo"],
+                    }
                     if old_pron := char_to_new_to_old_pron.get(c, {}).get(pron):
                         pron_entry["historical"] = old_pron
                     pron_entries.append(pron_entry)
-
+                # put the Joyo pronunciations before the non-joyo ones
+                pron_entries.sort(key=lambda item: (item["non-joyo"], item["pron"]))
                 c_entry = {"prons": pron_entries}
                 c_entry.update(char_supplement[c])
                 cluster_entry[c] = c_entry

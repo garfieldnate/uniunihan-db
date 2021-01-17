@@ -16,8 +16,6 @@
     "働": "動",
     "//": "Unihan missed 櫔 variant",
     "栃": "萬",
-    "//": "Unihan missed 匈 variant",
-    "匂": "凶",
     "//": "Override wrong semantic variant from both Unihan and ytenx (礮); TODO: can we automate this fix using the pronunciation?",
     "砲": "勹"
 }
