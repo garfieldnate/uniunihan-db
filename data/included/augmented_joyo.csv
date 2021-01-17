@@ -5,6 +5,9 @@
 # the "new" field; this reflects usage better, and these characters are
 # listed as acceptable substitutes in the original government document.　Additionally,
 # the characters 辦辮 were added to the list of old characters for 弁.
+# An asterisk (*) indicates a reading that is not in the Joyo standard; some of these are present
+# in the Joyo specification for reference but not required learning. Where the Joyo standard
+# provided no on'yomi at all, the data were filled in from other sources (such as the Unihan database).
 number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1,亜,亞,二,7,S,,sub-,ア,
 2,哀,,口,9,S,,pathetic,アイ,あわ-れ|あわ-れむ
@@ -14,9 +17,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 6,悪,惡,心,11,3,,bad,アク|オ,わる-い
 7,握,,手,12,S,,grip,アク,にぎ-る
 8,圧,壓,土,5,5,,pressure,アツ,
-9,扱,,手,6,S,,handle,,,あつか-う
-10,宛,,宀,8,S,2010,allocate,,,あ-てる
-11,嵐,,山,12,S,2010,storm,,,あらし
+9,扱,,手,6,S,,handle,キュウ*|ソウ*,あつか-う
+10,宛,,宀,8,S,2010,allocate,エン*,あ-てる
+11,嵐,,山,12,S,2010,storm,ラン*,あらし
 12,安,,宀,6,3,,cheap,アン,やす-い
 13,案,,木,10,4,,plan,アン,
 14,暗,,日,13,3,,dark,アン,くら-い
@@ -25,7 +28,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 17,位,,人,7,4,,rank,イ,くらい
 18,囲,圍,囗,7,4,,surround,イ,かこ-む|かこ-う
 19,医,醫,酉,7,3,,medicine,イ,
-20,依,,人,8,S,,reliant,イ|（エ）
+20,依,,人,8,S,,reliant,イ|エ*
 21,委,,女,8,3,,committee,イ,ゆだ-ねる
 22,威,,女,9,S,,intimidate,イ,
 23,為,爲,爪,9,S,,do,イ,
@@ -42,15 +45,15 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 34,違,,辵,13,S,,differ,イ,ちが-う|ちが-える
 35,維,,糸,14,S,,fiber,イ,
 36,慰,,心,15,S,,consolation,イ,なぐさ-める|なぐさ-む
-37,遺,,辵,15,6,,bequeath,イ|（ユイ）
+37,遺,,辵,15,6,,bequeath,イ|ユイ*
 38,緯,,糸,16,S,,horizontal,イ,
 39,域,,土,11,6,,range,イキ,
 40,育,,肉,8,3,,nurture,イク,そだ-つ|そだ-てる|はぐく-む
 41,一,,一,1,1,,one,イチ|イツ,ひと|ひと-つ
 42,壱,壹,士,7,S,,one (falsification prevention),イチ,
 43,逸,逸,辵,11,S,,deviate,イツ,
-44,茨,,艸,9,S,2010,thorn,,（いばら）
-45,芋,,艸,6,S,,potato,,,いも
+44,茨,,艸,9,S,2010,thorn,シ*|ジ*,いばら*
+45,芋,,艸,6,S,,potato,ウ*,いも
 46,引,,弓,4,2,,pull,イン,ひ-く|ひ-ける
 47,印,,卩,6,4,,mark,イン,しるし
 48,因,,囗,6,5,,cause,イン,よ-る
@@ -66,11 +69,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 58,右,,口,5,1,,right (direction),ウ|ユウ,みぎ
 59,宇,,宀,6,6,,eaves,ウ,
 60,羽,,羽,6,2,,feather,ウ,は|はね
-61,雨,,雨,8,1,,rain,ウ,あめ|（あま）
-62,唄,,口,10,S,2010,song,,（うた）
+61,雨,,雨,8,1,,rain,ウ,あめ|あま*
+62,唄,,口,10,S,2010,song,バイ*,うた*
 63,鬱,,鬯,29,S,2010,gloom,ウツ,
-64,畝,,田,10,S,,furrow,,,うね
-65,浦,,水,10,S,,bay,,,うら
+64,畝,,田,10,S,,furrow,ホ*|ボウ*,うね
+65,浦,,水,10,S,,bay,ホ*,うら
 66,運,,辵,12,3,,carry,ウン,はこ-ぶ
 67,雲,,雨,12,2,,cloud,ウン,くも
 68,永,,水,5,5,,eternity,エイ,なが-い
@@ -84,8 +87,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 76,鋭,,金,15,S,,pointed,エイ,するど-い
 77,衛,衞,行,16,5,,defense,エイ,
 78,易,,日,8,5,,easy,エキ|イ,やさ-しい
-79,疫,,疒,9,S,,epidemic,エキ|（ヤク）
-80,益,,皿,10,5,,benefit,エキ|（ヤク）
+79,疫,,疒,9,S,,epidemic,エキ|ヤク*
+80,益,,皿,10,5,,benefit,エキ|ヤク*
 81,液,,水,11,5,,fluid,エキ,
 82,駅,驛,馬,14,3,,station,エキ,
 83,悦,,心,10,S,,ecstasy,エツ,
@@ -103,7 +106,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 95,園,,囗,13,2,,garden,エン,その
 96,煙,,火,13,S,,smoke,エン,けむ-る|けむり|けむ-い
 97,猿,,犬,13,S,1981,monkey,エン,さる
-98,遠,,辵,13,2,,far,エン|（オン）,とお-い
+98,遠,,辵,13,2,,far,エン|オン*,とお-い
 99,鉛,,金,13,S,,lead,エン,なまり
 100,塩,鹽,鹵,13,4,,salt,エン,しお
 101,演,,水,14,5,,perform,エン,
@@ -123,26 +126,26 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 115,翁,,羽,10,S,,venerable old man,オウ,
 116,奥,奧,大,12,S,,heart,オウ,おく
 117,横,橫,木,15,3,,side,オウ,よこ
-118,岡,,山,8,S,2010,hill,,（おか）
+118,岡,,山,8,S,2010,hill,コウ*,おか*
 119,屋,,尸,9,3,,roof,オク,や
 120,億,,人,15,4,,hundred million,オク,
 121,憶,,心,16,S,,recollection,オク,
 122,臆,,肉,17,S,2010,timidity,オク,
-123,虞,,虍,13,S,,uneasiness,,おそれ
+123,虞,,虍,13,S,,uneasiness,グ*,おそれ
 124,乙,,乙,1,S,,the latter,オツ,
-125,俺,,人,10,S,2010,I|we,,おれ
-126,卸,,卩,9,S,,wholesale,,おろ-す|おろし
+125,俺,,人,10,S,2010,I|we,エン*,おれ
+126,卸,,卩,9,S,,wholesale,シャ*,おろ-す|おろし
 127,音,,音,9,1,,sound,オン|イン,おと|ね
 128,恩,,心,10,5,,grace,オン,
 129,温,溫,水,12,3,,warm,オン,あたた-か|あたた-かい|あたた-まる|あたた-める
 130,穏,穩,禾,16,S,,calm,オン,おだ-やか
 131,下,,一,3,1,,below,カ|ゲ,した|しも|もと|さ-げる|さ-がる|くだ-る|くだ-す|くだ-さる|お-ろす|お-りる
 132,化,,匕,4,3,,change,カ|ケ,ば-ける|ば-かす
-133,火,,火,4,1,,fire,カ,ひ|（ほ）
+133,火,,火,4,1,,fire,カ,ひ|ほ*
 134,加,,力,5,4,,add,カ,くわ-える|くわ-わる
 135,可,,口,5,5,,possible,カ,
-136,仮,假,人,6,5,,temporary,カ|（ケ）,かり
-137,何,,人,7,2,,what,カ,なに|（なん）
+136,仮,假,人,6,5,,temporary,カ|ケ*,かり
+137,何,,人,7,2,,what,カ,なに|なん*
 138,花,,艸,7,1,,flower,カ,はな
 139,佳,,人,8,S,,excellent,カ,
 140,価,價,人,8,5,,value,カ,あたい
@@ -151,10 +154,10 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 143,苛,,艸,8,S,2010,torment,カ,
 144,科,,禾,9,2,,section,カ,
 145,架,,木,9,S,,rack,カ,か-ける|か-かる
-146,夏,,夊,10,2,,summer,カ|（ゲ）,なつ
+146,夏,,夊,10,2,,summer,カ|ゲ*,なつ
 147,家,,宀,10,2,,house,カ|ケ,いえ|や
 148,荷,,艸,10,3,,luggage,カ,に
-149,華,,艸,10,S,,splendor,カ|（ケ）,はな
+149,華,,艸,10,S,,splendor,カ|ケ*,はな
 150,菓,,艸,11,S,,confectionery,カ,
 151,貨,,貝,11,4,,freight,カ,
 152,渦,,水,12,S,1981,whirlpool,カ,うず
@@ -168,8 +171,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 160,箇,,竹,14,S,,counters for things,カ,
 161,稼,,禾,15,S,1981,earnings,カ,かせ-ぐ
 162,課,,言,15,4,,section,カ,
-163,蚊,,虫,10,S,,mosquito,,か
-164,牙,,牙,4,S,2010,tusk,ガ|（ゲ）,きば
+163,蚊,,虫,10,S,,mosquito,ブン*,か
+164,牙,,牙,4,S,2010,tusk,ガ|ゲ*,きば
 165,瓦,,瓦,5,S,2010,tile,ガ,かわら
 166,我,,戈,7,6,,ego,ガ,われ|わ
 167,画,畫,田,8,2,,tableau,ガ|カク,
@@ -178,7 +181,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 170,雅,,隹,13,S,,gracious,ガ,
 171,餓,,食,15,S,,starve,ガ,
 172,介,,人,4,S,,jammed in,カイ,
-173,回,,囗,6,2,,times,カイ|（エ）,まわ-る|まわ-す
+173,回,,囗,6,2,,times,カイ|エ*,まわ-る|まわ-す
 174,灰,,火,6,6,,ashes,カイ,はい
 175,会,會,曰,6,2,,association,カイ|エ,あ-う
 176,快,,心,7,5,,cheerful,カイ,こころよ-い
@@ -201,25 +204,25 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 193,壊,壞,土,16,S,,demolition,カイ,こわ-す|こわ-れる
 194,懐,懷,心,16,S,,pocket,カイ,ふところ|なつ-かしい|なつ-かしむ|なつ-く|なつ-ける
 195,諧,,言,16,S,2010,harmony,カイ,
-196,貝,,貝,7,1,,shellfish,,かい
+196,貝,,貝,7,1,,shellfish,バイ*|ハイ*,かい
 197,外,,夕,5,2,,outside,ガイ|ゲ,そと|ほか|はず-す|はず-れる
 198,劾,,力,8,S,,censure,ガイ,
 199,害,,宀,10,4,,harm,ガイ,
 200,崖,,山,11,S,2010,cliff,ガイ,がけ
 201,涯,,水,11,S,1981,horizon,ガイ,
-202,街,,行,12,4,,street,ガイ|（カイ）,まち
+202,街,,行,12,4,,street,ガイ|カイ*,まち
 203,慨,慨,心,13,S,,rue,ガイ,
 204,蓋,,艸,13,S,2010,cover,ガイ,ふた
 205,該,,言,13,S,,above-stated,ガイ,
 206,概,槪,木,14,S,,outline,ガイ,
 207,骸,,骨,16,S,2010,dead remains,ガイ,
-208,垣,,土,9,S,1981,hedge,,かき
-209,柿,,木,9,S,2010,persimmon,,かき
+208,垣,,土,9,S,1981,hedge,エン*,かき
+209,柿,,木,9,S,2010,persimmon,シ*,かき
 210,各,,口,6,4,,each,カク,おのおの
 211,角,,角,7,2,,angle,カク,かど|つの
 212,拡,擴,手,8,6,,broaden,カク,
 213,革,,革,9,6,,leather,カク,かわ
-214,格,,木,10,5,,status,カク|（コウ）
+214,格,,木,10,5,,status,カク|コウ*
 215,核,,木,10,S,,nucleus,カク,
 216,殻,殼,殳,11,S,1981,husk,カク,から
 217,郭,,邑,11,S,,enclosure,カク,
@@ -236,8 +239,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 228,楽,樂,木,13,2,,pleasure,ガク|ラク,たの-しい|たの-しむ
 229,額,,頁,18,5,,amount,ガク,ひたい
 230,顎,,頁,18,S,2010,jaw,ガク,あご
-231,掛,,手,11,S,,hang,,か-ける|か-かる|かかり
-232,潟,,水,15,S,1981,lagoon,,かた
+231,掛,,手,11,S,,hang,カ*|カイ*,か-ける|か-かる|かかり
+232,潟,,水,15,S,1981,lagoon,セキ*,かた
 233,括,,手,9,S,,fasten,カツ,
 234,活,,水,9,2,,active,カツ,
 235,喝,喝,口,11,S,1981,hoarse,カツ,
@@ -247,11 +250,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 239,滑,,水,13,S,,slippery,カツ|コツ,すべ-る|なめ-らか
 240,褐,褐,衣,13,S,1981,brown,カツ,
 241,轄,,車,17,S,,control,カツ,
-242,且,,一,5,S,,moreover,,か-つ
-243,株,,木,10,6,,stocks,,かぶ
-244,釜,,金,10,S,2010,kettle,,かま
-245,鎌,,金,18,S,2010,sickle,,かま
-246,刈,,刀,4,S,,reap,,か-る
+242,且,,一,5,S,,moreover,シャ*|ショ*,か-つ
+243,株,,木,10,6,,stocks,チュ*|シュ*,かぶ
+244,釜,,金,10,S,2010,kettle,フ*,かま
+245,鎌,,金,18,S,2010,sickle,レン*,かま
+246,刈,,刀,4,S,,reap,ガイ*,か-る
 247,干,,干,3,6,,dry,カン,ほ-す|ひ-る
 248,刊,,刀,5,5,,publish,カン,
 249,甘,,甘,5,S,,sweet,カン,あま-い|あま-える|あま-やかす
@@ -302,7 +305,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 294,岸,,山,8,3,,beach,ガン,きし
 295,岩,,山,8,2,,boulder,ガン,いわ
 296,玩,,玉,8,S,2010,trifle with,ガン,
-297,眼,,目,11,5,,eyeball,ガン|（ゲン）,まなこ
+297,眼,,目,11,5,,eyeball,ガン|ゲン*,まなこ
 298,頑,,頁,13,S,1981,stubborn,ガン,
 299,顔,,頁,18,2,,face,ガン,かお
 300,願,,頁,19,4,,request,ガン,ねが-う
@@ -333,7 +336,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 325,喜,,口,12,4,,rejoice,キ,よろこ-ぶ
 326,幾,,幺,12,S,,how many,キ,いく
 327,揮,,手,12,6,,brandish,キ,
-328,期,,月,12,3,,period of time,キ|（ゴ）
+328,期,,月,12,3,,period of time,キ|ゴ*
 329,棋,,木,12,S,,chess piece,キ,
 330,貴,,貝,12,6,,precious,キ,たっと-い|とうと-い|たっと-ぶ|とうと-ぶ
 331,棄,,木,13,S,,abandon,キ,
@@ -361,11 +364,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 353,詰,,言,13,S,,packed,キツ,つ-める|つ-まる|つ-む
 354,却,,卩,7,S,,instead,キャク,
 355,客,,宀,9,3,,guest,キャク|カク,
-356,脚,,肉,11,S,,leg,キャク|（キャ）,あし
+356,脚,,肉,11,S,,leg,キャク|キャ*,あし
 357,逆,,辵,9,5,,inverted,ギャク,さか|さか-らう
 358,虐,,虍,9,S,,tyrannize,ギャク,しいた-げる
 359,九,,乙,2,1,,nine,キュウ|ク,ここの|ここの-つ
-360,久,,丿,3,5,,long time,キュウ|（ク）,ひさ-しい
+360,久,,丿,3,5,,long time,キュウ|ク*,ひさ-しい
 361,及,,又,3,S,,reach out,キュウ,およ-ぶ|およ-び|およ-ぼす
 362,弓,,弓,3,2,,"bow (archery, violin)",キュウ,ゆみ
 363,丘,,一,5,S,,hill,キュウ,おか
@@ -380,7 +383,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 372,急,,心,9,3,,hurry,キュウ,いそ-ぐ
 373,級,,糸,9,3,,rank,キュウ,
 374,糾,,糸,9,S,,twist,キュウ,
-375,宮,,宀,10,3,,Shinto shrine,キュウ|グウ|（ク）,みや
+375,宮,,宀,10,3,,Shinto shrine,キュウ|グウ|ク*,みや
 376,救,,攴,11,4,,salvation,キュウ,すく-う
 377,球,,玉,11,3,,sphere,キュウ,たま
 378,給,,糸,12,4,,salary,キュウ,
@@ -393,7 +396,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 385,拒,,手,8,S,,repel,キョ,こば-む
 386,拠,據,手,8,S,,foothold,キョ|コ,
 387,挙,擧,手,10,4,,raise,キョ,あ-げる|あ-がる
-388,虚,虛,虍,11,S,,void,キョ|（コ）
+388,虚,虛,虍,11,S,,void,キョ|コ*
 389,許,,言,11,5,,permit,キョ,ゆる-す
 390,距,,足,12,S,,long-distance,キョ,
 391,魚,,魚,11,2,,fish,ギョ,うお|さかな
@@ -405,7 +408,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 397,狂,,犬,7,S,,lunatic,キョウ,くる-う|くる-おしい
 398,京,,亠,8,2,,capital,キョウ|ケイ,
 399,享,,亠,8,S,,receive,キョウ,
-400,供,,人,8,6,,offer,キョウ|（ク）,そな-える|とも
+400,供,,人,8,6,,offer,キョウ|ク*,そな-える|とも
 401,協,,十,8,4,,cooperation,キョウ,
 402,況,,水,8,S,,condition,キョウ,
 403,峡,峽,山,9,S,,gorge,キョウ,
@@ -413,19 +416,19 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 405,狭,狹,犬,9,S,,cramped,キョウ,せま-い|せば-める|せば-まる
 406,恐,,心,10,S,,fear,キョウ,おそ-れる|おそ-ろしい
 407,恭,,心,10,S,,respect,キョウ,うやうや-しい
-408,胸,,肉,10,6,,bosom,キョウ,むね|（むな）
+408,胸,,肉,10,6,,bosom,キョウ,むね|むな*
 409,脅,,肉,10,S,,threaten,キョウ,おびや-かす|おど-す|おど-かす
 410,強,,弓,11,2,,strong,キョウ|ゴウ,つよ-い|つよ-まる|つよ-める|し-いる
 411,教,,攴,11,2,,teach,キョウ,おし-える|おそ-わる
 412,郷,鄕,邑,11,6,,home town,キョウ|ゴウ,
-413,境,,土,14,5,,boundary,キョウ|（ケイ）,さかい
+413,境,,土,14,5,,boundary,キョウ|ケイ*,さかい
 414,橋,,木,16,3,,bridge,キョウ,はし
 415,矯,,矢,17,S,1981,rectify,キョウ,た-める
 416,鏡,,金,19,4,,mirror,キョウ,かがみ
 417,競,,立,20,4,,compete,キョウ|ケイ,きそ-う|せ-る
 418,響,響,音,20,S,,echo,キョウ,ひび-く
 419,驚,,馬,22,S,,wonder,キョウ,おどろ-く|おどろ-かす
-420,仰,,人,6,S,,face-up,ギョウ|（コウ）,あお-ぐ|おお-せ
+420,仰,,人,6,S,,face-up,ギョウ|コウ*,あお-ぐ|おお-せ
 421,暁,曉,日,12,S,,daybreak,ギョウ,あかつき
 422,業,,木,13,3,,business,ギョウ|ゴウ,わざ
 423,凝,,冫,16,S,,congeal,ギョウ,こ-る|こ-らす
@@ -437,9 +440,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 429,斤,,斤,4,S,,axe,キン,
 430,均,,土,7,5,,level,キン,
 431,近,,辵,7,2,,near,キン,ちか-い
-432,金,,金,8,1,,gold,キン|コン,かね|（かな）
+432,金,,金,8,1,,gold,キン|コン,かね|かな*
 433,菌,,艸,11,S,,germ,キン,
-434,勤,勤,力,12,6,,diligence,キン|（ゴン）,つと-める|つと-まる
+434,勤,勤,力,12,6,,diligence,キン|ゴン*,つと-める|つと-まる
 435,琴,,玉,12,S,,harp,キン,こと
 436,筋,,竹,12,6,,muscle,キン,すじ
 437,僅,,人,13,S,2010,a wee bit,キン,わず-か
@@ -461,20 +464,20 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 453,偶,,人,11,S,,accidentally,グウ,
 454,遇,,辵,12,S,,interview,グウ,
 455,隅,,阜,12,S,1981,corner,グウ,すみ
-456,串,,丨,7,S,2010,skewer,,くし
+456,串,,丨,7,S,2010,skewer,セン*|カン*,くし
 457,屈,,尸,8,S,,yield,クツ,
 458,掘,,手,11,S,,dig,クツ,ほ-る
 459,窟,,穴,13,S,2010,cavern,クツ,
-460,熊,,火,14,S,2010,bear,,くま
-461,繰,,糸,19,S,,winding,,く-る
+460,熊,,火,14,S,2010,bear,ユウ*,くま
+461,繰,,糸,19,S,,winding,ソウ*,く-る
 462,君,,口,7,3,,you,クン,きみ
 463,訓,,言,10,4,,instruction,クン,
 464,勲,勳,力,15,S,,meritorious deed,クン,
 465,薫,薰,艸,16,S,,fragrant,クン,かお-る
 466,軍,,車,9,4,,army,グン,
 467,郡,,邑,10,4,,county,グン,
-468,群,,羊,13,5,,flock,グン,む-れる|む-れ|（むら）
-469,兄,,儿,5,2,,older brother,ケイ|（キョウ）,あに
+468,群,,羊,13,5,,flock,グン,む-れる|む-れ|むら*
+469,兄,,儿,5,2,,older brother,ケイ|キョウ*,あに
 470,刑,,刀,6,S,,punish,ケイ,
 471,形,,彡,7,2,,shape,ケイ|ギョウ,かた|かたち
 472,系,,糸,7,6,,lineage,ケイ,
@@ -510,7 +513,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 502,劇,,刀,15,6,,drama,ゲキ,
 503,撃,擊,手,15,S,,beat,ゲキ,う-つ
 504,激,,水,16,6,,violent,ゲキ,はげ-しい
-505,桁,,木,10,S,2010,beam,,けた
+505,桁,,木,10,S,2010,beam,コウ*,けた
 506,欠,缺,缶,4,4,,lack,ケツ,か-ける|か-く
 507,穴,,穴,5,6,,hole,ケツ,あな
 508,血,,血,6,3,,blood,ケツ,ち
@@ -524,7 +527,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 516,見,,見,7,1,,see,ケン,み-る|み-える|み-せる
 517,券,,刀,8,5,,ticket,ケン,
 518,肩,,肉,8,S,,shoulder,ケン,かた
-519,建,,廴,9,4,,build,ケン|（コン）,た-てる|た-つ
+519,建,,廴,9,4,,build,ケン|コン*,た-てる|た-つ
 520,研,硏,石,9,3,,sharpen,ケン,と-ぐ
 521,県,縣,糸,9,3,,prefecture,ケン,
 522,倹,儉,人,10,S,,frugal,ケン,
@@ -537,19 +540,19 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 529,圏,圈,囗,12,S,,sphere,ケン,
 530,堅,,土,12,S,,strict,ケン,かた-い
 531,検,檢,木,12,5,,examine,ケン,
-532,嫌,,女,13,S,1981,dislike,ケン|（ゲン）,きら-う|いや
-533,献,獻,犬,13,S,,offering,ケン|（コン）
+532,嫌,,女,13,S,1981,dislike,ケン|ゲン*,きら-う|いや
+533,献,獻,犬,13,S,,offering,ケン|コン*
 534,絹,,糸,13,6,,silk,ケン,きぬ
 535,遣,,辵,13,S,,dispatch,ケン,つか-う|つか-わす
-536,権,權,木,15,6,,rights,ケン|（ゴン）
+536,権,權,木,15,6,,rights,ケン|ゴン*
 537,憲,,心,16,6,,constitution,ケン,
 538,賢,,貝,16,S,,intelligent,ケン,かしこ-い
 539,謙,,言,17,S,,self-effacing,ケン,
 540,鍵,,金,17,S,2010,key,ケン,かぎ
 541,繭,,糸,18,S,,cocoon,ケン,まゆ
 542,顕,顯,頁,18,S,,appear,ケン,
-543,験,驗,馬,18,4,,test,ケン|（ゲン）
-544,懸,,心,20,S,,suspend,ケン|（ケ）,か-ける|か-かる
+543,験,驗,馬,18,4,,test,ケン|ゲン*
+544,懸,,心,20,S,,suspend,ケン|ケ*,か-ける|か-かる
 545,元,,儿,4,2,,origin,ゲン|ガン,もと
 546,幻,,幺,4,S,,phantasm,ゲン,まぼろし
 547,玄,,玄,5,S,,mysterious,ゲン,
@@ -561,7 +564,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 553,舷,,舟,11,S,2010,gunwale,ゲン,
 554,減,,水,12,5,,decrease,ゲン,へ-る|へ-らす
 555,源,,水,13,6,,origin,ゲン,みなもと
-556,厳,嚴,口,17,6,,strict,ゲン|（ゴン）,おごそ-か|きび-しい
+556,厳,嚴,口,17,6,,strict,ゲン|ゴン*,おごそ-か|きび-しい
 557,己,,己,3,6,,self,コ|キ,おのれ
 558,戸,,戶,4,2,,door,コ,と
 559,古,,口,5,2,,old,コ,ふる-い|ふる-す
@@ -574,7 +577,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 566,故,,攴,9,5,,circumstances,コ,ゆえ
 567,枯,,木,9,S,,wither,コ,か-れる|か-らす
 568,個,,人,10,5,,individual,コ,
-569,庫,,广,10,3,,warehouse,コ|（ク）
+569,庫,,广,10,3,,warehouse,コ|ク*
 570,湖,,水,12,3,,lake,コ,みずうみ
 571,雇,,隹,12,S,,employ,コ,やと-う
 572,誇,,言,13,S,,boast,コ,ほこ-る
@@ -597,7 +600,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 589,公,,八,4,2,,public,コウ,おおやけ
 590,勾,,勹,4,S,2010,capture,コウ,
 591,孔,,子,4,S,,cavity,コウ,
-592,功,,力,5,4,,achievement,コウ|（ク）
+592,功,,力,5,4,,achievement,コウ|ク*
 593,巧,,工,5,S,,adroit,コウ,たく-み
 594,広,廣,广,5,2,,wide,コウ,ひろ-い|ひろ-まる|ひろ-める|ひろ-がる|ひろ-げる
 595,甲,,田,5,S,,armor,コウ|カン,
@@ -608,7 +611,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 600,好,,女,6,4,,like,コウ,この-む|す-く
 601,江,,水,6,S,,inlet,コウ,え
 602,考,,老,6,2,,think,コウ,かんが-える
-603,行,,行,6,2,,go,コウ|ギョウ|（アン）,い-く|ゆ-く|おこな-う
+603,行,,行,6,2,,go,コウ|ギョウ|アン*,い-く|ゆ-く|おこな-う
 604,坑,,土,7,S,,pit,コウ,
 605,孝,,子,7,6,,filial piety,コウ,
 606,抗,,手,7,S,,confront,コウ,
@@ -623,21 +626,21 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 615,恒,恆,心,9,S,,constancy,コウ,
 616,洪,,水,9,S,1981,deluge,コウ,
 617,皇,,白,9,6,,emperor,コウ|オウ,
-618,紅,,糸,9,6,,deep red,コウ|（ク）,べに|くれない
+618,紅,,糸,9,6,,deep red,コウ|ク*,べに|くれない
 619,荒,,艸,9,S,,laid waste,コウ,あら-い|あ-れる|あ-らす
 620,郊,,邑,9,S,,outskirts,コウ,
-621,香,,香,9,S,,incense,コウ|（キョウ）,か|かお-り|かお-る
+621,香,,香,9,S,,incense,コウ|キョウ*,か|かお-り|かお-る
 622,候,,人,10,4,,climate,コウ,そうろう
 623,校,,木,10,1,,school,コウ,
 624,耕,,耒,10,5,,till,コウ,たがや-す
 625,航,,舟,10,4,,cruise,コウ,
-626,貢,,貝,10,S,,tribute,コウ|（ク）,みつ-ぐ
+626,貢,,貝,10,S,,tribute,コウ|ク*,みつ-ぐ
 627,降,,阜,10,6,,descend,コウ,お-りる|お-ろす|ふ-る
 628,高,,高,10,2,,tall|expensive,コウ,たか-い|たか|たか-まる|たか-める
 629,康,,广,11,4,,health,コウ,
 630,控,,手,11,S,,withdraw,コウ,ひか-える
 631,梗,,木,11,S,2010,close up,コウ,
-632,黄,黃,黃,11,2,,yellow,コウ|オウ,き|（こ）
+632,黄,黃,黃,11,2,,yellow,コウ|オウ,き|こ*
 633,喉,,口,12,S,2010,throat,コウ,のど
 634,慌,,心,12,S,,disconcerted,コウ,あわ-てる|あわ-ただしい
 635,港,,水,12,3,,harbor,コウ,みなと
@@ -655,9 +658,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 647,鋼,,金,16,6,,steel,コウ,はがね
 648,講,,言,17,5,,lecture,コウ,
 649,購,,貝,17,S,,subscription,コウ,
-650,乞,,乙,3,S,2010,beg,,こ-う
+650,乞,,乙,3,S,2010,beg,コツ*|キ*,こ-う
 651,号,號,虍,5,3,,number,ゴウ,
-652,合,,口,6,2,,fit,ゴウ|ガッ|（カッ）,あ-う|あ-わす|あ-わせる
+652,合,,口,6,2,,fit,ゴウ|ガッ|カッ*,あ-う|あ-わす|あ-わせる
 653,拷,,手,9,S,,torture,ゴウ,
 654,剛,,刀,10,S,,sturdy,ゴウ,
 655,傲,,人,13,S,2010,be proud,ゴウ,
@@ -672,9 +675,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 664,酷,,酉,14,S,,cruel,コク,
 665,獄,,犬,14,S,,prison,ゴク,
 666,骨,,骨,10,6,,bone,コツ,ほね
-667,駒,,馬,15,S,2010,horse,,こま
+667,駒,,馬,15,S,2010,horse,ク*,こま
 668,込,,辵,5,S,,crowded,,こ-む|こ-める
-669,頃,,頁,11,S,2010,times,,ころ
+669,頃,,頁,11,S,2010,times,ケイ*|キョウ*|キ*,ころ
 670,今,,人,4,2,,now,コン|キン,いま
 671,困,,囗,7,6,,become distressed,コン,こま-る
 672,昆,,日,8,S,1981,descendants,コン,
@@ -699,7 +702,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 691,座,,广,10,6,,sit,ザ,すわ-る
 692,挫,,手,10,S,2010,sprain,ザ,
 693,才,,手,3,2,,genius,サイ,
-694,再,,冂,6,5,,again,サイ|（サ）,ふたた-び
+694,再,,冂,6,5,,again,サイ|サ*,ふたた-び
 695,災,,火,7,5,,disaster,サイ,わざわ-い
 696,妻,,女,8,5,,wife,サイ,つま
 697,采,,釆,8,S,2010,form,サイ,
@@ -718,16 +721,16 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 710,債,,人,13,S,,bond,サイ,
 711,催,,人,13,S,,sponsor,サイ,もよお-す
 712,塞,,土,13,S,2010,obstruct,サイ|ソク,ふさ-ぐ|ふさ-がる
-713,歳,,止,13,S,,year-end,サイ|（セイ）
+713,歳,,止,13,S,,year-end,サイ|セイ*
 714,載,,車,13,S,,ride,サイ,の-せる|の-る
 715,際,,阜,14,5,,occasion,サイ,きわ
-716,埼,,土,11,S,2010,cape (geography),,（さい）
+716,埼,,土,11,S,2010,cape (geography),キ*,さい*
 717,在,,土,6,5,,exist,ザイ,あ-る
 718,材,,木,7,4,,lumber,ザイ,
 719,剤,劑,刀,10,S,,dose,ザイ,
-720,財,,貝,10,5,,wealth,ザイ|（サイ）
+720,財,,貝,10,5,,wealth,ザイ|サイ*
 721,罪,,网,13,5,,guilt,ザイ,つみ
-722,崎,,山,11,S,1981,promontory,,さき
+722,崎,,山,11,S,1981,promontory,キ,さき
 723,作,,人,7,2,,make,サク|サ,つく-る
 724,削,,刀,9,S,,plane,サク,けず-る
 725,昨,,日,9,4,,previous,サク,
@@ -737,18 +740,18 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 729,酢,,酉,12,S,,vinegar,サク,す
 730,搾,,手,13,S,,squeeze,サク,しぼ-る
 731,錯,,金,16,S,,confused,サク,
-732,咲,,口,9,S,,blossom,,さ-く
+732,咲,,口,9,S,,blossom,ショウ*,さ-く
 733,冊,,冂,5,6,,counter for books,サツ|サク,
 734,札,,木,5,4,,tag,サツ,ふだ
 735,刷,,刀,8,4,,printing,サツ,す-る
 736,刹,,刀,8,S,2010,temple,サツ|セツ,
 737,拶,,手,9,S,2010,be imminent,サツ,
-738,殺,殺,殳,10,4,,kill,サツ|（サイ）|（セツ）,ころ-す
+738,殺,殺,殳,10,4,,kill,サツ|サイ*|セツ*,ころ-す
 739,察,,宀,14,4,,guess,サツ,
 740,撮,,手,15,S,,snapshot,サツ,と-る
 741,擦,,手,17,S,,grate,サツ,す-る|す-れる
 742,雑,雜,隹,14,5,,miscellaneous,ザツ|ゾウ,
-743,皿,,皿,5,3,1981,dish,,さら
+743,皿,,皿,5,3,1981,dish,バイ*|ミョウ*,さら
 744,三,,一,3,1,,three,サン,み|み-つ|みっ-つ
 745,山,,山,3,1,,mountain,サン,やま
 746,参,參,厶,8,4,,participate,サン,まい-る
@@ -769,7 +772,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 761,支,,支,4,5,,branch,シ,ささ-える
 762,止,,止,4,2,,stop,シ,と-まる|と-める
 763,氏,,氏,4,4,,family name,シ,うじ
-764,仕,,人,5,3,,do,シ|（ジ）,つか-える
+764,仕,,人,5,3,,do,シ|ジ*,つか-える
 765,史,,口,5,4,,history,シ,
 766,司,,口,5,4,,director,シ,
 767,四,,囗,5,1,,four,シ,よ|よ-つ|よっ-つ|よん
@@ -818,8 +821,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 810,耳,,耳,6,1,,ear,ジ,みみ
 811,自,,自,6,2,,oneself,ジ|シ,みずか-ら
 812,似,,人,7,5,,becoming,ジ,に-る
-813,児,兒,儿,7,4,,child,ジ|（ニ）
-814,事,,亅,8,3,,abstract thing,ジ|（ズ）,こと
+813,児,兒,儿,7,4,,child,ジ|ニ*
+814,事,,亅,8,3,,abstract thing,ジ|ズ*,こと
 815,侍,,人,8,S,,waiter,ジ,さむらい
 816,治,,水,8,4,,govern,ジ|チ,おさ-める|おさ-まる|なお-る|なお-す
 817,持,,手,9,3,,hold,ジ,も-つ
@@ -830,11 +833,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 822,磁,,石,14,6,,magnet,ジ,
 823,餌,,食,15,S,2010,bait,ジ,えさ|え
 824,璽,,玉,19,S,,emperor's seal,ジ,
-825,鹿,,鹿,11,S,2010,deer,,しか|（か）
+825,鹿,,鹿,11,S,2010,deer,ロク*,しか|か*
 826,式,,弋,6,3,,style,シキ,
 827,識,,言,19,5,,discriminating,シキ,
 828,軸,,車,12,S,,axis,ジク,
-829,七,,一,2,1,,seven,シチ,なな|なな-つ|（なの）
+829,七,,一,2,1,,seven,シチ,なな|なな-つ|なの*
 # 𠮟 is the official one, but it's usually replaced by 叱
 830,叱,𠮟,口,5,S,2010,scold,シツ,しか-る
 831,失,,大,5,4,,lose,シツ,うしな-う
@@ -844,9 +847,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 835,湿,濕,水,12,S,,damp,シツ,しめ-る|しめ-す
 836,嫉,,女,13,S,2010,envy,シツ,
 837,漆,,水,14,S,,lacquer,シツ,うるし
-838,質,,貝,15,5,,quality,シツ|シチ|（チ）
+838,質,,貝,15,5,,quality,シツ|シチ|チ*
 839,実,實,宀,8,3,,truth,ジツ,み|みの-る
-840,芝,,艸,6,S,,turf,,しば
+840,芝,,艸,6,S,,turf,シ*,しば
 841,写,寫,宀,5,3,,copy,シャ,うつ-す|うつ-る
 842,社,社,示,7,2,,company,シャ,やしろ
 843,車,,車,7,1,,car,シャ,くるま
@@ -866,19 +869,19 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 857,酌,,酉,10,S,1981,bartending,シャク,く-む
 858,釈,釋,釆,11,S,,explanation,シャク,
 859,爵,,爪,17,S,,baron,シャク,
-860,若,,艸,8,6,,young,ジャク|（ニャク）,わか-い|も-しくは
+860,若,,艸,8,6,,young,ジャク|ニャク*,わか-い|も-しくは
 861,弱,,弓,10,2,,weak,ジャク,よわ-い|よわ-る|よわ-まる|よわ-める
-862,寂,,宀,11,S,,loneliness,ジャク|（セキ）,さび|さび-しい|さび-れる
-863,手,,手,4,1,,hand,シュ,て|（た）
-864,主,,丶,5,3,,master,シュ|（ス）,ぬし|おも
-865,守,,宀,6,3,,protect,シュ|（ス）,まも-る|も-り
+862,寂,,宀,11,S,,loneliness,ジャク|セキ*,さび|さび-しい|さび-れる
+863,手,,手,4,1,,hand,シュ,て|た*
+864,主,,丶,5,3,,master,シュ|ス*,ぬし|おも
+865,守,,宀,6,3,,protect,シュ|ス*,まも-る|も-り
 866,朱,,木,6,S,,vermilion,シュ,
 867,取,,又,8,3,,take,シュ,と-る
 868,狩,,犬,9,S,,hunt,シュ,か-る|か-り
 869,首,,首,9,2,,neck,シュ,くび
 870,殊,,歹,10,S,,particularly,シュ,こと
 871,珠,,玉,10,S,,pearl,シュ,
-872,酒,,酉,10,3,,alcoholic drink,シュ,さけ|（さか）
+872,酒,,酉,10,3,,alcoholic drink,シュ,さけ|さか*
 873,腫,,肉,13,S,2010,tumor,シュ,は-れる|は-らす
 874,種,,禾,14,4,,kind,シュ,たね
 875,趣,,走,15,S,,gist,シュ,おもむき
@@ -892,21 +895,21 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 883,収,收,攴,4,6,,take in,シュウ,おさ-める|おさ-まる
 884,囚,,囗,5,S,,captured,シュウ,
 885,州,,巛,6,3,,state,シュウ,す
-886,舟,,舟,6,S,,boat,シュウ,ふね|（ふな）
+886,舟,,舟,6,S,,boat,シュウ,ふね|ふな*
 887,秀,,禾,7,S,,excel,シュウ,ひい-でる
 888,周,,口,8,4,,circumference,シュウ,まわ-り
 889,宗,,宀,8,6,,religion,シュウ|ソウ,
 890,拾,,手,9,3,,pick up,シュウ|ジュウ,ひろ-う
 891,秋,,禾,9,2,,autumn,シュウ,あき
 892,臭,臭,自,9,S,,stinking,シュウ,くさ-い|にお-う
-893,修,,人,10,5,,discipline,シュウ|（シュ）,おさ-める|おさ-まる
+893,修,,人,10,5,,discipline,シュウ|シュ*,おさ-める|おさ-まる
 894,袖,,衣,10,S,2010,sleeve,シュウ,そで
 895,終,,糸,11,3,,end,シュウ,お-わる|お-える
 896,羞,,羊,11,S,2010,feel ashamed,シュウ,
 897,習,,羽,11,3,,learn,シュウ,なら-う
 898,週,,辵,11,2,,week,シュウ,
-899,就,,尢,12,6,,concerning,シュウ|（ジュ）,つ-く|つ-ける
-900,衆,,血,12,6,,masses,シュウ|（シュ）
+899,就,,尢,12,6,,concerning,シュウ|ジュ*,つ-く|つ-ける
+900,衆,,血,12,6,,masses,シュウ|シュ*
 901,集,,隹,12,3,,collect,シュウ,あつ-まる|あつ-める|つど-う
 902,愁,,心,13,S,,distress,シュウ,うれ-える|うれ-い
 903,酬,,酉,13,S,,repay,シュウ,
@@ -919,26 +922,26 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 910,住,,人,7,3,,dwelling,ジュウ,す-む|す-まう
 911,柔,,木,9,S,,tender,ジュウ|ニュウ,やわ-らか|やわ-らかい
 912,重,,里,9,3,,heavy,ジュウ|チョウ,え|おも-い|かさ-ねる|かさ-なる
-913,従,從,彳,10,6,,obey,ジュウ|（ショウ）|（ジュ）,したが-う|したが-える
+913,従,從,彳,10,6,,obey,ジュウ|ショウ*|ジュ*,したが-う|したが-える
 914,渋,澁,水,11,S,,astringent,ジュウ,しぶ|しぶ-い|しぶ-る
 915,銃,,金,14,S,,gun,ジュウ,
 916,獣,獸,犬,16,S,,animal,ジュウ,けもの
 917,縦,縱,糸,16,6,,vertical,ジュウ,たて
 918,叔,,又,8,S,,uncle,シュク,
-919,祝,祝,示,9,4,,celebrate,シュク|（シュウ）,いわ-う
+919,祝,祝,示,9,4,,celebrate,シュク|シュウ*,いわ-う
 920,宿,,宀,11,3,,inn,シュク,やど|やど-る|やど-す
 921,淑,,水,11,S,,graceful,シュク,
 922,粛,肅,聿,11,S,,solemn,シュク,
 923,縮,,糸,17,6,,shrink,シュク,ちぢ-む|ちぢ-まる|ちぢ-める|ちぢ-れる|ちぢ-らす
 924,塾,,土,14,S,1981,cram school,ジュク,
 925,熟,,火,15,6,,ripen,ジュク,う-れる
-926,出,,凵,5,1,,exit,シュツ|（スイ）,で-る|だ-す
+926,出,,凵,5,1,,exit,シュツ|スイ*,で-る|だ-す
 927,述,,辵,8,5,,mention,ジュツ,の-べる
 928,術,,行,11,5,,art,ジュツ,
 929,俊,,人,9,S,,genius,シュン,
 930,春,,日,9,2,,springtime,シュン,はる
 931,瞬,,目,18,S,,wink,シュン,またた-く
-932,旬,,日,6,S,,10-day period (of the month),ジュン|（シュン）
+932,旬,,日,6,S,,10-day period (of the month),ジュン|シュン*
 933,巡,,巛,6,S,,patrol,ジュン,めぐ-る
 934,盾,,目,9,S,,shield,ジュン,たて
 935,准,,冫,10,S,,quasi-,ジュン,
@@ -956,15 +959,15 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 947,庶,,广,11,S,,commoner,ショ,
 948,暑,暑,日,12,3,,hot,ショ,あつ-い
 949,署,署,网,13,6,,government office,ショ,
-950,緒,緖,糸,14,S,,thong,ショ|（チョ）,お
+950,緒,緖,糸,14,S,,thong,ショ|チョ*,お
 951,諸,諸,言,15,6,,various,ショ,
-952,女,,女,3,1,,woman,ジョ|ニョ|（ニョウ）,おんな|め
+952,女,,女,3,1,,woman,ジョ|ニョ|ニョウ*,おんな|め
 953,如,,女,6,S,,likeness,ジョ|ニョ,
 954,助,,力,7,3,,help,ジョ,たす-ける|たす-かる|すけ
 955,序,,广,7,5,,preface,ジョ,
 956,叙,敍,攴,9,S,,confer,ジョ,
 957,徐,,彳,10,S,,gradually,ジョ,
-958,除,,阜,10,6,,exclude,ジョ|（ジ）,のぞ-く
+958,除,,阜,10,6,,exclude,ジョ|ジ*,のぞ-く
 959,小,,小,3,1,,small,ショウ,ちい-さい|こ|お
 960,升,,十,4,S,,measuring box,ショウ,ます
 961,少,,小,4,2,,few,ショウ,すく-ない|すこ-し
@@ -1015,7 +1018,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1006,償,,人,17,S,,reparation,ショウ,つぐな-う
 1007,礁,,石,17,S,,reef,ショウ,
 1008,鐘,,金,20,S,,bell,ショウ,かね
-1009,上,,一,3,1,,up,ジョウ|（ショウ）,うえ|（うわ）|かみ|あ-げる|あ-がる|のぼ-る|のぼ-せる|のぼ-す
+1009,上,,一,3,1,,up,ジョウ|ショウ*,うえ|うわ*|かみ|あ-げる|あ-がる|のぼ-る|のぼ-せる|のぼ-す
 1010,丈,,一,3,S,,length,ジョウ,たけ
 1011,冗,,冖,4,S,,superfluous,ジョウ,
 1012,条,條,木,7,5,,clause,ジョウ,
@@ -1025,7 +1028,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1016,浄,淨,水,9,S,,clean,ジョウ,
 1017,剰,剩,刀,11,S,,surplus,ジョウ,
 1018,常,,巾,11,5,,normal,ジョウ,つね|とこ
-1019,情,,心,11,5,,feelings,ジョウ|（セイ）,なさ-け
+1019,情,,心,11,5,,feelings,ジョウ|セイ*,なさ-け
 1020,場,,土,12,2,,place,ジョウ,ば
 1021,畳,疊,田,12,S,,tatami mat,ジョウ,たた-む|たたみ
 1022,蒸,,艸,13,6,,steam,ジョウ,む-す|む-れる|む-らす
@@ -1037,7 +1040,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1028,醸,釀,酉,20,S,,brew,ジョウ,かも-す
 1029,色,,色,6,2,,color,ショク|シキ,いろ
 1030,拭,,手,9,S,2010,wipe,ショク,ふ-く|ぬぐ-う
-1031,食,,食,9,2,,eat|meal,ショク|（ジキ）,く-う|く-らう|た-べる
+1031,食,,食,9,2,,eat|meal,ショク|ジキ*,く-う|く-らう|た-べる
 1032,植,,木,12,3,,plant,ショク,う-える|う-わる
 1033,殖,,歹,12,S,,augment,ショク,ふ-える|ふ-やす
 1034,飾,,食,13,S,,decorate,ショク,かざ-る
@@ -1046,7 +1049,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1037,織,,糸,18,5,,weave,ショク|シキ,お-る
 1038,職,,耳,18,5,,employment,ショク,
 1039,辱,,辰,10,S,,embarrass,ジョク,はずかし-める
-1040,尻,,尸,5,S,2010,buttocks,,しり
+1040,尻,,尸,5,S,2010,buttocks,コウ*,しり
 1041,心,,心,4,2,,heart,シン,こころ
 1042,申,,田,5,3,,say,シン,もう-す
 1043,伸,,人,7,S,,lengthen,シン,の-びる|の-ばす|の-べる
@@ -1057,7 +1060,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1048,侵,,人,9,S,,encroach,シン,おか-す
 1049,信,,人,9,4,,trust,シン,
 1050,津,,水,9,S,,haven,シン,つ
-1051,神,神,示,9,3,,god,シン|ジン,かみ|（かん）|（こう）
+1051,神,神,示,9,3,,god,シン|ジン,かみ|かん*|こう*
 1052,唇,,口,10,S,1981,lips,シン,くちびる
 1053,娠,,女,10,S,,with child,シン,
 1054,振,,手,10,S,,shake,シン,ふ-る|ふ-るう|ふ-れる
@@ -1078,7 +1081,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1069,親,,見,16,2,,parent,シン,おや|した-しい|した-しむ
 1070,人,,人,2,1,,person,ジン|ニン,ひと
 1071,刃,,刀,3,S,,blade,ジン,は
-1072,仁,,人,4,6,,humanity,ジン|（ニ）
+1072,仁,,人,4,6,,humanity,ジン|ニ*
 1073,尽,盡,皿,6,S,,exhaust,ジン,つ-くす|つ-きる|つ-かす
 1074,迅,,辵,6,S,,swift,ジン,
 1075,甚,,甘,9,S,1981,tremendously,ジン,はなは-だ|はなは-だしい
@@ -1103,52 +1106,52 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1094,髄,髓,骨,19,S,,marrow,ズイ,
 1095,枢,樞,木,8,S,,hinge,スウ,
 1096,崇,,山,11,S,,adore,スウ,
-1097,数,數,攴,13,2,,number,スウ|（ス）,かず|かぞ-える
-1098,据,,手,11,S,1981,set,,す-える|す-わる
-1099,杉,,木,7,S,1981,cedar,,すぎ
-1100,裾,,衣,13,S,2010,cuff,,すそ
+1097,数,數,攴,13,2,,number,スウ|ス*,かず|かぞ-える
+1098,据,,手,11,S,1981,set,キョ*,す-える|す-わる
+1099,杉,,木,7,S,1981,cedar,サン*,すぎ
+1100,裾,,衣,13,S,2010,cuff,キョ*,すそ
 1101,寸,,寸,3,6,,measurement,スン,
-1102,瀬,瀨,水,19,S,,rapids,,せ
+1102,瀬,瀨,水,19,S,,rapids,ライ*,せ
 1103,是,,日,9,S,,just so,ゼ,
-1104,井,,二,4,S,,well,セイ|（ショウ）,い
+1104,井,,二,4,S,,well,セイ|ショウ*,い
 1105,世,,一,5,3,,world,セイ|セ,よ
 1106,正,,止,5,1,,correct,セイ|ショウ,ただ-しい|ただ-す|まさ
 1107,生,,生,5,1,,life,セイ|ショウ,い-きる|い-かす|い-ける|う-まれる|う-む|お-う|は-える|は-やす|き|なま
-1108,成,,戈,6,4,,become,セイ|（ジョウ）,な-る|な-す
+1108,成,,戈,6,4,,become,セイ|ジョウ*,な-る|な-す
 1109,西,,襾,6,2,,west,セイ|サイ,にし
-1110,声,聲,耳,7,2,,voice,セイ|（ショウ）,こえ|（こわ）
+1110,声,聲,耳,7,2,,voice,セイ|ショウ*,こえ|こわ*
 1111,制,,刀,8,5,,control,セイ,
 1112,姓,,女,8,S,,surname,セイ|ショウ,
 1113,征,,彳,8,S,,subjugate,セイ,
 1114,性,,心,8,5,,gender,セイ|ショウ,
-1115,青,,靑,8,1,,blue,セイ|（ショウ）,あお|あお-い
+1115,青,,靑,8,1,,blue,セイ|ショウ*,あお|あお-い
 1116,斉,齊,齊,8,S,1981,adjusted,セイ,
-1117,政,,攴,9,5,,politics,セイ|（ショウ）,まつりごと
-1118,星,,日,9,2,,star,セイ|（ショウ）,ほし
+1117,政,,攴,9,5,,politics,セイ|ショウ*,まつりごと
+1118,星,,日,9,2,,star,セイ|ショウ*,ほし
 1119,牲,,牛,9,S,,animal sacrifice,セイ,
 1120,省,,目,9,4,,government ministry,セイ|ショウ,かえり-みる|はぶ-く
 1121,凄,,冫,10,S,2010,uncanny,セイ,
 1122,逝,,辵,10,S,1981,departed,セイ,ゆ-く|い-く
-1123,清,,水,11,4,,pure,セイ|（ショウ）,きよ-い|きよ-まる|きよ-める
-1124,盛,,皿,11,6,,prosper,セイ|（ジョウ）,も-る|さか-る|さか-ん
+1123,清,,水,11,4,,pure,セイ|ショウ*,きよ-い|きよ-まる|きよ-める
+1124,盛,,皿,11,6,,prosper,セイ|ジョウ*,も-る|さか-る|さか-ん
 1125,婿,,女,12,S,,bridegroom,セイ,むこ
 1126,晴,,日,12,2,,clear up,セイ,は-れる|は-らす
 1127,勢,,力,13,5,,power,セイ,いきお-い
 1128,聖,,耳,13,6,,holy,セイ,
 1129,誠,,言,13,6,,sincerity,セイ,まこと
-1130,精,,米,14,5,,refined,セイ|（ショウ）
+1130,精,,米,14,5,,refined,セイ|ショウ*
 1131,製,,衣,14,5,,manufacture,セイ,
 1132,誓,,言,14,S,,vow,セイ,ちか-う
-1133,静,靜,靑,14,4,,quiet,セイ|（ジョウ）,しず|しず-か|しず-まる|しず-める
-1134,請,,言,15,S,,solicit,セイ|（シン）,こ-う|う-ける
+1133,静,靜,靑,14,4,,quiet,セイ|ジョウ*,しず|しず-か|しず-まる|しず-める
+1134,請,,言,15,S,,solicit,セイ|シン*,こ-う|う-ける
 1135,整,,攴,16,3,,put in order,セイ,ととの-える|ととの-う
 1136,醒,,酉,16,S,2010,be disillusioned,セイ,
 1137,税,,禾,12,5,,tax,ゼイ,
 1138,夕,,夕,3,1,,evening,セキ,ゆう
 1139,斥,,斤,5,S,,reject,セキ,
-1140,石,,石,5,1,,stone,セキ|（シャク）|（コク）,いし
-1141,赤,,赤,7,1,,red,セキ|（シャク）,あか|あか-い|あか-らむ|あか-らめる
-1142,昔,,日,8,3,,long ago,セキ|（シャク）,むかし
+1140,石,,石,5,1,,stone,セキ|シャク*|コク*,いし
+1141,赤,,赤,7,1,,red,セキ|シャク*,あか|あか-い|あか-らむ|あか-らめる
+1142,昔,,日,8,3,,long ago,セキ|シャク*,むかし
 1143,析,,木,8,S,,chop,セキ,
 1144,席,,巾,10,4,,seat,セキ,
 1145,脊,,肉,10,S,2010,stature,セキ,
@@ -1160,7 +1163,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1151,積,,禾,16,4,,accumulate,セキ,つ-む|つ-もる
 1152,績,,糸,17,5,,exploits,セキ,
 1153,籍,,竹,20,S,,enroll,セキ,
-1154,切,,刀,4,2,,cut,セツ|（サイ）,き-る|き-れる
+1154,切,,刀,4,2,,cut,セツ|サイ*,き-る|き-れる
 1155,折,,手,7,4,,fold,セツ,お-る|おり|お-れる
 1156,拙,,手,8,S,,bungling,セツ,つたな-い
 1157,窃,竊,穴,9,S,,stealth,セツ,
@@ -1168,8 +1171,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1159,設,,言,11,5,,establish,セツ,もう-ける
 1160,雪,,雨,11,2,,snow,セツ,ゆき
 1161,摂,攝,手,13,S,,vicarious,セツ,
-1162,節,節,竹,13,4,,node,セツ|（セチ）,ふし
-1163,説,,言,14,4,,theory,セツ|（ゼイ）,と-く
+1162,節,節,竹,13,4,,node,セツ|セチ*,ふし
+1163,説,,言,14,4,,theory,セツ|ゼイ*,と-く
 1164,舌,,舌,6,5,,tongue,ゼツ,した
 1165,絶,絕,糸,12,5,,discontinue,ゼツ,た-える|た-やす|た-つ
 1166,千,,十,3,1,,thousand,セン,ち
@@ -1186,7 +1189,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1177,扇,,戶,10,S,,fan,セン,おうぎ
 1178,栓,,木,10,S,1981,plug,セン,
 1179,旋,,方,11,S,,rotation,セン,
-1180,船,,舟,11,2,,boat,セン,ふね|（ふな）
+1180,船,,舟,11,2,,boat,セン,ふね|ふな*
 1181,戦,戰,戈,13,4,,war,セン,いくさ|たたか-う
 1182,煎,,火,13,S,2010,broil,セン,い-る
 1183,羨,,羊,13,S,2010,envy,セン,うらや-む|うらや-ましい
@@ -1225,7 +1228,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1216,礎,,石,18,S,,cornerstone,ソ,いしずえ
 1217,双,雙,隹,4,S,,pair,ソウ,ふた
 1218,壮,壯,士,6,S,,robust,ソウ,
-1219,早,,日,6,1,,early,ソウ|（サッ）,はや-い|はや-まる|はや-める
+1219,早,,日,6,1,,early,ソウ|サッ*,はや-い|はや-まる|はや-める
 1220,争,爭,爪,6,4,,conflict,ソウ,あらそ-う
 1221,走,,走,7,2,,run,ソウ,はし-る
 1222,奏,,大,9,6,,play music,ソウ,かな-でる
@@ -1240,7 +1243,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1231,巣,巢,巛,11,4,,nest,ソウ,す
 1232,掃,,手,11,S,,sweep,ソウ,は-く
 1233,曹,,曰,11,S,1981,cadet,ソウ,
-1234,曽,曾,曰,11,S,2010,formerly,ソウ|（ゾ）
+1234,曽,曾,曰,11,S,2010,formerly,ソウ|ゾ*
 1235,爽,,爻,11,S,2010,refreshing,ソウ,さわ-やか
 1236,窓,,穴,11,6,,window,ソウ,まど
 1237,創,,刀,12,6,,create,ソウ,つく-る
@@ -1249,7 +1252,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1240,葬,,艸,12,S,,interment,ソウ,ほうむ-る
 1241,装,裝,衣,12,6,,attire,ソウ|ショウ,よそお-う
 1242,僧,僧,人,13,S,,Buddhist priest,ソウ,
-1243,想,,心,13,3,,concept,ソウ|（ソ）
+1243,想,,心,13,3,,concept,ソウ|ソ*
 1244,層,層,尸,14,6,,stratum,ソウ,
 1245,総,總,糸,14,5,,whole,ソウ,
 1246,遭,,辵,14,S,,encounter,ソウ,あ-う
@@ -1265,7 +1268,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1256,増,增,土,14,5,,increase,ゾウ,ま-す|ふ-える|ふ-やす
 1257,憎,憎,心,14,S,,hate,ゾウ,にく-む|にく-い|にく-らしい|にく-しみ
 1258,蔵,藏,艸,15,6,,warehouse,ゾウ,くら
-1259,贈,贈,貝,18,S,,presents,ゾウ|（ソウ）,おく-る
+1259,贈,贈,貝,18,S,,presents,ゾウ|ソウ*,おく-る
 1260,臓,臟,肉,19,6,,entrails,ゾウ,
 1261,即,卽,卩,7,S,,instant,ソク,
 1262,束,,木,7,4,,bundle,ソク,たば
@@ -1323,7 +1326,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1314,台,臺,至,5,2,,pedestal,ダイ|タイ,
 1315,第,,竹,11,3,,ordinal number prefix,ダイ,
 1316,題,,頁,18,3,,topic,ダイ,
-1317,滝,瀧,水,13,S,,waterfall,,たき
+1317,滝,瀧,水,13,S,,waterfall,ソウ*|ロウ*,たき
 1318,宅,,宀,6,6,,home,タク,
 1319,択,擇,手,7,S,,choose,タク,
 1320,沢,澤,水,7,S,,swamp,タク,さわ
@@ -1333,12 +1336,12 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1324,濯,,水,17,S,1981,laundry,タク,
 1325,諾,,言,15,S,,consent,ダク,
 1326,濁,,水,16,S,,voiced,ダク,にご-る|にご-す
-1327,但,,人,7,S,,however,,ただ-し
+1327,但,,人,7,S,,however,タン*|ダン*,ただ-し
 1328,達,,辵,12,4,,attain,タツ,
 1329,脱,,肉,11,S,,undress,ダツ,ぬ-ぐ|ぬ-げる
 1330,奪,,大,14,S,,rob,ダツ,うば-う
-1331,棚,,木,12,S,1981,shelf,,たな
-1332,誰,,言,15,S,2010,who (question word),,だれ
+1331,棚,,木,12,S,1981,shelf,ホウ*,たな
+1332,誰,,言,15,S,2010,who (question word),スイ*,だれ
 1333,丹,,丶,4,S,,cinnabar,タン,
 1334,旦,,日,5,S,2010,daybreak,タン|ダン,
 1335,担,擔,手,8,6,,shouldering,タン,かつ-ぐ|にな-う
@@ -1353,14 +1356,14 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1344,綻,,糸,14,S,2010,rip,タン,ほころ-びる
 1345,誕,,言,15,6,,nativity,タン,
 1346,鍛,,金,17,S,,forge,タン,きた-える
-1347,団,團,囗,6,5,,group,ダン|（トン）
+1347,団,團,囗,6,5,,group,ダン|トン*
 1348,男,,田,7,1,,male,ダン|ナン,おとこ
 1349,段,,殳,9,6,,steps,ダン,
 1350,断,斷,斤,11,5,,cut off,ダン,た-つ|ことわ-る
 1351,弾,彈,弓,12,S,,bullet,ダン,ひ-く|はず-む|たま
 1352,暖,,日,13,6,,warmth,ダン,あたた-か|あたた-かい|あたた-まる|あたた-める
 1353,談,,言,15,3,,discuss,ダン,
-1354,壇,,土,16,S,,podium,ダン|（タン）
+1354,壇,,土,16,S,,podium,ダン|タン*
 1355,地,,土,6,2,,ground,チ|ジ,
 1356,池,,水,6,2,,pond,チ,いけ
 1357,知,,矢,8,2,,know,チ,し-る
@@ -1380,9 +1383,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1371,秩,,禾,10,S,,regularity,チツ,
 1372,窒,,穴,11,S,,plug up,チツ,
 1373,茶,,艸,9,2,,tea,チャ|サ,
-1374,着,,羊,12,3,,wear,チャク|（ジャク）,き-る|き-せる|つ-く|つ-ける
+1374,着,,羊,12,3,,wear,チャク|ジャク*,き-る|き-せる|つ-く|つ-ける
 1375,嫡,,女,14,S,,legitimate wife,チャク,
-1376,中,,丨,4,1,,middle,チュウ|（ジュウ）,なか
+1376,中,,丨,4,1,,middle,チュウ|ジュウ*,なか
 1377,仲,,人,6,4,,relationship,チュウ,なか
 1378,虫,蟲,虫,6,1,,insect,チュウ,むし
 1379,沖,,水,7,S,,open sea,チュウ,おき
@@ -1436,17 +1439,17 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1427,追,,辵,9,3,,follow,ツイ,お-う
 1428,椎,,木,12,S,2010,oak,ツイ,
 1429,墜,,土,15,S,,crash,ツイ,
-1430,通,,辵,10,2,,pass through,ツウ|（ツ）,とお-る|とお-す|かよ-う
+1430,通,,辵,10,2,,pass through,ツウ|ツ*,とお-る|とお-す|かよ-う
 1431,痛,,疒,12,6,,pain,ツウ,いた-い|いた-む|いた-める
-1432,塚,塚,土,12,S,1981,hillock,,つか
-1433,漬,,水,14,S,1981,pickling,,つ-ける|つ-かる
-1434,坪,,土,8,S,,two-mat area,,つぼ
-1435,爪,,爪,4,S,2010,claw,,つめ|（つま）
-1436,鶴,,鳥,21,S,2010,crane,,つる
+1432,塚,塚,土,12,S,1981,hillock,チョウ*,つか
+1433,漬,,水,14,S,1981,pickling,シ*,つ-ける|つ-かる
+1434,坪,,土,8,S,,two-mat area,ヘイ*|ヒョウ*,つぼ
+1435,爪,,爪,4,S,2010,claw,ソウ*,つめ|つま*
+1436,鶴,,鳥,21,S,2010,crane,カク*,つる
 1437,低,,人,7,4,,low,テイ,ひく-い|ひく-める|ひく-まる
 1438,呈,,口,7,S,,display,テイ,
 1439,廷,,廴,7,S,,courts,テイ,
-1440,弟,,弓,7,2,,younger brother,テイ|（ダイ）|（デ）,おとうと
+1440,弟,,弓,7,2,,younger brother,テイ|ダイ*|デ*,おとうと
 1441,定,,宀,8,3,,decide,テイ|ジョウ,さだ-める|さだ-まる|さだ-か
 1442,底,,广,8,4,,bottom,テイ,そこ
 1443,抵,,手,8,S,,resist,テイ,
@@ -1478,7 +1481,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1469,鉄,鐵,金,13,3,,iron,テツ,
 1470,徹,,彳,15,S,,penetrate,テツ,
 1471,撤,,手,15,S,,remove,テツ,
-1472,天,,大,4,1,,heaven,テン,あめ|（あま）
+1472,天,,大,4,1,,heaven,テン,あめ|あま*
 1473,典,,八,8,4,,code,テン,
 1474,店,,广,8,2,,shop,テン,みせ
 1475,点,點,黑,9,2,,point,テン,
@@ -1503,14 +1506,14 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1493,土,,土,3,1,,soil,ド|ト,つち
 1494,奴,,女,5,S,,guy,ド,
 1495,努,,力,7,4,,toil,ド,つと-める
-1496,度,,广,9,3,,degrees,ド|（ト）|（タク）,たび
+1496,度,,广,9,3,,degrees,ド|ト*|タク*,たび
 1497,怒,,心,9,S,,angry,ド,いか-る|おこ-る
 1498,刀,,刀,2,2,,sword,トウ,かたな
 1499,冬,,冫,5,2,,winter,トウ,ふゆ
 1500,灯,燈,火,6,4,,lamp,トウ,ひ
 1501,当,當,田,6,2,,hit,トウ,あ-たる|あ-てる
 1502,投,,手,7,3,,throw,トウ,な-げる
-1503,豆,,豆,7,3,,beans,トウ|（ズ）,まめ
+1503,豆,,豆,7,3,,beans,トウ|ズ*,まめ
 1504,東,,木,8,2,,east,トウ,ひがし
 1505,到,,刀,8,S,,arrival,トウ,
 1506,逃,,辵,9,S,,escape,トウ,に-げる|に-がす|のが-す|のが-れる
@@ -1527,7 +1530,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1517,陶,,阜,11,S,,pottery,トウ,
 1518,塔,,土,12,S,,pagoda,トウ,
 1519,搭,,手,12,S,1981,board,トウ,
-1520,棟,,木,12,S,1981,ridgepole,トウ,むね|（むな）
+1520,棟,,木,12,S,1981,ridgepole,トウ,むね|むな*
 1521,湯,,水,12,3,,hot water,トウ,ゆ
 1522,痘,,疒,12,S,,pox,トウ,
 1523,登,,癶,12,3,,climb,トウ|ト,のぼ-る
@@ -1535,10 +1538,10 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1525,等,,竹,12,3,,class,トウ,ひと-しい
 1526,筒,,竹,12,S,,cylinder,トウ,つつ
 1527,統,,糸,12,5,,unite,トウ,す-べる
-1528,稲,稻,禾,14,S,,rice plant,トウ,いね|（いな）
+1528,稲,稻,禾,14,S,,rice plant,トウ,いね|いな*
 1529,踏,,足,15,S,,step,トウ,ふ-む|ふ-まえる
 1530,糖,,米,16,6,,sugar,トウ,
-1531,頭,,頁,16,2,,head,トウ|ズ|（ト）,あたま|かしら
+1531,頭,,頁,16,2,,head,トウ|ズ|ト*,あたま|かしら
 1532,謄,,言,17,S,,mimeograph,トウ,
 1533,藤,,艸,18,S,2010,wisteria,トウ,ふじ
 1534,闘,鬭,鬥,18,S,,fight,トウ,たたか-う
@@ -1549,7 +1552,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1539,動,,力,11,3,,move,ドウ,うご-く|うご-かす
 1540,堂,,土,11,4,,public chamber,ドウ,
 1541,童,,立,12,3,,juvenile,ドウ,わらべ
-1542,道,,辵,12,2,,road,ドウ|（トウ）,みち
+1542,道,,辵,12,2,,road,ドウ|トウ*,みち
 1543,働,,人,13,4,,work,ドウ,はたら-く
 1544,銅,,金,14,5,,copper,ドウ,
 1545,導,,寸,15,5,,guide,ドウ,みちび-く
@@ -1563,25 +1566,25 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1553,篤,,竹,16,S,,fervent,トク,
 1554,毒,,毋,8,4,,poison,ドク,
 1555,独,獨,犬,9,5,,alone,ドク,ひと-り
-1556,読,讀,言,14,2,,read,ドク|トク|（トウ）,よ-む
-1557,栃,,木,9,S,2010,horse chestnut,,（とち）
+1556,読,讀,言,14,2,,read,ドク|トク|トウ*,よ-む
+1557,栃,,木,9,S,2010,horse chestnut,レイ*,とち*
 1558,凸,,凵,5,S,1981,convex,トツ,
 1559,突,突,穴,8,S,,stab,トツ,つ-く
-1560,届,屆,尸,8,6,,deliver,,とど-ける|とど-く
+1560,届,屆,尸,8,6,,deliver,カイ*,とど-ける|とど-く
 1561,屯,,屮,4,S,1981,barracks,トン,
 1562,豚,,豕,11,S,,pork,トン,ぶた
 1563,頓,,頁,13,S,2010,suddenly,トン,
 1564,貪,,貝,11,S,2010,covet,ドン,むさぼ-る
 1565,鈍,,金,12,S,,dull,ドン,にぶ-い|にぶ-る
 1566,曇,,日,16,S,,cloudy weather,ドン,くも-る
-1567,丼,,丶,5,S,2010,bowl of food,,どんぶり|（どん）
+1567,丼,,丶,5,S,2010,bowl of food,セイ*|タン*|ショウ*,どんぶり|どん*
 1568,那,,邑,7,S,2010,what,ナ,
 1569,奈,,大,8,S,2010,what,ナ,
-1570,内,,入,4,2,,inside,ナイ|（ダイ）,うち
-1571,梨,,木,11,S,2010,pear tree,,なし
-1572,謎,,言,17,S,2010,riddle,,なぞ
-1573,鍋,,金,17,S,2010,pot,,なべ
-1574,南,,十,9,2,,south,ナン|（ナ）,みなみ
+1570,内,,入,4,2,,inside,ナイ|ダイ*,うち
+1571,梨,,木,11,S,2010,pear tree,リ*,なし
+1572,謎,,言,17,S,2010,riddle,メイ*,なぞ
+1573,鍋,,金,17,S,2010,pot,カ*,なべ
+1574,南,,十,9,2,,south,ナン|ナ*,みなみ
 1575,軟,,車,11,S,,soft,ナン,やわ-らか|やわ-らかい
 1576,難,難,隹,18,6,,difficult,ナン,かた-い|むずか-しい
 1577,二,,二,2,1,,two,ニ,ふた|ふた-つ
@@ -1589,7 +1592,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1579,弐,貳,貝,6,S,,two (falsification prevention),ニ,
 1580,匂,,勹,4,S,2010,scent,,にお-う
 1581,肉,,肉,6,2,,meat,ニク,
-1582,虹,,虫,9,S,2010,rainbow,,にじ
+1582,虹,,虫,9,S,2010,rainbow,コウ*,にじ
 1583,日,,日,4,1,,day,ニチ|ジツ,ひ|か
 1584,入,,入,2,1,,enter,ニュウ,い-る|い-れる|はい-る
 1585,乳,,乙,8,6,,milk,ニュウ,ちち|ち
@@ -1606,7 +1609,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1596,粘,,米,11,S,,sticky,ネン,ねば-る
 1597,燃,,火,16,5,,burn,ネン,も-える|も-やす|も-す
 1598,悩,惱,心,10,S,,trouble,ノウ,なや-む|なや-ます
-1599,納,,糸,10,6,,settlement,ノウ|（ナッ）|（ナ）|（ナン）|（トウ）,おさ-める|おさ-まる
+1599,納,,糸,10,6,,settlement,ノウ|ナッ*|ナ*|ナン*|トウ*,おさ-める|おさ-まる
 1600,能,,肉,10,5,,ability,ノウ,
 1601,脳,腦,肉,11,6,,brain,ノウ,
 1602,農,,辰,13,3,,farming,ノウ,
@@ -1616,7 +1619,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1606,派,,水,9,6,,sect,ハ,
 1607,破,,石,10,5,,rend,ハ,やぶ-る|やぶ-れる
 1608,覇,霸,雨,19,S,1981,hegemony,ハ,
-1609,馬,,馬,10,2,,horse,バ,うま|（ま）
+1609,馬,,馬,10,2,,horse,バ,うま|ま*
 1610,婆,,女,11,S,,old woman,バ,
 1611,罵,,网,15,S,2010,insult,バ,ののし-る
 1612,拝,拜,手,8,6,,worship,ハイ,おが-む
@@ -1637,33 +1640,33 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1627,媒,,女,12,S,,mediator,バイ,
 1628,買,,貝,12,2,,buy,バイ,か-う
 1629,賠,,貝,15,S,,compensation,バイ,
-1630,白,,白,5,1,,white,ハク|ビャク,しろ|（しら）|しろ-い
+1630,白,,白,5,1,,white,ハク|ビャク,しろ|しら*|しろ-い
 1631,伯,,人,7,S,,chief,ハク,
-1632,拍,,手,8,S,,clap,ハク|（ヒョウ）
+1632,拍,,手,8,S,,clap,ハク|ヒョウ*
 1633,泊,,水,8,S,,overnight,ハク,と-まる|と-める
 1634,迫,,辵,8,S,,urge,ハク,せま-る
 # 剝 is the official one, but it's usually replaced by 剥
 1635,剥,剝,刀,10,S,2010,peel,ハク,は-がす|は-ぐ|は-がれる|は-げる
 1636,舶,,舟,11,S,,liner,ハク,
-1637,博,,十,12,4,,Dr.,ハク|（バク）
+1637,博,,十,12,4,,Dr.,ハク|バク*
 1638,薄,,艸,16,S,,dilute,ハク,うす-い|うす-める|うす-まる|うす-らぐ|うす-れる
 1639,麦,麥,麥,7,2,,wheat,バク,むぎ
 1640,漠,,水,13,S,1981,vague,バク,
 1641,縛,,糸,16,S,,truss,バク,しば-る
 1642,爆,,火,19,S,,explode,バク,
-1643,箱,,竹,15,3,,box,,はこ
-1644,箸,,竹,15,S,2010,chopsticks,,はし
+1643,箱,,竹,15,3,,box,ショウ*|ソウ*,はこ
+1644,箸,,竹,15,S,2010,chopsticks,チョ*|チャク*,はし
 1645,畑,,田,9,3,,farm,,はた|はたけ
-1646,肌,,肉,6,S,1981,texture,,はだ
-1647,八,,八,2,1,,eight,ハチ,や|や-つ|やっ-つ|（よう）
-1648,鉢,,金,13,S,1981,bowl,ハチ|（ハツ）
+1646,肌,,肉,6,S,1981,texture,キ*,はだ
+1647,八,,八,2,1,,eight,ハチ,や|や-つ|やっ-つ|よう*
+1648,鉢,,金,13,S,1981,bowl,ハチ|ハツ*
 1649,発,發,癶,9,3,,departure,ハツ|ホツ,
 1650,髪,髮,髟,14,S,,hair of the head,ハツ,かみ
 1651,伐,,人,6,S,,fell,バツ,
 1652,抜,拔,手,7,S,,slip out,バツ,ぬ-く|ぬ-ける|ぬ-かす|ぬ-かる
 1653,罰,,网,14,S,,penalty,バツ|バチ,
 1654,閥,,門,14,S,,clique,バツ,
-1655,反,,又,4,3,,anti-,ハン|（ホン）|（タン）,そ-る|そ-らす
+1655,反,,又,4,3,,anti-,ハン|ホン*|タン*,そ-る|そ-らす
 1656,半,,十,5,2,,half,ハン,なか-ば
 1657,氾,,水,5,S,2010,spread out,ハン,
 1658,犯,,犬,5,5,,crime,ハン,おか-す
@@ -1682,7 +1685,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1671,斑,,文,12,S,2010,blemish,ハン,
 1672,飯,,食,12,4,,meal,ハン,めし
 1673,搬,,手,13,S,,conveyor,ハン,
-1674,煩,,火,13,S,,anxiety,ハン|（ボン）,わずら-う|わずら-わす
+1674,煩,,火,13,S,,anxiety,ハン|ボン*,わずら-う|わずら-わす
 1675,頒,,頁,13,S,,partition,ハン,
 1676,範,,竹,15,S,,pattern,ハン,
 1677,繁,繁,糸,16,S,,luxuriant,ハン,
@@ -1696,7 +1699,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1685,妃,,女,6,S,,queen,ヒ,
 1686,否,,口,7,6,,negate,ヒ,いな
 1687,批,,手,7,6,,criticism,ヒ,
-1688,彼,,彳,8,S,,he,ヒ,かれ|（かの）
+1688,彼,,彳,8,S,,he,ヒ,かれ|かの*
 1689,披,,手,8,S,1981,expose,ヒ,
 1690,肥,,肉,8,5,,fertilizer,ヒ,こ-える|こえ|こ-やす|こ-やし
 1691,非,,非,8,5,,negative,ヒ,
@@ -1712,18 +1715,18 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1701,罷,,网,15,S,,quit,ヒ,
 1702,避,,辵,16,S,,evade,ヒ,さ-ける
 1703,尾,,尸,7,S,,tail,ビ,お
-1704,眉,,目,9,S,2010,eyebrow,ビ|（ミ）,まゆ
+1704,眉,,目,9,S,2010,eyebrow,ビ|ミ*,まゆ
 1705,美,,羊,9,3,,beauty,ビ,うつく-しい
 1706,備,,人,12,5,,provide,ビ,そな-える|そな-わる
 1707,微,,彳,13,S,,delicate,ビ,
 1708,鼻,,鼻,14,3,,nose,ビ,はな
-1709,膝,,肉,15,S,2010,knee,,ひざ
-1710,肘,,肉,7,S,2010,elbow,,ひじ
+1709,膝,,肉,15,S,2010,knee,シツ*,ひざ
+1710,肘,,肉,7,S,2010,elbow,チュウ*,ひじ
 1711,匹,,匸,4,S,,equal,ヒツ,ひき
 1712,必,,心,5,4,,without fail,ヒツ,かなら-ず
 1713,泌,,水,8,S,,ooze,ヒツ|ヒ,
 1714,筆,,竹,12,3,,writing brush,ヒツ,ふで
-1715,姫,,女,10,S,,princess,,ひめ
+1715,姫,,女,10,S,,princess,キ*,ひめ
 1716,百,,白,6,1,,hundred,ヒャク,
 1717,氷,,水,5,3,,ice,ヒョウ,こおり|ひ
 1718,表,,衣,8,3,,express,ヒョウ,おもて|あらわ-す|あらわ-れる
@@ -1732,9 +1735,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1721,評,,言,12,5,,evaluate,ヒョウ,
 1722,漂,,水,14,S,,drift,ヒョウ,ただよ-う
 1723,標,,木,15,4,,signpost,ヒョウ,
-1724,苗,,艸,8,S,,seedling,ビョウ,なえ|（なわ）
+1724,苗,,艸,8,S,,seedling,ビョウ,なえ|なわ*
 1725,秒,,禾,9,3,,second (part of time),ビョウ,
-1726,病,,疒,10,3,,sick,ビョウ|（ヘイ）,や-む|やまい
+1726,病,,疒,10,3,,sick,ビョウ|ヘイ*,や-む|やまい
 1727,描,,手,11,S,,sketch,ビョウ,えが-く|か-く
 1728,猫,,犬,11,S,1981,cat,ビョウ,ねこ
 1729,品,,口,9,3,,article,ヒン,しな
@@ -1745,14 +1748,14 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1734,敏,敏,攴,10,S,,cleverness,ビン,
 1735,瓶,甁,瓦,11,S,1981,flower pot,ビン,
 1736,不,,一,4,4,,non-,フ|ブ,
-1737,夫,,大,4,4,,husband,フ|（フウ）,おっと
+1737,夫,,大,4,4,,husband,フ|フウ*,おっと
 1738,父,,父,4,2,,father,フ,ちち
 1739,付,,人,5,4,,attach,フ,つ-ける|つ-く
 1740,布,,巾,5,5,,linen,フ,ぬの
 1741,扶,,手,7,S,,aid,フ,
 1742,府,,广,8,4,,urban prefecture,フ,
 1743,怖,,心,8,S,,dreadful,フ,こわ-い
-1744,阜,,阜,8,S,2010,mound,（フ）
+1744,阜,,阜,8,S,2010,mound,フ*
 1745,附,,阜,8,S,,affixed,フ,
 1746,訃,,言,9,S,2010,obituary,フ,
 1747,負,,貝,9,3,,lose,フ,ま-ける|ま-かす|お-う
@@ -1760,7 +1763,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1749,浮,,水,10,S,,floating,フ,う-く|う-かれる|う-かぶ|う-かべる
 1750,婦,,女,11,5,,lady,フ,
 1751,符,,竹,11,S,,token,フ,
-1752,富,,宀,12,5,,rich,フ|（フウ）,と-む|とみ
+1752,富,,宀,12,5,,rich,フ|フウ*,と-む|とみ
 1753,普,,日,12,S,,universal,フ,
 1754,腐,,肉,14,S,,rot,フ,くさ-る|くさ-れる|くさ-らす
 1755,敷,,攴,15,S,,spread,フ,し-く
@@ -1772,7 +1775,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1761,部,,邑,11,3,,part,ブ,
 1762,舞,,舛,15,S,,dance,ブ,ま-う|まい
 1763,封,,寸,9,S,,seal,フウ|ホウ,
-1764,風,,風,9,2,,wind,フウ|（フ）,かぜ|（かざ）
+1764,風,,風,9,2,,wind,フウ|フ*,かぜ|かざ*
 1765,伏,,人,6,S,,prostrated,フク,ふ-せる|ふ-す
 1766,服,,月,8,3,,clothes,フク,
 1767,副,,刀,11,4,,vice,フク,
@@ -1825,7 +1828,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1814,弁,辨瓣辯辦辮,辛瓜辛,5,5,,valve,ベン,
 1815,便,,人,9,4,,convenience,ベン|ビン,たよ-り
 1816,勉,勉,力,10,3,,exertion,ベン,
-1817,歩,步,止,8,2,,walk,ホ|ブ|（フ）,ある-く|あゆ-む
+1817,歩,步,止,8,2,,walk,ホ|ブ|フ*,ある-く|あゆ-む
 1818,保,,人,9,5,,preserve,ホ,たも-つ
 1819,哺,,口,10,S,2010,suckle,ホ,
 1820,捕,,手,10,S,,catch,ホ,と-らえる|と-らわれる|と-る|つか-まえる|つか-まる
@@ -1841,11 +1844,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1830,包,,勹,5,4,,wrap,ホウ,つつ-む
 1831,芳,,艸,7,S,,perfume,ホウ,かんば-しい
 1832,邦,,邑,7,S,,home country,ホウ,
-1833,奉,,大,8,S,,observance,ホウ|（ブ）,たてまつ-る
+1833,奉,,大,8,S,,observance,ホウ|ブ*,たてまつ-る
 1834,宝,寶,宀,8,6,,treasure,ホウ,たから
 1835,抱,,手,8,S,,embrace,ホウ,だ-く|いだ-く|かか-える
 1836,放,,攴,8,3,,release,ホウ,はな-す|はな-つ|はな-れる|ほう-る
-1837,法,,水,8,4,,method,ホウ|（ハッ）|（ホッ）
+1837,法,,水,8,4,,method,ホウ|ハッ*|ホッ*
 1838,泡,,水,8,S,1981,bubbles,ホウ,あわ
 1839,胞,,肉,9,S,,placenta,ホウ,
 1840,俸,,人,10,S,1981,salary,ホウ,
@@ -1860,10 +1863,10 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1849,飽,,食,13,S,,sated,ホウ,あ-きる|あ-かす
 1850,褒,襃,衣,15,S,1981,praise,ホウ,ほ-める
 1851,縫,,糸,16,S,,sew,ホウ,ぬ-う
-1852,亡,,亠,3,6,,deceased,ボウ|（モウ）,な-い
+1852,亡,,亠,3,6,,deceased,ボウ|モウ*,な-い
 1853,乏,,丿,4,S,,scarce,ボウ,とぼ-しい
 1854,忙,,心,6,S,,busy,ボウ,いそが-しい
-1855,坊,,土,7,S,,boy,ボウ|（ボッ）
+1855,坊,,土,7,S,,boy,ボウ|ボッ*
 1856,妨,,女,7,S,,disturb,ボウ,さまた-げる
 1857,忘,,心,7,6,,forget,ボウ,わす-れる
 1858,防,,阜,7,5,,prevent,ボウ,ふせ-ぐ
@@ -1879,13 +1882,13 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1868,棒,,木,12,6,,rod,ボウ,
 1869,貿,,貝,12,5,,trade,ボウ,
 1870,貌,,豸,14,S,2010,appearance,ボウ,
-1871,暴,,日,15,5,,outburst,ボウ|（バク）,あば-く|あば-れる
+1871,暴,,日,15,5,,outburst,ボウ|バク*,あば-く|あば-れる
 1872,膨,,肉,16,S,,swell,ボウ,ふく-らむ|ふく-れる
-1873,謀,,言,16,S,,conspire,ボウ|（ム）,はか-る
+1873,謀,,言,16,S,,conspire,ボウ|ム*,はか-る
 # 頰 is the official one, but it's usually replaced by 頬
-1874,頬,頰,頁,16,S,2010,cheek,,ほお
+1874,頬,頰,頁,16,S,2010,cheek,キョウ*,ほお
 1875,北,,匕,5,2,,north,ホク,きた
-1876,木,,木,4,1,,tree,ボク|モク,き|（こ）
+1876,木,,木,4,1,,tree,ボク|モク,き|こ*
 1877,朴,,木,6,S,1981,crude,ボク,
 1878,牧,,牛,8,4,,breed,ボク,まき
 1879,睦,,目,13,S,2010,harmonious,ボク,
@@ -1894,11 +1897,11 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1882,撲,,手,15,S,,slap,ボク,
 1883,没,沒,水,7,S,,drown,ボツ,
 1884,勃,,力,9,S,2010,rise,ボツ,
-1885,堀,,土,11,S,1981,ditch,,ほり
+1885,堀,,土,11,S,1981,ditch,クツ*,ほり
 1886,本,,木,5,1,,book,ホン,もと
 1887,奔,,大,8,S,,bustle,ホン,
 1888,翻,飜,飛,18,S,,flip,ホン,ひるがえ-る|ひるがえ-す
-1889,凡,,几,3,S,,mediocre,ボン|（ハン）
+1889,凡,,几,3,S,,mediocre,ボン|ハン*
 1890,盆,,皿,9,S,,basin,ボン,
 1891,麻,,麻,11,S,,hemp,マ,あさ
 1892,摩,,手,15,S,,chafe,マ,
@@ -1911,8 +1914,8 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1899,埋,,土,10,S,,bury,マイ,う-める|う-まる|う-もれる
 1900,幕,,巾,13,6,,curtain,マク|バク,
 1901,膜,,肉,14,S,,membrane,マク,
-1902,枕,,木,8,S,2010,pillow,,まくら
-1903,又,,又,2,S,,or again,,また
+1902,枕,,木,8,S,2010,pillow,チン*,まくら
+1903,又,,又,2,S,,or again,ユウ*,また
 1904,末,,木,5,4,,end,マツ|バツ,すえ
 1905,抹,,手,8,S,1981,rub,マツ,
 1906,万,萬,艸,3,2,,ten thousand,マン|バン,
@@ -1922,7 +1925,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1910,未,,木,5,4,,not yet,ミ,
 1911,味,,口,8,3,,flavor,ミ,あじ|あじ-わう
 1912,魅,,鬼,15,S,,fascination,ミ,
-1913,岬,,山,8,S,1981,headland,,みさき
+1913,岬,,山,8,S,1981,headland,コウ*,みさき
 1914,密,,宀,11,6,,secrecy,ミツ,
 1915,蜜,,虫,14,S,2010,honey,ミツ,
 1916,脈,,肉,10,4,,vein,ミャク,
@@ -1934,7 +1937,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1922,無,,火,12,4,,nothing,ム|ブ,な-い
 1923,夢,,夕,13,5,,dream,ム,ゆめ
 1924,霧,,雨,19,S,,fog,ム,きり
-1925,娘,,女,10,S,,daughter,,むすめ
+1925,娘,,女,10,S,,daughter,ジョウ*|ニョウ*,むすめ
 1926,名,,口,6,1,,name,メイ|ミョウ,な
 1927,命,,口,8,3,,fate,メイ|ミョウ,いのち
 1928,明,,日,8,2,,bright,メイ|ミョウ,あ-かり|あか-るい|あか-るむ|あか-らむ|あき-らか|あ-ける|あ-く|あ-くる|あ-かす
@@ -1953,33 +1956,33 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1941,毛,,毛,4,2,,hair,モウ,け
 1942,妄,,女,6,S,1981,delusion,モウ|ボウ,
 1943,盲,,目,8,S,,blind,モウ,
-1944,耗,,耒,10,S,,decrease,モウ|（コウ）
+1944,耗,,耒,10,S,,decrease,モウ|コウ*
 1945,猛,,犬,11,S,,fierce,モウ,
 1946,網,,糸,14,S,,netting,モウ,あみ
-1947,目,,目,5,1,,eye,モク|（ボク）,め|（ま）
+1947,目,,目,5,1,,eye,モク|ボク*,め|ま*
 1948,黙,默,黑,15,S,,silence,モク,だま-る
 1949,門,,門,8,2,,gates,モン,かど
 1950,紋,,糸,10,S,,family crest,モン,
-1951,問,,口,11,3,,question,モン,と-う|と-い|（とん）
+1951,問,,口,11,3,,question,モン,と-う|と-い|とん*
 1952,冶,,冫,7,S,2010,melting,ヤ,
 1953,夜,,夕,8,2,,night,ヤ,よ|よる
 1954,野,,里,11,2,,field,ヤ,の
-1955,弥,彌,弓,8,S,2010,all the more,,や
+1955,弥,彌,弓,8,S,2010,all the more,ビ*|ミ*|ゲイ*,や
 1956,厄,,厂,4,S,1981,unlucky,ヤク,
 1957,役,,彳,7,3,,service,ヤク|エキ,
 1958,約,,糸,9,4,,promise,ヤク,
 1959,訳,譯,言,11,6,,translate,ヤク,わけ
 1960,薬,藥,艸,16,3,,medicine,ヤク,くすり
 1961,躍,,足,21,S,,leap,ヤク,おど-る
-1962,闇,,門,17,S,2010,darkness,,やみ
-1963,由,,田,5,3,,reason,ユ|ユウ|（ユイ）,よし
+1962,闇,,門,17,S,2010,darkness,アン*|オン*,やみ
+1963,由,,田,5,3,,reason,ユ|ユウ|ユイ*,よし
 1964,油,,水,8,3,,oil,ユ,あぶら
 1965,喩,,口,12,S,2010,metaphor,ユ,
 1966,愉,,心,12,S,,pleasure,ユ,
 1967,諭,,言,16,S,,rebuke,ユ,さと-す
 1968,輸,,車,16,5,,transport,ユ,
 1969,癒,,疒,18,S,1981,healing,ユ,い-える|い-やす
-1970,唯,,口,11,S,,solely,ユイ|（イ）
+1970,唯,,口,11,S,,solely,ユイ|イ*
 1971,友,,又,4,2,,friend,ユウ,とも
 1972,有,,月,6,3,,have,ユウ|ウ,あ-る
 1973,勇,,力,9,4,,courage,ユウ,いさ-む
@@ -1989,7 +1992,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 1977,湧,,水,12,S,2010,boil,ユウ,わ-く
 1978,猶,,犬,12,S,,furthermore,ユウ,
 1979,裕,,衣,12,S,,abundant,ユウ,
-1980,遊,,辵,12,3,,play,ユウ|（ユ）,あそ-ぶ
+1980,遊,,辵,12,3,,play,ユウ|ユ*,あそ-ぶ
 1981,雄,,隹,12,S,,male,ユウ,お|おす
 1982,誘,,言,14,S,,entice,ユウ,さそ-う
 1983,憂,,心,15,S,,melancholy,ユウ,うれ-える|うれ-い|う-い
@@ -2054,13 +2057,13 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 2042,璃,,玉,15,S,2010,glassy,リ,
 2043,離,,隹,19,S,,detach,リ,はな-れる|はな-す
 2044,陸,,阜,11,4,,land,リク,
-2045,立,,立,5,1,,stand up,リツ|（リュウ）,た-つ|た-てる
-2046,律,,彳,9,6,,law,リツ|（リチ）
+2045,立,,立,5,1,,stand up,リツ|リュウ*,た-つ|た-てる
+2046,律,,彳,9,6,,law,リツ|リチ*
 2047,慄,,心,13,S,2010,fear,リツ,
 2048,略,,田,11,5,,abbreviation,リャク,
 2049,柳,,木,9,S,,willow,リュウ,やなぎ
-2050,流,,水,10,3,,stream,リュウ|（ル）,なが-れる|なが-す
-2051,留,,田,10,5,,detain,リュウ|（ル）,と-める|と-まる
+2050,流,,水,10,3,,stream,リュウ|ル*,なが-れる|なが-す
+2051,留,,田,10,5,,detain,リュウ|ル*,と-める|と-まる
 2052,竜,龍,龍,10,S,1981,dragon,リュウ,たつ
 2053,粒,,米,11,S,,grains,リュウ,つぶ
 2054,隆,隆,阜,11,S,,hump,リュウ,
@@ -2082,9 +2085,9 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 2070,寮,,宀,15,S,,dormitory,リョウ,
 2071,療,,疒,17,S,,heal,リョウ,
 2072,瞭,,目,17,S,2010,clear,リョウ,
-2073,糧,,米,18,S,,provisions,リョウ|（ロウ）,かて
+2073,糧,,米,18,S,,provisions,リョウ|ロウ*,かて
 2074,力,,力,2,1,,power,リョク|リキ,ちから
-2075,緑,綠,糸,14,3,,green,リョク|（ロク）,みどり
+2075,緑,綠,糸,14,3,,green,リョク|ロク*,みどり
 2076,林,,木,8,1,,woods,リン,はやし
 2077,厘,,厂,9,S,,thousandth,リン,
 2078,倫,,人,10,S,,ethics,リン,
@@ -2123,7 +2126,7 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 2111,炉,爐,火,8,S,,hearth,ロ,
 2112,賂,,貝,13,S,2010,bribe,ロ,
 2113,路,,足,13,3,,road,ロ,じ
-2114,露,,雨,21,S,,dew,ロ|（ロウ）,つゆ
+2114,露,,雨,21,S,,dew,ロ|ロウ*,つゆ
 2115,老,,老,6,4,,old man,ロウ,お-いる|ふ-ける
 2116,労,勞,力,7,4,,labour,ロウ,
 2117,弄,,廾,7,S,2010,tamper with,ロウ,もてあそ-ぶ
@@ -2134,14 +2137,14 @@ number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
 2122,楼,樓,木,13,S,,watchtower,ロウ,
 2123,漏,,水,14,S,,leak,ロウ,も-る|も-れる|も-らす
 2124,籠,,竹,22,S,2010,basket,ロウ,かご|こ-もる
-2125,六,,八,4,1,,six,ロク,む|む-つ|むっ-つ|（むい）
+2125,六,,八,4,1,,six,ロク,む|む-つ|むっ-つ|むい*
 2126,録,錄,金,16,4,,record,ロク,
 2127,麓,,鹿,19,S,2010,foot of a mountain,ロク,ふもと
 2128,論,,言,15,6,,theory,ロン,
-2129,和,,口,8,3,,peace,ワ|（オ）,やわ-らぐ|やわ-らげる|なご-む|なご-やか
+2129,和,,口,8,3,,peace,ワ|オ*,やわ-らぐ|やわ-らげる|なご-む|なご-やか
 2130,話,,言,13,2,,talk,ワ,はな-す|はなし
 2131,賄,,貝,13,S,,bribe,ワイ,まかな-う
-2132,脇,,肉,10,S,2010,aside,,わき
+2132,脇,,肉,10,S,2010,aside,キョウ*,わき
 2133,惑,,心,12,S,,beguile,ワク,まど-う
 2134,枠,,木,8,S,1981,frame,,わく
 2135,湾,灣,水,12,S,,gulf,ワン,

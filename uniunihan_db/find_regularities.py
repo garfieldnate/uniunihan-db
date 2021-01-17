@@ -85,7 +85,7 @@ def _read_joyo():
     new_char_to_prons = {}
     old_char_to_prons = {}
     char_to_supplementary_info = {}
-    with open(INCLUDED_DATA_DIR / "joyo.csv") as f:
+    with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
