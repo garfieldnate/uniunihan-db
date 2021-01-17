@@ -1,12 +1,10 @@
 # TODO
 
-* Remove unnneeded indexes
-* put language-specific stuff in separate files
+* put language-specific logic in separate files
 
 Topic: groupings
 
-* possibly move pronunciation grouping into ComponentGroup
-* check for empty chars and pronunciations
+* Disallow mixed no-pron and with-pron characters (because on'yomi-less kokuji don't get phonetic components!)
 * possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
@@ -18,13 +16,12 @@ Topic: Mandarin support
 
 Topic: final dictionary output
 
-* Output final data (json) per char in desired order
-* for singleton chars:
-    - order chars by commonness of their example words
+* Order singleton groups by frequency of their most frequent word
+* Kokuji group last (or first?)
 
 Topic: Japanese Support
 
-* Add kun'yomi definitions
+* possibly kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 * possibly add Unihan pronunciations when missing from Joyo
 

@@ -5,6 +5,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Set
 
+import jaconv
+
 from .component_group import ComponentGroup, PurityType
 from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
 
@@ -145,9 +147,11 @@ def _read_historical_on_yomi():
         for r in rows:
             modern = r["現代仮名遣い"]
             historical = r["字音仮名遣い"]
-            chars = r["字"]
-            for c in chars:
-                char_to_new_to_old_pron[c][modern] = historical
+            historical_kata = jaconv.hira2kata(historical)
+            if historical_kata != modern:
+                chars = r["字"]
+                for c in chars:
+                    char_to_new_to_old_pron[c][modern] = historical
 
     return char_to_new_to_old_pron
 
@@ -347,17 +351,18 @@ def main():
             char_supplement[c]["old"] = c
 
         char_to_new_to_old_pron = _read_historical_on_yomi()
+        index = _index(char_to_prons, comp_to_char)
+        index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
     elif args.language == "zh-HK":
         unihan = _read_unihan()
         char_to_prons = _get_hk_ed_chars(unihan)
         # print(char_to_prons)
         # get chars to prons from unihan where
+        index = _index(char_to_prons, comp_to_char)
     # elif args.language == 'zh-Zh':
     else:
         log.error(f"Cannot handle language {args.language} yet")
         exit()
-
-    index = _index(char_to_prons, comp_to_char)
 
     purity_to_chars = defaultdict(set)
     purity_to_groups = defaultdict(int)

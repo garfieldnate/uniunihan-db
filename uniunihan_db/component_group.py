@@ -34,6 +34,8 @@ class ComponentGroup:
         # reverse the char/pron mapping to determine pronunciation regularities
         self.pron_to_chars = defaultdict(list)
         for char, prons in char_to_prons.items():
+            if not prons:
+                prons = [""]
             self.chars.add(char)
             for p in prons:
                 self.pron_to_chars[p].append(char)
@@ -52,6 +54,12 @@ class ComponentGroup:
                 self.exceptions[pron] = chars[0]
 
         self.purity_type = PurityType.NO_PATTERN
+
+        if "" in self.pron_to_chars and len(self.pron_to_chars) == 1:
+            self.empty_prons = True
+            return
+        else:
+            self.empty_prons = False
 
         if len(self.chars) == 1:
             self.purity_type = PurityType.SINGLETON

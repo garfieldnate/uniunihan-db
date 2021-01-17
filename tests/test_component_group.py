@@ -23,6 +23,11 @@ def test_pron_to_chars():
     assert pron_to_chars == {"a": ["x", "y", "z"], "b": ["u", "w", "x"]}
 
 
+def test_non_empty_prons():
+    group = ComponentGroup("x", {"x": ["b", "a"], "y": []})
+    assert not group.empty_prons
+
+
 def test_exceptions():
     group = ComponentGroup(
         "x",
@@ -95,3 +100,12 @@ def test_get_char_presentation():
     group = ComponentGroup("x", char_to_prons)
     char_clusters = group.get_char_presentation()
     assert char_clusters == [["x", "y", "z"], ["u", "w"], ["t"], ["v"]]
+
+
+def test_group_with_no_pronunciations():
+    group = ComponentGroup("x", {"a": [], "b": [], "c": []})
+    assert group.empty_prons
+    assert group.chars == {"a", "b", "c"}
+    assert group.purity_type == PurityType.NO_PATTERN
+    assert group.pron_to_chars == {"": ["a", "b", "c"]}
+    assert group.get_char_presentation() == [["a", "b", "c"]]
