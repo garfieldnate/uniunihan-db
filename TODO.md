@@ -13,16 +13,10 @@ Topic: Mandarin support
 * Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list
 
-Topic: final dictionary output
-
-* Order singleton groups by frequency of their most frequent word
-* Kokuji group last (or first?)
-
 Topic: Japanese Support
 
 * possibly kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
-* possibly add Unihan pronunciations when missing from Joyo
 
 Topic: Korean Support
 

@@ -327,9 +327,6 @@ def _index(char_to_prons, comp_to_char):
         groups.append(group)
         chars_assigned_to_a_group.update(chars)
 
-    # Organize and sort the groups for easier inspection
-    groups.sort(key=lambda g: (g.purity_type, -len(g.chars)))
-
     # find characters with no assigned group
     all_chars = set(char_to_prons.keys())
     chars_with_no_group = all_chars - chars_assigned_to_a_group
@@ -422,11 +419,11 @@ def _print_reports(index, char_to_prons, char_to_words, out_dir):
         )
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "groups.json", "w") as f:
-        f.write(_format_json(index.groups))
     with open(out_dir / "unique_readings.json", "w") as f:
+        # Characters with unique on'yomi (for the joyo data)
         f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "missing_words.json", "w") as f:
+        # Character/pronunciation pairs for which no vocab examples could be found
         f.write(_format_json(sorted(list(missing_words))))
 
 
@@ -436,6 +433,8 @@ def _print_final_output(
     log.info("Constructing final output...")
     final = []
     for g in index.groups:
+        # keep track of highest frequency vocab used in the group
+        highest_freq = -1
         cluster_entries = []
         for cluster in g.get_char_presentation():
             cluster_entry = {}
@@ -451,6 +450,7 @@ def _print_final_output(
                             )
                         except StopIteration:
                             vocab = vocab_list[0]
+                        highest_freq = max(highest_freq, vocab["freq"])
                     else:
                         vocab = None
                     pron_entry = {
@@ -470,9 +470,22 @@ def _print_final_output(
         group_entry = {
             "component": g.component,
             "clusters": cluster_entries,
-            "purity": g.purity_type.name,
+            "purity": g.purity_type,
+            "chars": g.chars,
+            "highest_vocab_freq": highest_freq,
         }
         final.append(group_entry)
+
+    # Sort the entries by purity type, then number of characters descending, then frequency
+    # of most frequent word descending, and final orthographically by component
+    final.sort(
+        key=lambda g: (
+            g["purity"],
+            -len(g["chars"]),
+            -g["highest_vocab_freq"],
+            g["component"],
+        )
+    )
 
     with open(out_dir / "final_output.json", "w") as f:
         f.write(_format_json(final))
