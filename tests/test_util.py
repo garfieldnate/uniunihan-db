@@ -12,6 +12,10 @@ CHAR_TO_PRONS = {
     "分": ["ブン"],
     "泌": ["ヒツ"],
     "科": ["カ"],
+    "納": ["ナン", "ナッ"],
+    "得": ["トク"],
+    "今": ["コン"],
+    "昔": ["シャク"],
 }
 ALIGNER = Aligner(CHAR_TO_PRONS)
 
@@ -26,9 +30,17 @@ def test_sokuon_alignment():
     assert alignment == {"学": "ガク", "校": "コウ"}
 
 
+def test_n_cannot_be_sokuon():
+    alignment = ALIGNER.align("納得", "ナットク")
+    assert alignment == {"納": "ナッ", "得": "トク"}
+
+
 def test_rendaku_alignment():
     alignment = ALIGNER.align("賭博", "トバク")
     assert alignment == {"賭": "ト", "博": "ハク"}
+
+    alignment = ALIGNER.align("今昔", "コンシャク")
+    assert alignment == {"今": "コン", "昔": "シャク"}
 
 
 def test_no_rendaku_dakuten_alignment():

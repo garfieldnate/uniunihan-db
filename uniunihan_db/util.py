@@ -32,6 +32,21 @@ class Aligner:
     """A word/furigana character aligner"""
 
     RENDAKU = {
+        "カ": "ガ",
+        "キ": "ギ",
+        "ク": "グ",
+        "ケ": "ゲ",
+        "コ": "ゴ",
+        "サ": "ザ",
+        "シ": "ジ",
+        "ス": "ズ",
+        "セ": "ゼ",
+        "ソ": "ゾ",
+        "タ": "ダ",
+        "チ": "ジ",
+        "ツ": "ズ",
+        "テ": "デ",
+        "ト": "ド",
         "ハ": "バ",
         "ヒ": "ビ",
         "フ": "ブ",
@@ -49,6 +64,7 @@ class Aligner:
     # katakana codepoints are in this range
     KATAKANA_LOW = int("30a0", 16)
     KATAKANA_HIGH = int("30ff", 16)
+    NO_SOKUON_ALLOWED = set("ンアイウエオ")
 
     def __init__(self, char_to_prons):
         self.char_to_prons = char_to_prons
@@ -78,7 +94,10 @@ class Aligner:
                 if p.startswith(pron):
                     matched_pron = pron
                 # test for sokuon, e.g. little っ
-                elif p.startswith(pron[:-1] + self.sokuon):
+                elif (
+                    p.startswith(pron[:-1] + self.sokuon)
+                    and pron[-1] not in Aligner.NO_SOKUON_ALLOWED
+                ):
                     matched_pron = pron[:-1] + self.sokuon
                 # test for rendaku, e.g. added tenten
                 elif pron[0] in Aligner.RENDAKU.keys() and p.startswith(
