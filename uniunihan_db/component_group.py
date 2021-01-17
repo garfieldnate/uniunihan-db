@@ -22,6 +22,8 @@ class PurityType(IntEnum):
     NO_PATTERN = 7
     # Only one character in the group
     SINGLETON = 8
+    # No pronunciations are available to judge the group's purity
+    NO_PRONUNCIATIONS = 9
 
 
 class ComponentGroup:
@@ -53,13 +55,11 @@ class ComponentGroup:
             if len(chars) == 1:
                 self.exceptions[pron] = chars[0]
 
-        self.purity_type = PurityType.NO_PATTERN
-
         if "" in self.pron_to_chars and len(self.pron_to_chars) == 1:
-            self.empty_prons = True
+            self.purity_type = PurityType.NO_PRONUNCIATIONS
             return
-        else:
-            self.empty_prons = False
+
+        self.purity_type = PurityType.NO_PATTERN
 
         if len(self.chars) == 1:
             self.purity_type = PurityType.SINGLETON
