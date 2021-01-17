@@ -4,7 +4,6 @@
 
 Topic: groupings
 
-* Disallow mixed no-pron and with-pron characters (because on'yomi-less kokuji don't get phonetic components!)
 * possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support

@@ -8,6 +8,11 @@ def test_no_chars_raises_error():
         ComponentGroup("x", {})
 
 
+def test_mixed_with_and_with_pron_raises_error():
+    with pytest.raises(ValueError):
+        ComponentGroup("x", {"x": ["b", "a"], "y": [], "z": ["a"]})
+
+
 def test_chars():
     group = ComponentGroup(
         "x", {"x": ["b", "a"], "y": ["a"], "z": ["a"], "w": ["b"], "u": ["b"]}
