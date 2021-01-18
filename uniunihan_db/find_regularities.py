@@ -8,7 +8,13 @@ from typing import Dict, List, Set
 import jaconv
 
 from .component_group import ComponentGroup, PurityType
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, Aligner, configure_logging
+from .util import (
+    GENERATED_DATA_DIR,
+    INCLUDED_DATA_DIR,
+    Aligner,
+    configure_logging,
+    read_joyo,
+)
 
 log = configure_logging(__name__)
 
@@ -23,48 +29,6 @@ class CustomJsonEncoder(json.JSONEncoder):
             return vars(obj)
 
         return json.JSONEncoder.default(self, obj)
-
-
-def _read_joyo():
-    log.info("Loading joyo data...")
-    new_char_to_prons = {}
-    old_char_to_prons = {}
-    char_to_supplementary_info = {}
-    with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
-        # filter comments
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
-        for r in rows:
-            supplementary_info = {
-                "keyword": r["English_meaning"],
-                "kun-yomi": r["kun-yomi"],
-                "grade": r["grade"],
-                "strokes": r["strokes"],
-                "new": r["new"],
-            }
-            # remove empty readings
-            readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
-            # note the non-Joyo readings and strip the indicator asterisk
-            supplementary_info["non-joyo"] = [
-                yomi[:-1] for yomi in readings if yomi[-1] == "*"
-            ]
-            readings = [yomi.rstrip("*") for yomi in readings if yomi]
-            supplementary_info["readings"] = sorted(readings)
-
-            for c in r["new"]:
-                new_char_to_prons[c] = readings
-                char_to_supplementary_info[c] = supplementary_info
-            # old glyph same as new glyph when missing
-            for c in r["old"] or r["new"]:
-                old_char_to_prons[c] = readings
-                char_to_supplementary_info[c] = dict(supplementary_info)
-            # handle multiple old characters case (弁/辨瓣辯辦辮)
-            if old := r["old"]:
-                for old_c in old:
-                    char_to_supplementary_info[old_c]["old"] = old_c
-                    for new_c in r["new"]:
-                        char_to_supplementary_info[new_c]["old"] = old_c
-
-    return old_char_to_prons, new_char_to_prons, char_to_supplementary_info
 
 
 def _read_edict_freq(aligner):
@@ -363,7 +327,7 @@ def main():
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets,
         # and only new glyphs are matchable against modern word lists
-        char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
+        char_to_prons, new_char_to_prons, char_supplement = read_joyo()
         aligner = Aligner(new_char_to_prons)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
         char_to_words = _get_vocab_per_char_pron(

@@ -15,7 +15,9 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
-* possibly kun'yomi definitions
+* Separate keywords for the 弁 kyuujitai
+* rename aligner to japanese aligner, move to its own file
+* possibly output kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 
 Topic: Korean Support
