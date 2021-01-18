@@ -14,150 +14,6 @@ log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
-JP_VOCAB_OVERRIDE = {
-    # These five characters were collapsed in the sinjitai, and we don't have old spellings
-    # for vocab, so these have to be specified directly
-    "辯": {
-        "ベン": [
-            {
-                "surface": "関西弁",
-                "pron": "カンサイベン",
-                "freq": 42413,
-                "en": "(n) Kansai dialect",
-            }
-        ]
-    },
-    "辨": {
-        "ベン": [
-            {
-                "surface": "弁当",
-                "pron": "ベントウ",
-                "freq": 524433,
-                "en": "(n) bento (Japanese box lunch)",
-            }
-        ]
-    },
-    "瓣": {
-        "ベン": [
-            {
-                "surface": "安全弁",
-                "pron": "アンゼンベン",
-                "freq": 566,
-                "en": "(n) safety valve",
-            }
-        ]
-    },
-    "辦": {
-        "ベン": [
-            {
-                "surface": "合弁会社",
-                "pron": "ゴウベンガイシャ",
-                "freq": 1374,
-                "en": "(n) joint venture or concern",
-            }
-        ]
-    },
-    "辮": {
-        "ベン": [
-            {
-                "surface": "弁髪",
-                "pron": "ベンパツ",
-                "freq": 414,
-                "en": "(n) pigtail/queue",
-            }
-        ]
-    },
-    # these two aren't found automatically because of their non-Joyo kanji usage
-    "肘": {
-        "チュウ": [
-            {
-                "surface": "掣肘",
-                "pron": "セイチュウ",
-                "freq": 200,
-                "en": "(n,vs) restraint/restriction/control",
-            },
-        ]
-    },
-    "唄": {
-        "バイ": [
-            {
-                "surface": "梵唄",
-                "pron": "ボンバイ",
-                "freq": 27,
-                "en": "(n) song in praise of Buddhas virtues",
-            },
-        ]
-    },
-    # This character reading is rare enough not to be in EDICT
-    "栃": {
-        "レイ": [
-            {
-                "surface": "帰栃",
-                "pron": "キレイ",
-                "freq": -1,
-                "en": "(n,vs) Returning to Tochigi prefecture",
-            }
-        ]
-    },
-    # These I had to find online somewhere
-    "鍋": {
-        "カ": [
-            {
-                "surface": "コロナ鍋",
-                "pron": "コロナカ",
-                "freq": -1,
-                "en": "(n) A stew with enoki mushrooms sticking out of meatballs to look like the spikes on a Corona virus. Pun with コロナ禍.",
-            },
-            {
-                "surface": "鍋戸",
-                "pron": "カコ",
-                "freq": -1,
-                "en": "(n) Someone who makes salt by boiling seawater in a large pot",
-            },
-        ]
-    },
-    "釜": {
-        "フ": [
-            {
-                "surface": "釜中の魚",
-                "pron": "フチュウノウオ",
-                "freq": -1,
-                "en": "(n) A fish being boiled in a pot; at death's door",
-            },
-        ]
-    },
-    "瀨": {
-        "ライ": [
-            {
-                "surface": "急瀬",
-                "pron": "キュウライ",
-                "freq": -1,
-                "en": "(n) A strait",
-            },
-        ]
-    },
-    "鎌": {
-        "レン": [
-            {
-                "surface": "鎌利",
-                "pron": "レンリ",
-                "freq": -1,
-                "en": "(name) Being as sharp as a sickle",
-            },
-        ]
-    },
-    "裾": {
-        "キョ": [
-            {
-                "surface": "衣裾",
-                "pron": "イキョ",
-                "freq": -1,
-                "en": "(n) The sleeve of a robe",
-            },
-        ]
-    },
-}
-
 
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -365,12 +221,10 @@ def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
 
     char_to_words = defaultdict(lambda: defaultdict(list))
     missing_words = []
-    prons_to_move = defaultdict(list)
     for char, prons in char_to_prons.items():
         for p in prons:
             if word := char_to_pron_to_words.get(char, {}).get(p):
                 char_to_words[char][p].extend(word)
-                prons_to_move[char].append(p)
             else:
                 missing_words.append(f"{char}/{p}")
 
@@ -507,7 +361,6 @@ def main():
     comp_to_char = _read_phonetic_components()
 
     if args.language == "jp":
-
         # old glyphs give a better matching with non-Japanese datasets,
         # and only new glyphs are matchable against modern word lists
         char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
@@ -523,8 +376,13 @@ def main():
                 old_char_to_words[c] = words
         char_to_words.update(old_char_to_words)
 
-        char_to_words.update(JP_VOCAB_OVERRIDE)
-        for c in JP_VOCAB_OVERRIDE:
+        # Some words had to be specified manually instead of found in (2008) EDICT
+        jp_vocab_override = json.load(
+            open(INCLUDED_DATA_DIR / "jp_vocab_override.json")
+        )
+        del jp_vocab_override["//"]
+        char_to_words.update(jp_vocab_override)
+        for c in jp_vocab_override:
             char_supplement[c]["old"] = c
 
         char_to_new_to_old_pron = _read_historical_on_yomi()
