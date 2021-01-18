@@ -34,7 +34,6 @@ def _read_joyo():
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
-            # number,new,old,radical,strokes,grade,year_added,English_meaning,on-yomi,kun-yomi
             supplementary_info = {
                 "keyword": r["English_meaning"],
                 "kun-yomi": r["kun-yomi"],
@@ -42,9 +41,7 @@ def _read_joyo():
                 "strokes": r["strokes"],
                 "new": r["new"],
             }
-            if r["old"]:
-                supplementary_info["old"] = r["old"]
-            # remove empty readings;
+            # remove empty readings
             readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
             # note the non-Joyo readings and strip the indicator asterisk
             supplementary_info["non-joyo"] = [
@@ -60,6 +57,12 @@ def _read_joyo():
             for c in r["old"] or r["new"]:
                 old_char_to_prons[c] = readings
                 char_to_supplementary_info[c] = dict(supplementary_info)
+            # handle multiple old characters case (弁/辨瓣辯辦辮)
+            if old := r["old"]:
+                for old_c in old:
+                    char_to_supplementary_info[old_c]["old"] = old_c
+                    for new_c in r["new"]:
+                        char_to_supplementary_info[new_c]["old"] = old_c
 
     return old_char_to_prons, new_char_to_prons, char_to_supplementary_info
 
@@ -379,8 +382,6 @@ def main():
         )
         del jp_vocab_override["//"]
         char_to_words.update(jp_vocab_override)
-        for c in jp_vocab_override:
-            char_supplement[c]["old"] = c
 
         char_to_new_to_old_pron = _read_historical_on_yomi()
         index = _index(char_to_prons, comp_to_char)
