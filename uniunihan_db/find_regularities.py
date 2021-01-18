@@ -59,7 +59,7 @@ def _read_joyo():
             # old glyph same as new glyph when missing
             for c in r["old"] or r["new"]:
                 old_char_to_prons[c] = readings
-                char_to_supplementary_info[c] = supplementary_info
+                char_to_supplementary_info[c] = dict(supplementary_info)
 
     return old_char_to_prons, new_char_to_prons, char_to_supplementary_info
 
@@ -220,15 +220,12 @@ def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
     of vocab sorted by frequency of use"""
 
     char_to_words = defaultdict(lambda: defaultdict(list))
-    missing_words = []
     for char, prons in char_to_prons.items():
         for p in prons:
             if word := char_to_pron_to_words.get(char, {}).get(p):
                 char_to_words[char][p].extend(word)
-            else:
-                missing_words.append(f"{char}/{p}")
 
-    return char_to_words, missing_words
+    return char_to_words
 
 
 def _format_json(data):
@@ -366,7 +363,7 @@ def main():
         char_to_prons, new_char_to_prons, char_supplement = _read_joyo()
         aligner = Aligner(new_char_to_prons)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
-        char_to_words, missing_words = _get_vocab_per_char_pron(
+        char_to_words = _get_vocab_per_char_pron(
             new_char_to_prons, char_to_pron_to_vocab
         )
         # convert to old glyphs to match char_to_prons
