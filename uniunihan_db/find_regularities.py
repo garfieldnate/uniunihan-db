@@ -8,13 +8,8 @@ from typing import Dict, List, Set
 import jaconv
 
 from .component_group import ComponentGroup, PurityType
-from .util import (
-    GENERATED_DATA_DIR,
-    INCLUDED_DATA_DIR,
-    Aligner,
-    configure_logging,
-    read_joyo,
-)
+from .lingua.jp.aligner import Aligner
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging, read_joyo
 
 log = configure_logging(__name__)
 
