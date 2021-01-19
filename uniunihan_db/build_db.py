@@ -11,7 +11,7 @@ from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
 from .lingua import japanese, mandarin
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
+from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging, read_unihan
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
@@ -41,10 +41,7 @@ UNIHAN_DICT = None
 def get_unihan():
     global UNIHAN_DICT
     if not UNIHAN_DICT:
-        log.info("Reading in Unihan DB...")
-        with open(UNIHAN_FILE) as f:
-            UNIHAN_DICT = json.load(f)
-        log.info(f"  Read {len(UNIHAN_DICT)} characters from Unihan DB")
+        UNIHAN_DICT = read_unihan()
     return UNIHAN_DICT
 
 

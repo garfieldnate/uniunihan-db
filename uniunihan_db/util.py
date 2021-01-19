@@ -1,10 +1,13 @@
 import csv
+import json
 import logging
 import os
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List
+
+import jaconv
 
 PROJECT_DIR = Path(__file__).parents[1]
 
@@ -90,3 +93,93 @@ def read_joyo():
                 supplementary_info["old"] = old_c
 
     return Joyo(old_char_to_prons, new_char_to_prons, char_info)
+
+
+def read_phonetic_components():
+    log.info("Loading phonetic components...")
+    comp_to_char = {}
+    with open(GENERATED_DATA_DIR / "components_to_chars.tsv") as f:
+        rows = csv.DictReader(f, delimiter="\t")
+        for r in rows:
+            component = r["component"]
+            chars = r["characters"]
+            comp_to_char[component] = set(chars)
+
+    return comp_to_char
+
+
+def read_edict_freq(aligner):
+    log.info("Loading EDICT frequency list...")
+    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    with open(GENERATED_DATA_DIR / "edict-freq.tsv") as f:
+        num_words = 0
+        for line in f.readlines():
+            line = line.strip()
+            surface, surface_normalized, pronunciation, english, frequency = line.split(
+                "\t"
+            )
+            alignment = aligner.align(surface_normalized, pronunciation)
+            if alignment:
+                word = {
+                    "surface": surface,
+                    "pron": pronunciation,
+                    "freq": int(frequency),
+                    "en": english,
+                }
+                for c, pron in alignment.items():
+                    char_to_pron_to_words[c][pron].append(word)
+                num_words += 1
+    return char_to_pron_to_words
+
+
+def read_historical_on_yomi(normalizer=jaconv.hira2kata):
+    log.info("Loading historical on-yomi data...")
+    char_to_new_to_old_pron = defaultdict(dict)
+    with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
+        # filter comments
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
+        for r in rows:
+            modern = r["現代仮名遣い"]
+            historical = r["字音仮名遣い"]
+            historical_kata = normalizer(historical)
+            if historical_kata != modern:
+                chars = r["字"]
+                for c in chars:
+                    char_to_new_to_old_pron[c][modern] = historical
+
+    return char_to_new_to_old_pron
+
+
+def read_unihan():
+    log.info("Loading unihan data...")
+    # TODO: read path from constants file
+    with open(GENERATED_DATA_DIR / "unihan.json") as f:
+        unihan = json.load(f)
+    log.info(f"  Read {len(unihan)} characters from Unihan DB")
+
+    return unihan
+
+
+def get_hk_ed_chars(unihan):
+    def get_pron(info):
+        # check all of the available fields in order of usefulness/accuracy
+        if pron := info.get("kHanyuPinlu"):
+            #             print('returning pinlu')
+            return [p["phonetic"] for p in pron]
+        elif pron := info.get("kXHC1983"):
+            #             print('returning 1983')
+            return [p["reading"] for p in pron]
+        elif pron := info.get("kHanyuPinyin"):
+            #             print('returning pinyin!')
+            return [r for p in pron for r in p["readings"]]
+        elif pron := info.get("kMandarin"):
+            print("returning mandarin!")
+            return pron["zh-Hans"]
+        return []
+
+    chars = {}
+    for char, info in unihan.items():
+        if "kGradeLevel" in info:
+            prons = get_pron(info)
+            chars[char] = prons
+    return chars

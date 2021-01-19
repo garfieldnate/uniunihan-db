@@ -1,15 +1,20 @@
 import argparse
-import csv
 import json
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Set
 
-import jaconv
-
 from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging, read_joyo
+from .util import (
+    GENERATED_DATA_DIR,
+    INCLUDED_DATA_DIR,
+    configure_logging,
+    read_edict_freq,
+    read_historical_on_yomi,
+    read_joyo,
+    read_phonetic_components,
+)
 
 log = configure_logging(__name__)
 
@@ -24,95 +29,6 @@ class CustomJsonEncoder(json.JSONEncoder):
             return vars(obj)
 
         return json.JSONEncoder.default(self, obj)
-
-
-def _read_edict_freq(aligner):
-    log.info("Loading EDICT frequency list...")
-    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
-    with open(GENERATED_DATA_DIR / "edict-freq.tsv") as f:
-        num_words = 0
-        for line in f.readlines():
-            line = line.strip()
-            surface, surface_normalized, pronunciation, english, frequency = line.split(
-                "\t"
-            )
-            alignment = aligner.align(surface_normalized, pronunciation)
-            if alignment:
-                word = {
-                    "surface": surface,
-                    "pron": pronunciation,
-                    "freq": int(frequency),
-                    "en": english,
-                }
-                for c, pron in alignment.items():
-                    char_to_pron_to_words[c][pron].append(word)
-                num_words += 1
-    return char_to_pron_to_words
-
-
-def _read_historical_on_yomi(normalizer=jaconv.hira2kata):
-    log.info("Loading historical on-yomi data...")
-    char_to_new_to_old_pron = defaultdict(dict)
-    with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
-        # filter comments
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
-        for r in rows:
-            modern = r["現代仮名遣い"]
-            historical = r["字音仮名遣い"]
-            historical_kata = normalizer(historical)
-            if historical_kata != modern:
-                chars = r["字"]
-                for c in chars:
-                    char_to_new_to_old_pron[c][modern] = historical
-
-    return char_to_new_to_old_pron
-
-
-def _read_unihan():
-    log.info("Loading unihan data...")
-    # TODO: read path from constants file
-    with open(GENERATED_DATA_DIR / "unihan.json") as f:
-        unihan = json.load(f)
-
-    return unihan
-
-
-def _get_hk_ed_chars(unihan):
-    def get_pron(info):
-        # check all of the available fields in order of usefulness/accuracy
-        if pron := info.get("kHanyuPinlu"):
-            #             print('returning pinlu')
-            return [p["phonetic"] for p in pron]
-        elif pron := info.get("kXHC1983"):
-            #             print('returning 1983')
-            return [p["reading"] for p in pron]
-        elif pron := info.get("kHanyuPinyin"):
-            #             print('returning pinyin!')
-            return [r for p in pron for r in p["readings"]]
-        elif pron := info.get("kMandarin"):
-            print("returning mandarin!")
-            return pron["zh-Hans"]
-        return []
-
-    chars = {}
-    for char, info in unihan.items():
-        if "kGradeLevel" in info:
-            prons = get_pron(info)
-            chars[char] = prons
-    return chars
-
-
-def _read_phonetic_components():
-    log.info("Loading phonetic components...")
-    comp_to_char = {}
-    with open(GENERATED_DATA_DIR / "components_to_chars.tsv") as f:
-        rows = csv.DictReader(f, delimiter="\t")
-        for r in rows:
-            component = r["component"]
-            chars = r["characters"]
-            comp_to_char[component] = set(chars)
-
-    return comp_to_char
 
 
 @dataclass
@@ -174,20 +90,6 @@ def _index(char_to_prons, comp_to_char):
         no_pron_chars,
         chars_with_no_group,
     )
-
-
-def _get_vocab_per_char_pron(char_to_prons, char_to_pron_to_words):
-    """char_to_prons: dict character -> iterable of pronunciations
-    char_to_pron_to_words: dict character -> pronunciation -> list
-    of vocab sorted by frequency of use"""
-
-    char_to_words = defaultdict(lambda: defaultdict(list))
-    for char, prons in char_to_prons.items():
-        for p in prons:
-            if word := char_to_pron_to_words.get(char, {}).get(p):
-                char_to_words[char][p].extend(word)
-
-    return char_to_words
 
 
 def _format_json(data):
@@ -318,45 +220,46 @@ def main():
 
     args = parser.parse_args()
 
-    comp_to_char = _read_phonetic_components()
+    comp_to_char = read_phonetic_components()
 
     if args.language == "jp":
-        # old glyphs give a better matching with non-Japanese datasets,
-        # and only new glyphs are matchable against modern word lists
-        # char_to_prons, new_char_to_prons, char_supplement
+        # read initial character data
         joyo = read_joyo()
-        aligner = Aligner(joyo.new_char_to_prons)
-        char_to_pron_to_vocab = _read_edict_freq(aligner)
 
-        # new characters must be used for vocab
-        char_to_words = _get_vocab_per_char_pron(
-            joyo.new_char_to_prons, char_to_pron_to_vocab
-        )
-        # convert to old glyphs, which we use as the master list of characters
-        old_char_to_words = {}
-        for new_char, words in char_to_words.items():
-            for old_c in joyo.new_to_old(new_char):
-                old_char_to_words[old_c] = words
-        char_to_words.update(old_char_to_words)
-
-        # Some words had to be specified manually instead of found in (2008) EDICT
-        jp_vocab_override = json.load(
-            open(INCLUDED_DATA_DIR / "jp_vocab_override.json")
-        )
-        del jp_vocab_override["//"]
-        char_to_words.update(jp_vocab_override)
-
-        # update char supplementary info with new-to-old pronunciations
-        char_to_new_to_old_pron = _read_historical_on_yomi()
+        # update character information with historical kana spellings
+        char_to_new_to_old_pron = read_historical_on_yomi()
         for c, new_to_old_pron in char_to_new_to_old_pron.items():
             if c_sup := joyo.char_to_supplementary_info.get(c):
                 c_sup["historical_pron"] = new_to_old_pron
 
+        # Compile a dictionary of characters to high frequency words which use them
+        # Old glyphs will be presented to the user in the end, but new glyphs are
+        # required for finding vocab.
+        # Create aligner to determine which character pronunciations are used in a word
+        aligner = Aligner(joyo.new_char_to_prons)
+        # Read initial vocab list
+        char_to_pron_to_vocab = read_edict_freq(aligner)
+        # Add mappings for old character glyphs
+        old_char_to_words = {}
+        for new_char, words in char_to_pron_to_vocab.items():
+            for old_c in joyo.new_to_old(new_char):
+                old_char_to_words[old_c] = words
+        char_to_pron_to_vocab.update(old_char_to_words)
+        # Some words had to be specified manually instead of extracted from our downloaded dictionary
+        jp_vocab_override = json.load(
+            open(INCLUDED_DATA_DIR / "jp_vocab_override.json")
+        )
+        del jp_vocab_override["//"]
+        char_to_pron_to_vocab.update(jp_vocab_override)
+
+        # Extract character groups and grade their pronunciation regularities
         index = _index(joyo.old_char_to_prons, comp_to_char)
+        # 国字 do not have phonetic characters, but can be usefully learned together
         index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
+
     # elif args.language == "zh-HK":
     #     unihan = _read_unihan()
-    #     char_to_prons = _get_hk_ed_chars(unihan)
+    #     char_to_prons = get_hk_ed_chars(unihan)
     #     # print(char_to_prons)
     #     # get chars to prons from unihan where
     #     index = _index(char_to_prons, comp_to_char)
@@ -366,11 +269,11 @@ def main():
     #     exit()
 
     out_dir = OUTPUT_DIR / args.language
-    _print_reports(index, joyo.old_char_to_prons, char_to_words, out_dir)
+    _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
 
     _print_final_output(
         index,
-        char_to_words,
+        char_to_pron_to_vocab,
         joyo.char_to_supplementary_info,
         out_dir,
     )
