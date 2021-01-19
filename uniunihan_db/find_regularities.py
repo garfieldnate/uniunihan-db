@@ -50,7 +50,7 @@ def _read_edict_freq(aligner):
     return char_to_pron_to_words
 
 
-def _read_historical_on_yomi():
+def _read_historical_on_yomi(normalizer=jaconv.hira2kata):
     log.info("Loading historical on-yomi data...")
     char_to_new_to_old_pron = defaultdict(dict)
     with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
@@ -59,7 +59,7 @@ def _read_historical_on_yomi():
         for r in rows:
             modern = r["現代仮名遣い"]
             historical = r["字音仮名遣い"]
-            historical_kata = jaconv.hira2kata(historical)
+            historical_kata = normalizer(historical)
             if historical_kata != modern:
                 chars = r["字"]
                 for c in chars:
@@ -240,9 +240,7 @@ def _print_reports(index, char_to_prons, char_to_words, out_dir):
         f.write(_format_json(sorted(list(missing_words))))
 
 
-def _print_final_output(
-    index, char_to_new_to_old_pron, char_to_words, char_supplement, out_dir
-):
+def _print_final_output(index, char_to_words, char_supplement, out_dir):
     log.info("Constructing final output...")
     final = []
     for g in index.groups:
@@ -252,8 +250,9 @@ def _print_final_output(
         for cluster in g.get_char_presentation():
             cluster_entry = {}
             for c in cluster:
+                c_sup = char_supplement[c]
                 pron_entries = []
-                for pron in char_supplement[c]["readings"]:
+                for pron in c_sup["readings"]:
                     vocab_list = char_to_words[c].get(pron, [])
                     if vocab_list:
                         # find a multi-char word if possible
@@ -269,15 +268,17 @@ def _print_final_output(
                     pron_entry = {
                         "pron": pron,
                         "vocab": vocab,
-                        "non-joyo": pron in char_supplement[c]["non-joyo"],
+                        "non-joyo": pron in c_sup["non-joyo"],
                     }
-                    if old_pron := char_to_new_to_old_pron.get(c, {}).get(pron):
+                    if old_pron := c_sup.get("historical_pron", {}).get(pron):
                         pron_entry["historical"] = old_pron
                     pron_entries.append(pron_entry)
                 # put the Joyo pronunciations before the non-joyo ones
                 pron_entries.sort(key=lambda item: (item["non-joyo"], item["pron"]))
                 c_entry = {"prons": pron_entries}
-                c_entry.update(char_supplement[c])
+                c_entry.update(c_sup)
+                # already added this in pronunciation entries
+                c_entry.pop("historical_pron", None)
                 cluster_entry[c] = c_entry
             cluster_entries.append(cluster_entry)
         group_entry = {
@@ -345,7 +346,12 @@ def main():
         del jp_vocab_override["//"]
         char_to_words.update(jp_vocab_override)
 
+        # update char supplementary info with new-to-old pronunciations
         char_to_new_to_old_pron = _read_historical_on_yomi()
+        for c, new_to_old_pron in char_to_new_to_old_pron.items():
+            if c_sup := joyo.char_to_supplementary_info.get(c):
+                c_sup["historical_pron"] = new_to_old_pron
+
         index = _index(joyo.old_char_to_prons, comp_to_char)
         index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
     # elif args.language == "zh-HK":
@@ -364,7 +370,6 @@ def main():
 
     _print_final_output(
         index,
-        char_to_new_to_old_pron,
         char_to_words,
         joyo.char_to_supplementary_info,
         out_dir,
