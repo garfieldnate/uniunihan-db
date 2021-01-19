@@ -322,19 +322,19 @@ def main():
     if args.language == "jp":
         # old glyphs give a better matching with non-Japanese datasets,
         # and only new glyphs are matchable against modern word lists
-        char_to_prons, new_char_to_prons, char_supplement = read_joyo()
-        aligner = Aligner(new_char_to_prons)
+        # char_to_prons, new_char_to_prons, char_supplement
+        joyo = read_joyo()
+        aligner = Aligner(joyo.new_char_to_prons)
         char_to_pron_to_vocab = _read_edict_freq(aligner)
+
+        # new characters must be used for vocab
         char_to_words = _get_vocab_per_char_pron(
-            new_char_to_prons, char_to_pron_to_vocab
+            joyo.new_char_to_prons, char_to_pron_to_vocab
         )
-        # convert to old glyphs to match char_to_prons
+        # convert to old glyphs, which we use as the master list of characters
         old_char_to_words = {}
         for new_char, words in char_to_words.items():
-            for c_sup in filter(
-                lambda c_sup: c_sup["new"] == new_char, char_supplement.values()
-            ):
-                old_c = c_sup["old"]
+            for old_c in joyo.new_to_old(new_char):
                 old_char_to_words[old_c] = words
         char_to_words.update(old_char_to_words)
 
@@ -346,24 +346,28 @@ def main():
         char_to_words.update(jp_vocab_override)
 
         char_to_new_to_old_pron = _read_historical_on_yomi()
-        index = _index(char_to_prons, comp_to_char)
+        index = _index(joyo.old_char_to_prons, comp_to_char)
         index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
-    elif args.language == "zh-HK":
-        unihan = _read_unihan()
-        char_to_prons = _get_hk_ed_chars(unihan)
-        # print(char_to_prons)
-        # get chars to prons from unihan where
-        index = _index(char_to_prons, comp_to_char)
-    # elif args.language == 'zh-Zh':
-    else:
-        log.error(f"Cannot handle language {args.language} yet")
-        exit()
+    # elif args.language == "zh-HK":
+    #     unihan = _read_unihan()
+    #     char_to_prons = _get_hk_ed_chars(unihan)
+    #     # print(char_to_prons)
+    #     # get chars to prons from unihan where
+    #     index = _index(char_to_prons, comp_to_char)
+    # # elif args.language == 'zh-Zh':
+    # else:
+    #     log.error(f"Cannot handle language {args.language} yet")
+    #     exit()
 
     out_dir = OUTPUT_DIR / args.language
-    _print_reports(index, char_to_prons, char_to_words, out_dir)
+    _print_reports(index, joyo.old_char_to_prons, char_to_words, out_dir)
 
     _print_final_output(
-        index, char_to_new_to_old_pron, char_to_words, char_supplement, out_dir
+        index,
+        char_to_new_to_old_pron,
+        char_to_words,
+        joyo.char_to_supplementary_info,
+        out_dir,
     )
 
 
