@@ -10,7 +10,7 @@ def test_read_joyo():
     assert len(old_char_to_prons) == 2140
 
     assert char_supplement["辯"] == {
-        "keyword": "valve",
+        "keyword": "articulate",
         "kun-yomi": "",
         "grade": "5",
         "strokes": "5",
@@ -21,7 +21,6 @@ def test_read_joyo():
     }
     # make sure these are properly recognized as separate characters
     assert char_supplement["辮"]["old"] == "辮"
-    assert char_supplement["弁"]["old"] == "辨瓣辯辦辮"
     assert char_supplement["和"]["non-joyo"] == ["オ"]
 
     assert new_char_to_prons["労"] == ["ロウ"]
@@ -29,3 +28,7 @@ def test_read_joyo():
     assert old_char_to_prons["勞"] == ["ロウ"]
     # new glyph is used if old one not available
     assert old_char_to_prons["老"] == ["ロウ"]
+
+    # 1-to-many new-to-old mappings should be listed in a separate row for each variant
+    assert all([len(char_supplement[c]["old"] or "") <= 1 for c in char_supplement])
+    assert all([len(char_supplement[c]["new"]) == 1 for c in char_supplement])

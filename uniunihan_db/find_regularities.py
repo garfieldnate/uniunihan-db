@@ -331,8 +331,11 @@ def main():
         # convert to old glyphs to match char_to_prons
         old_char_to_words = {}
         for new_char, words in char_to_words.items():
-            for c in char_supplement[new_char].get("old", []):
-                old_char_to_words[c] = words
+            for c_sup in filter(
+                lambda c_sup: c_sup["new"] == new_char, char_supplement.values()
+            ):
+                old_c = c_sup["old"]
+                old_char_to_words[old_c] = words
         char_to_words.update(old_char_to_words)
 
         # Some words had to be specified manually instead of found in (2008) EDICT

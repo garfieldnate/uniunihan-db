@@ -47,6 +47,7 @@ def read_joyo():
                 "grade": r["grade"],
                 "strokes": r["strokes"],
                 "new": r["new"],
+                "old": None,
             }
             # remove empty readings
             readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
@@ -57,22 +58,15 @@ def read_joyo():
             readings = [yomi.rstrip("*") for yomi in readings if yomi]
             supplementary_info["readings"] = sorted(readings)
 
-            for c in r["new"]:
-                new_char_to_prons[c] = readings
-                char_to_supplementary_info[c] = supplementary_info
+            new_c = r["new"]
+            new_char_to_prons[new_c] = readings
+            char_to_supplementary_info[new_c] = supplementary_info
+
             # old glyph same as new glyph when missing
-            for c in r["old"] or r["new"]:
-                old_char_to_prons[c] = readings
-                char_to_supplementary_info[c] = dict(supplementary_info)
-            # handle multiple old characters case (弁/辨瓣辯辦辮)
-            if old := r["old"]:
-                for old_c in old:
-                    char_to_supplementary_info[old_c]["old"] = old_c
-                    for new_c in r["new"]:
-                        # put all of the kyuujitai in 弁's 'old' field
-                        if new_c == "弁":
-                            char_to_supplementary_info[new_c]["old"] = old
-                        else:
-                            char_to_supplementary_info[new_c]["old"] = old_c
+            old_c = r["old"] or new_c
+            old_char_to_prons[old_c] = readings
+            char_to_supplementary_info[old_c] = supplementary_info
+            if old_c != new_c:
+                supplementary_info["old"] = old_c
 
     return old_char_to_prons, new_char_to_prons, char_to_supplementary_info

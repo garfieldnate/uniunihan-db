@@ -15,7 +15,10 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
-* Separate keywords for the 弁 kyuujitai
+* read_joyo should return single object
+    - get old chars for new char
+    - get char data
+    - get char prons (new, old)
 * possibly output kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 
