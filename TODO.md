@@ -8,7 +8,6 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* Use CJKlib (https://pythonhosted.org/cjklib/cjklib.reading.converter.PinyinWadeGilesConverter-class.html) to convert pinyin to Wade-Giles so words from CKIP and and chars from Unihan have same pronunciation strings.
 * Provide simplified character along with traditional
 * Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list

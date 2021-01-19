@@ -56,3 +56,8 @@ def test_parse_legal_syllable(
 def test_parse_nonce_syllable():
     syl = mandarin.parse_syllable("xyadfs")
     assert syl is None
+
+
+def test_pinyin_tone_marks_to_numbers():
+    s = "shén me"
+    assert mandarin.pinyin_tone_marks_to_numbers(s) == "shen2 me"

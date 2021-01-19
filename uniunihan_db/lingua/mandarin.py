@@ -66,6 +66,16 @@ ONSETS = "tdkgpbwqryljhszxcnmf"
 SYLLABLE_RE = f"(?i)^(?P<onset>[{ONSETS}]h?)?(?P<glide>i|u|ü)?(?P<nucleus>[{VOWEL_LIST}])(?P<final>ng?|r|i|u|o)?$"
 
 
+def _strip_tone(s):
+    tone = 0
+    for t, matcher in TONE_MATCHERS.items():
+        if re.search(matcher, s):
+            tone = t
+    for no_tone, with_tone in TONE_REMOVERS.items():
+        s = re.sub(with_tone, no_tone, s)
+    return s, tone
+
+
 def parse_syllable(s: str) -> Optional[Syllable]:
     """Parse a pinyin-romanized syllable into its constituent parts. This does not attempt
     to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
@@ -74,12 +84,12 @@ def parse_syllable(s: str) -> Optional[Syllable]:
     surface = s
 
     # determine the tone and strip the diacritic first to simplify later processing
-    tone = 0
-    for t, matcher in TONE_MATCHERS.items():
-        if re.search(matcher, s):
-            tone = t
-    for no_tone, with_tone in TONE_REMOVERS.items():
-        s = re.sub(with_tone, no_tone, s)
+    s, tone = _strip_tone(s)
+    # for t, matcher in TONE_MATCHERS.items():
+    #     if re.search(matcher, s):
+    #         tone = t
+    # for no_tone, with_tone in TONE_REMOVERS.items():
+    #     s = re.sub(with_tone, no_tone, s)
 
     tone_stripped = s
 
@@ -126,3 +136,14 @@ def parse_syllable(s: str) -> Optional[Syllable]:
         tone,
         tone_stripped,
     )
+
+
+def pinyin_tone_marks_to_numbers(s):
+    words = s.split()
+    new_words = []
+    for w in words:
+        s, tone = _strip_tone(w)
+        if tone == 0:
+            tone = ""
+        new_words.append(f"{s}{tone}")
+    return " ".join(new_words)
