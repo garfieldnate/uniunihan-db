@@ -8,6 +8,12 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* mandarin aligner (works using spaces)
+* pre-process mandarin_20K.tsv:
+    - numbers to tone marks
+    - ü to u conversion where needed
+    - comment on Wikipedia about that pitfall
+* get vocab from mandarin_20K.tsv
 * Provide simplified character along with traditional
 * Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list

@@ -1,4 +1,4 @@
-from uniunihan_db.util import read_joyo
+from uniunihan_db.util import read_ckip_20k, read_joyo
 
 
 def test_read_joyo():
@@ -44,3 +44,9 @@ def test_read_joyo():
     )
 
     assert set("辨瓣辯辦辮") == joyo.new_to_old("弁")
+
+
+def test_read_ckip_20k():
+    ckip_20k = read_ckip_20k()
+    print(ckip_20k.keys())
+    assert len(ckip_20k) == 3499

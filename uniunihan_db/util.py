@@ -129,6 +129,7 @@ def read_edict_freq(aligner):
                 for c, pron in alignment.items():
                     char_to_pron_to_words[c][pron].append(word)
                 num_words += 1
+    log.info(f"  Read {num_words} words from EDICT frequency list")
     return char_to_pron_to_words
 
 
@@ -160,7 +161,7 @@ def read_unihan():
     return unihan
 
 
-def get_hk_ed_chars(unihan):
+def read_hk_ed_chars(unihan):
     def get_pron(info):
         # check all of the available fields in order of usefulness/accuracy
         if pron := info.get("kHanyuPinlu"):
@@ -173,7 +174,7 @@ def get_hk_ed_chars(unihan):
             #             print('returning pinyin!')
             return [r for p in pron for r in p["readings"]]
         elif pron := info.get("kMandarin"):
-            print("returning mandarin!")
+            # print("returning mandarin!")
             return pron["zh-Hans"]
         return []
 
@@ -183,3 +184,34 @@ def get_hk_ed_chars(unihan):
             prons = get_pron(info)
             chars[char] = prons
     return chars
+
+
+def read_ckip_20k():
+    ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
+    log.info(f"Loading {ckip_path}")
+
+    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    with open(ckip_path) as f:
+        num_words = 0
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
+        for r in rows:
+            # word	function	roman	meaning	freq
+            pronunciation = r["roman"]
+            syllables = r["roman"].split(" ")
+            word = r["word"]
+            if len(syllables) != len(word):
+                raise ValueError(
+                    f"Number of pinyin syllables does not match number of characters: {word}/{pronunciation}"
+                )
+            else:
+                word_dict = {
+                    "surface": word,
+                    "pron": pronunciation,
+                    "freq": int(r["freq"]),
+                    "en": r["meaning"],
+                }
+                for c, pron in zip(word, syllables):
+                    char_to_pron_to_words[c][pron].append(word_dict)
+                num_words += 1
+    log.info(f"  Read {num_words} words from CKIP frequency list")
+    return char_to_pron_to_words
