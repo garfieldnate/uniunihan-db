@@ -61,3 +61,8 @@ def test_parse_nonce_syllable():
 def test_pinyin_tone_marks_to_numbers():
     s = "shén me"
     assert mandarin.pinyin_tone_marks_to_numbers(s) == "shen2 me"
+
+
+def test_pinyin_numbers_to_tone_marks():
+    s = "Ni3 hao3 ma0?"
+    assert mandarin.pinyin_numbers_to_tone_marks(s) == "Nǐ hǎo ma?"

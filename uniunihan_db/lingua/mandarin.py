@@ -102,7 +102,7 @@ def parse_syllable(s: str) -> Optional[Syllable]:
     # 'wen' is pronounced 'un'
     if s == "wen":
         s = "un"
-    # 'wu' is allophonic with 'wu'
+    # 'wu' is allophonic with 'u'
     s = s.replace("wu", "u")
     # elsewhere 'w' is a 'u' in the glide
     s = s.replace("w", "u")
@@ -147,3 +147,43 @@ def pinyin_tone_marks_to_numbers(s):
             tone = ""
         new_words.append(f"{s}{tone}")
     return " ".join(new_words)
+
+
+# Courtesy of https://stackoverflow.com/a/21488584/474819
+
+pinyinToneMarks = {
+    "a": "āáǎà",
+    "e": "ēéěè",
+    "i": "īíǐì",
+    "o": "ōóǒò",
+    "u": "ūúǔù",
+    "ü": "ǖǘǚǜ",
+    "A": "ĀÁǍÀ",
+    "E": "ĒÉĚÈ",
+    "I": "ĪÍǏÌ",
+    "O": "ŌÓǑÒ",
+    "U": "ŪÚǓÙ",
+    "Ü": "ǕǗǙǛ",
+}
+
+
+def __convertPinyinCallback(m):
+    print("calling callback")
+    tone = int(m.group(3)) % 5
+    r = m.group(1).replace("v", "ü").replace("V", "Ü")
+    # for multple vowels, use first one if it is a/e/o, otherwise use second one
+    pos = 0
+    if len(r) > 1 and not r[0] in "aeoAEO":
+        pos = 1
+    if tone != 0:
+        r = r[0:pos] + pinyinToneMarks[r[pos]][tone - 1] + r[pos + 1 :]
+    return r + m.group(2)
+
+
+def pinyin_numbers_to_tone_marks(s):
+    return re.sub(
+        r"([aeiouüvÜ]{1,3})(n?g?r?)([012345])",
+        __convertPinyinCallback,
+        s,
+        flags=re.IGNORECASE,
+    )
