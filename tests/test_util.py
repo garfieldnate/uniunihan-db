@@ -1,10 +1,4 @@
-from uniunihan_db.lingua.mandarin import strip_tone
-from uniunihan_db.util import (
-    get_mandarin_pronunciation,
-    read_ckip_20k,
-    read_joyo,
-    read_unihan,
-)
+from uniunihan_db.util import read_cedict, read_ckip_20k, read_joyo
 
 
 def test_read_joyo():
@@ -65,34 +59,17 @@ def test_read_ckip_20k():
             },
         ]
     }
-    unihan = read_unihan()
-    total_unihan_prons = 0
-    total_ckip_prons = 0
-    total_chars = len(ckip_20k)
-    chars_with_missing_prons = 0
-    for char in ckip_20k:
-        ckip_prons = set(ckip_20k[char].keys())
-        unihan_prons = set(get_mandarin_pronunciation(unihan[char]))
-        unihan_prons_to_remove = set()
-        for up in unihan_prons:
-            up_no_tone, tone = strip_tone(up)
-            if tone == 0:
-                continue
-            if up_no_tone in unihan_prons:
-                unihan_prons_to_remove.add(up)
-        for up in unihan_prons_to_remove:
-            unihan_prons.remove(up)
-        # print(char)
-        # print(unihan_prons)
-        # print(ckip_prons)
-        # tone sandhi, dialectal pronunciations, should probably ignore 0 tones
-        # if char not in set("一不個了人"):
-        total_unihan_prons += len(unihan_prons)
-        total_ckip_prons += len(ckip_prons)
-        if unihan_prons <= ckip_prons:
-            chars_with_missing_prons += 1
 
-    print(f"{chars_with_missing_prons}/{total_chars} chars with missing prons")
-    print(f"{total_unihan_prons} total unihan prons")
-    print(f"{total_ckip_prons} total ckip prons")
-    # assert False
+
+def test_read_cedict():
+    entries = read_cedict()
+    # Assuming the size of the dictionary will only grow over time
+    assert len(entries) >= 116751
+    assert entries["分錢"] == [
+        {
+            "en": "cent/penny",
+            "trad": "分錢",
+            "simp": "分钱",
+            "pron": "fen1 qian2",
+        }
+    ]

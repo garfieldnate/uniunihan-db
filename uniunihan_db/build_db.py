@@ -32,6 +32,10 @@ JUN_DA_CHAR_FREQ_URL = (
 )
 JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 
+CEDICT_URL = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.zip"
+CEDICT_ZIP = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg.zip"
+CEDICT_DIR = CEDICT_ZIP.with_suffix("")
+
 log = configure_logging(__name__)
 
 # lazy load this, since it's a lot of data
@@ -130,7 +134,7 @@ def ytenx_download():
 
 
 def edict_freq_download():
-    """Download, unzip and reformat Utsumi Hiroshi's frequency-annotated EDICT"""
+    """Download and unzip Utsumi Hiroshi's frequency-annotated EDICT"""
 
     # download
     if EDICT_FREQ_TARBALL.exists() and EDICT_FREQ_TARBALL.stat().st_size > 0:
@@ -151,6 +155,29 @@ def edict_freq_download():
         tar = tarfile.open(EDICT_FREQ_TARBALL, "r:gz")
         tar.extractall(GENERATED_DATA_DIR)
         tar.close()
+
+
+def cedict_download():
+    """Download and unzip CC-CEDICT"""
+
+    # download
+    if CEDICT_ZIP.exists() and CEDICT_ZIP.stat().st_size > 0:
+        log.info(f"{CEDICT_ZIP.name} already exists; skipping download")
+    else:
+        log.info(f"Downloading CC-CEDICT to {CEDICT_ZIP.name}...")
+        r = requests.get(CEDICT_URL, stream=True)
+        with open(CEDICT_ZIP, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    CEDICT_DIR = CEDICT_ZIP.with_suffix("")
+    # unzip
+    if CEDICT_DIR.exists() and CEDICT_DIR.stat().st_size() > 0:
+        log.info(f"  {CEDICT_DIR.name} already exists; skipping decompress")
+    else:
+        log.info(f"  Writing decompressed contents to {CEDICT_DIR.name}")
+        with zipfile.ZipFile(CEDICT_ZIP, "r") as zip_ref:
+            zip_ref.extractall(CEDICT_DIR)
 
 
 def edict_freq_format():
@@ -381,11 +408,16 @@ def expand_unihan():
 
 def main():
     unihan_download()
+
     ytenx_download()
+    write_phonetic_components()
+
     edict_freq_download()
     edict_freq_format()
-    write_phonetic_components()
+
     jun_da_char_freq_download()
+
+    cedict_download()
 
     # expand_unihan()
 

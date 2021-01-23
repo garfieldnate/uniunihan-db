@@ -218,3 +218,30 @@ def read_ckip_20k():
                 num_words += 1
     log.info(f"  Read {num_words} words from CKIP frequency list")
     return char_to_pron_to_words
+
+
+def read_cedict():
+    log.info("Loading CEDICT data...")
+    cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
+    num_words = 0
+    entries = defaultdict(list)
+    with open(cedict_file) as f:
+        for line in f.readlines():
+            # skip comments or empty lines
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            # parse format: trad simp [pin yin] /en1/en2/en3/
+            remaining, en = line.split("/", 1)
+            en = en.rstrip("/")
+            remaining, pron = remaining.split("[")
+            pron = pron.rstrip("] ")
+            trad, simp = remaining.rstrip().split(" ")
+            pron = pron.lstrip("[").rstrip("]")
+
+            # store word
+            word = {"en": en, "trad": trad, "simp": simp, "pron": pron}
+            num_words += 1
+            entries[trad].append(word)
+    log.info(f"  Read {num_words} entries from CEDICT")
+    return entries

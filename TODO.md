@@ -4,25 +4,15 @@
 
 Topic: groupings
 
-* possibly replace ytenx with phonetic series from Wikipedia
-
+* possibly replace ytenx with phonetic series from Wikiped
 Topic: Mandarin support
 
-* pre-processing CKIP 20k
-    - numbers to tone marks
-    - u to ü conversion where needed
-    - comment on Wikipedia about missing characters and umlauts
 * process unihan in build-db to get list of HK educational characters
-* If CKIP 20K doesn't work out:
-    - downloader/transformer/loader for CC-edict
-    - downloader/transformer/loader for SUBTLEX-CH
 * for all characters in HK-ed set:
-    - for each containing word in CC-EDICT:
-        + word = {trad, simp, pron, english, freq from SUBTLEX-CH}
-        + trad_to_pron[c] = word
-        + trad_to_simp[c].add(simp_char)
-        - ? simp_word_to_trad[simp].add(word)
-            - for simplified text lookup (e.g. santi)
+    - get all pronunciations and examples in CEDICT
+    - pick highest frequency examples for each pronunciation
+* If CKIP 20K doesn't work out:
+    - try SUBTLEX-CH or BCC; licenses are restrictive, though :(
 
 * Provide simplified character along with traditional
 * Provide middle or old Chinese pronunciations
@@ -116,7 +106,7 @@ Prediction experiments:
 * Unihan: relationship between 栃𣜜櫔 not given
 * Unihan: missing relationship between 顏顔, 匂匈, 倶俱 (from ytenx JihThex),
 * python json: ignore '//' key everywhere
-
+* comment on Wikipedia about missing syllables and umlauts in pronunciations for CKIP frequency data
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together
