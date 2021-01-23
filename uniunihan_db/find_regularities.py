@@ -12,8 +12,10 @@ from .util import (
     configure_logging,
     read_edict_freq,
     read_historical_on_yomi,
+    read_hk_ed_chars,
     read_joyo,
     read_phonetic_components,
+    read_unihan,
 )
 
 log = configure_logging(__name__)
@@ -101,7 +103,7 @@ def _format_json(data):
     )
 
 
-def _print_reports(index, char_to_prons, char_to_words, out_dir):
+def _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir):
     purity_to_chars = defaultdict(set)
     purity_to_groups = defaultdict(int)
     exceptional_chars = set()
@@ -111,7 +113,7 @@ def _print_reports(index, char_to_prons, char_to_words, out_dir):
         purity_to_groups[g.purity_type] += 1
         exceptional_chars.update(g.exceptions.values())
         for c in g.chars:
-            missing = set(char_to_prons[c]) - set(char_to_words[c].keys())
+            missing = set(char_to_prons[c]) - set(char_to_pron_to_vocab[c].keys())
             for p in missing:
                 missing_words.add(f"{c}/{p}")
 
@@ -219,6 +221,7 @@ def main():
     )
 
     args = parser.parse_args()
+    out_dir = OUTPUT_DIR / args.language
 
     comp_to_char = read_phonetic_components()
 
@@ -257,26 +260,33 @@ def main():
         # 国字 do not have phonetic characters, but can be usefully learned together
         index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
 
-    # elif args.language == "zh-HK":
-    #     unihan = _read_unihan()
-    #     char_to_prons = get_hk_ed_chars(unihan)
-    #     # print(char_to_prons)
-    #     # get chars to prons from unihan where
-    #     index = _index(char_to_prons, comp_to_char)
-    # # elif args.language == 'zh-Zh':
-    # else:
-    #     log.error(f"Cannot handle language {args.language} yet")
-    #     exit()
-
-    out_dir = OUTPUT_DIR / args.language
-    _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
-
-    _print_final_output(
-        index,
-        char_to_pron_to_vocab,
-        joyo.char_to_supplementary_info,
-        out_dir,
-    )
+        _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
+        _print_final_output(
+            index,
+            char_to_pron_to_vocab,
+            joyo.char_to_supplementary_info,
+            out_dir,
+        )
+    elif args.language == "zh-HK":
+        unihan = read_unihan()
+        char_to_prons = read_hk_ed_chars(unihan)
+        print(char_to_prons)
+        # print(char_to_prons)
+        # get chars to prons from unihan where
+        index = _index(char_to_prons, comp_to_char)
+        char_to_pron_to_vocab = {}  # TODO
+        char_to_supplementary_info = {}  # TODO
+        _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir)
+        _print_final_output(
+            index,
+            char_to_pron_to_vocab,
+            char_to_supplementary_info,
+            out_dir,
+        )
+    # elif args.language == 'zh-Zh':
+    else:
+        log.error(f"Cannot handle language {args.language} yet")
+        exit()
 
 
 if __name__ == "__main__":

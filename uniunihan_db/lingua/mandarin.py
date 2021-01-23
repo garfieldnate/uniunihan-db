@@ -66,7 +66,7 @@ ONSETS = "tdkgpbwqryljhszxcnmf"
 SYLLABLE_RE = f"(?i)^(?P<onset>[{ONSETS}]h?)?(?P<glide>i|u|ü)?(?P<nucleus>[{VOWEL_LIST}])(?P<final>ng?|r|i|u|o)?$"
 
 
-def _strip_tone(s):
+def strip_tone(s):
     tone = 0
     for t, matcher in TONE_MATCHERS.items():
         if re.search(matcher, s):
@@ -84,7 +84,7 @@ def parse_syllable(s: str) -> Optional[Syllable]:
     surface = s
 
     # determine the tone and strip the diacritic first to simplify later processing
-    s, tone = _strip_tone(s)
+    s, tone = strip_tone(s)
     # for t, matcher in TONE_MATCHERS.items():
     #     if re.search(matcher, s):
     #         tone = t
@@ -142,7 +142,7 @@ def pinyin_tone_marks_to_numbers(s):
     words = s.split()
     new_words = []
     for w in words:
-        s, tone = _strip_tone(w)
+        s, tone = strip_tone(w)
         if tone == 0:
             tone = ""
         new_words.append(f"{s}{tone}")
@@ -168,7 +168,6 @@ pinyinToneMarks = {
 
 
 def __convertPinyinCallback(m):
-    print("calling callback")
     tone = int(m.group(3)) % 5
     r = m.group(1).replace("v", "ü").replace("V", "Ü")
     # for multple vowels, use first one if it is a/e/o, otherwise use second one

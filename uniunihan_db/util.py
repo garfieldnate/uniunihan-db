@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 
 import jaconv
 
+from uniunihan_db.lingua import mandarin
+
 PROJECT_DIR = Path(__file__).parents[1]
 
 DATA_DIR = PROJECT_DIR / "data"
@@ -161,27 +163,28 @@ def read_unihan():
     return unihan
 
 
-def read_hk_ed_chars(unihan):
-    def get_pron(info):
-        # check all of the available fields in order of usefulness/accuracy
-        if pron := info.get("kHanyuPinlu"):
-            #             print('returning pinlu')
-            return [p["phonetic"] for p in pron]
-        elif pron := info.get("kXHC1983"):
-            #             print('returning 1983')
-            return [p["reading"] for p in pron]
-        elif pron := info.get("kHanyuPinyin"):
-            #             print('returning pinyin!')
-            return [r for p in pron for r in p["readings"]]
-        elif pron := info.get("kMandarin"):
-            # print("returning mandarin!")
-            return pron["zh-Hans"]
-        return []
+def get_mandarin_pronunciation(unihan_entry):
+    # check all of the available fields in order of usefulness/accuracy
+    if pron := unihan_entry.get("kHanyuPinlu"):
+        #             print('returning pinlu')
+        return [p["phonetic"] for p in pron]
+    elif pron := unihan_entry.get("kXHC1983"):
+        #             print('returning 1983')
+        return [p["reading"] for p in pron]
+    elif pron := unihan_entry.get("kHanyuPinyin"):
+        #             print('returning pinyin!')
+        return [r for p in pron for r in p["readings"]]
+    elif pron := unihan_entry.get("kMandarin"):
+        # print("returning mandarin!")
+        return pron["zh-Hans"]
+    return []
 
+
+def read_hk_ed_chars(unihan):
     chars = {}
     for char, info in unihan.items():
         if "kGradeLevel" in info:
-            prons = get_pron(info)
+            prons = get_mandarin_pronunciation(info)
             chars[char] = prons
     return chars
 
@@ -196,8 +199,8 @@ def read_ckip_20k():
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
         for r in rows:
             # word	function	roman	meaning	freq
-            pronunciation = r["roman"]
-            syllables = r["roman"].split(" ")
+            pronunciation = mandarin.pinyin_numbers_to_tone_marks(r["roman"])
+            syllables = pronunciation.split(" ")
             word = r["word"]
             if len(syllables) != len(word):
                 raise ValueError(

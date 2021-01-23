@@ -8,12 +8,22 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* mandarin aligner (works using spaces)
-* pre-process mandarin_20K.tsv:
+* pre-processing CKIP 20k
     - numbers to tone marks
-    - ü to u conversion where needed
-    - comment on Wikipedia about that pitfall
-* get vocab from mandarin_20K.tsv
+    - u to ü conversion where needed
+    - comment on Wikipedia about missing characters and umlauts
+* process unihan in build-db to get list of HK educational characters
+* If CKIP 20K doesn't work out:
+    - downloader/transformer/loader for CC-edict
+    - downloader/transformer/loader for SUBTLEX-CH
+* for all characters in HK-ed set:
+    - for each containing word in CC-EDICT:
+        + word = {trad, simp, pron, english, freq from SUBTLEX-CH}
+        + trad_to_pron[c] = word
+        + trad_to_simp[c].add(simp_char)
+        - ? simp_word_to_trad[simp].add(word)
+            - for simplified text lookup (e.g. santi)
+
 * Provide simplified character along with traditional
 * Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list
