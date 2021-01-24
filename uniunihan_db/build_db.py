@@ -225,9 +225,8 @@ def write_phonetic_components():
         log.info(f"{PHONETIC_COMPONENTS_FILE.name} already exists; skipping creation")
         return
 
-    variants = get_variants()
+    log.info("Determining phonetic components...")
 
-    log.info("Loading phonetic components from ytenx...")
     char_to_component = {}
     with open(YTENX_DIR / "ytenx" / "sync" / "dciangx" / "DrienghTriang.txt") as f:
         rows = csv.DictReader(f, delimiter=" ")
@@ -240,6 +239,7 @@ def write_phonetic_components():
         del extra_char_to_components["//"]
         char_to_component.update(extra_char_to_components)
 
+    variants = get_variants()
     log.info("  Addding phonetic components for variants...")
     variant_to_component = {}
     for char in char_to_component:
