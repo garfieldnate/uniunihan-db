@@ -287,14 +287,14 @@ def main():
     elif args.language == "zh-HK":
         with open(HK_ED_CHARS_FILE) as f:
             char_list = set(json.load(f))
-        char_to_pron_to_words = read_cedict(index_chars=True)
-        char_to_pron_to_words = filter_keys(char_to_pron_to_words, char_list)
-        _incorporate_ckip_freq_data(char_to_pron_to_words)
+        char_to_pron_to_vocab = read_cedict(index_chars=True)
+        char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
+        _incorporate_ckip_freq_data(char_to_pron_to_vocab)
         # # get chars to prons from unihan where
-        # index = _index(char_to_prons, comp_to_char)
+        index = _index(char_to_pron_to_vocab, comp_to_char)
         # char_to_pron_to_vocab = {}  # TODO
         # char_to_supplementary_info = {}  # TODO
-        # _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir)
+        _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
         # _print_final_output(
         #     index,
         #     char_to_pron_to_vocab,
