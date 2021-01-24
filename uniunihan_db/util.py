@@ -252,7 +252,7 @@ def read_cedict(index_chars=False):
                     f"Number of characters for tradition and simplified forms do not match: {trad}/{simp}"
                 )
 
-            pron = pron.lstrip("[").rstrip("] ")
+            pron = pron.lstrip("[").rstrip("] ").lower()
             word_dict = {"en": en, "trad": trad, "simp": simp, "pron": pron}
 
             # store word

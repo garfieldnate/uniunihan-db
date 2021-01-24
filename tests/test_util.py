@@ -92,6 +92,9 @@ def test_read_cedict():
             "pron": "fen1 qian2",
         }
     ]
+    # Ensure pronunciations are lower-cased
+    assert entries["辯機"][0]["pron"] == "bian4 ji1"
+
     char_to_pron_to_word = read_cedict(index_chars=True)
     # Assuming the number of characters in the dictionary will only grow over time
     assert len(char_to_pron_to_word) >= 11733
