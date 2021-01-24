@@ -22,6 +22,8 @@ INCLUDED_DATA_DIR = DATA_DIR / "included"
 
 LOG_FILE = GENERATED_DATA_DIR / "log.txt"
 
+HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
+
 
 def configure_logging(name):
     logging.basicConfig(
@@ -178,15 +180,6 @@ def get_mandarin_pronunciation(unihan_entry):
         # print("returning mandarin!")
         return pron["zh-Hans"]
     return []
-
-
-def read_hk_ed_chars(unihan):
-    chars = {}
-    for char, info in unihan.items():
-        if "kGradeLevel" in info:
-            prons = get_mandarin_pronunciation(info)
-            chars[char] = prons
-    return chars
 
 
 def read_ckip_20k():

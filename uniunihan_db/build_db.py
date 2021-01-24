@@ -11,7 +11,13 @@ from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
 from .lingua import japanese, mandarin
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging, read_unihan
+from .util import (
+    GENERATED_DATA_DIR,
+    HK_ED_CHARS_FILE,
+    INCLUDED_DATA_DIR,
+    configure_logging,
+    read_unihan,
+)
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
@@ -172,7 +178,7 @@ def cedict_download():
 
     CEDICT_DIR = CEDICT_ZIP.with_suffix("")
     # unzip
-    if CEDICT_DIR.exists() and CEDICT_DIR.stat().st_size() > 0:
+    if CEDICT_DIR.exists() and CEDICT_DIR.stat().st_size > 0:
         log.info(f"  {CEDICT_DIR.name} already exists; skipping decompress")
     else:
         log.info(f"  Writing decompressed contents to {CEDICT_DIR.name}")
@@ -406,6 +412,22 @@ def expand_unihan():
     export_json(new_data, UNIHAN_AUGMENTATION_FILE)
 
 
+def write_hk_ed_chars():
+    if HK_ED_CHARS_FILE.exists() and HK_ED_CHARS_FILE.stat().st_size > 0:
+        log.info(f"{HK_ED_CHARS_FILE.name} already exists; skipping unihan scan")
+        return
+    log.info("Scanning Unihan for Hong Kong educational character list...")
+
+    unihan = get_unihan()
+    chars = []
+    for char, info in unihan.items():
+        if "kGradeLevel" in info:
+            chars.append(char)
+
+    export_json(chars, HK_ED_CHARS_FILE)
+    log.info(f"  Wrote {len(chars)} characters to {HK_ED_CHARS_FILE.name}")
+
+
 def main():
     unihan_download()
 
@@ -420,6 +442,7 @@ def main():
     cedict_download()
 
     # expand_unihan()
+    write_hk_ed_chars()
 
 
 if __name__ == "__main__":

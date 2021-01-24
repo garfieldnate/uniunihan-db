@@ -7,7 +7,6 @@ Topic: groupings
 * possibly replace ytenx with phonetic series from Wikiped
 Topic: Mandarin support
 
-* process unihan in build-db to get list of HK educational characters
 * for all characters in HK-ed set:
     - get all pronunciations and examples in CEDICT
     - pick highest frequency examples for each pronunciation

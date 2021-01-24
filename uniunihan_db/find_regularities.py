@@ -8,14 +8,13 @@ from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
 from .util import (
     GENERATED_DATA_DIR,
+    HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
     configure_logging,
     read_edict_freq,
     read_historical_on_yomi,
-    read_hk_ed_chars,
     read_joyo,
     read_phonetic_components,
-    read_unihan,
 )
 
 log = configure_logging(__name__)
@@ -268,21 +267,24 @@ def main():
             out_dir,
         )
     elif args.language == "zh-HK":
-        unihan = read_unihan()
-        char_to_prons = read_hk_ed_chars(unihan)
-        print(char_to_prons)
+        with open(HK_ED_CHARS_FILE) as f:
+            chars = json.load(f)
+        print(chars)
+        # Next: get char_to_prons, char_info from CEDICT; get frequencies from CKIP20K
+        # char_to_prons = read_hk_ed_chars(unihan)
         # print(char_to_prons)
-        # get chars to prons from unihan where
-        index = _index(char_to_prons, comp_to_char)
-        char_to_pron_to_vocab = {}  # TODO
-        char_to_supplementary_info = {}  # TODO
-        _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir)
-        _print_final_output(
-            index,
-            char_to_pron_to_vocab,
-            char_to_supplementary_info,
-            out_dir,
-        )
+        # # print(char_to_prons)
+        # # get chars to prons from unihan where
+        # index = _index(char_to_prons, comp_to_char)
+        # char_to_pron_to_vocab = {}  # TODO
+        # char_to_supplementary_info = {}  # TODO
+        # _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir)
+        # _print_final_output(
+        #     index,
+        #     char_to_pron_to_vocab,
+        #     char_to_supplementary_info,
+        #     out_dir,
+        # )
     # elif args.language == 'zh-Zh':
     else:
         log.error(f"Cannot handle language {args.language} yet")
