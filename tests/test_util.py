@@ -61,7 +61,7 @@ def test_read_ckip_20k():
         {
             "en": "family_Aspergillaceae",
             "freq": 11,
-            "pron": "méi jùn",
+            "pron": "mei2 jun4",
             "surface": "黴菌",
         },
     ]
@@ -69,11 +69,11 @@ def test_read_ckip_20k():
     ckip_20k = read_ckip_20k(index_chars=True)
     assert len(ckip_20k) == 3499
     assert ckip_20k["黴"] == {
-        "méi": [
+        "mei2": [
             {
                 "en": "family_Aspergillaceae",
                 "freq": 11,
-                "pron": "méi jùn",
+                "pron": "mei2 jun4",
                 "surface": "黴菌",
             },
         ]

@@ -9,8 +9,6 @@ from typing import Any, Dict, List
 
 import jaconv
 
-from uniunihan_db.lingua import mandarin
-
 PROJECT_DIR = Path(__file__).parents[1]
 
 DATA_DIR = PROJECT_DIR / "data"
@@ -202,7 +200,7 @@ def read_ckip_20k(index_chars=False):
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
         for r in rows:
             # rows contains: word, function, roman, meaning, freq
-            pronunciation = mandarin.pinyin_numbers_to_tone_marks(r["roman"])
+            pronunciation = r["roman"]
             word = r["word"]
             word_dict = {
                 "surface": word,
