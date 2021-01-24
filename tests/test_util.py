@@ -1,4 +1,12 @@
-from uniunihan_db.util import read_cedict, read_ckip_20k, read_joyo
+import string
+
+from uniunihan_db.util import filter_keys, read_cedict, read_ckip_20k, read_joyo
+
+
+def test_filter_keys():
+    d = {c: ord(c) for c in string.ascii_lowercase}
+    letters = "abc"
+    assert filter_keys(d, letters) == {"a": ord("a"), "b": ord("b"), "c": ord("c")}
 
 
 def test_read_joyo():
@@ -48,6 +56,17 @@ def test_read_joyo():
 
 def test_read_ckip_20k():
     ckip_20k = read_ckip_20k()
+    assert len(ckip_20k) == 18462
+    assert ckip_20k["黴菌"] == [
+        {
+            "en": "family_Aspergillaceae",
+            "freq": 11,
+            "pron": "méi jùn",
+            "surface": "黴菌",
+        },
+    ]
+
+    ckip_20k = read_ckip_20k(index_chars=True)
     assert len(ckip_20k) == 3499
     assert ckip_20k["黴"] == {
         "méi": [
@@ -73,3 +92,15 @@ def test_read_cedict():
             "pron": "fen1 qian2",
         }
     ]
+    char_to_pron_to_word = read_cedict(index_chars=True)
+    # Assuming the number of characters in the dictionary will only grow over time
+    assert len(char_to_pron_to_word) >= 11733
+    assert "qian2" in char_to_pron_to_word["錢"]
+    assert {
+        "en": "cent/penny",
+        "trad": "分錢",
+        "simp": "分钱",
+        "pron": "fen1 qian2",
+    } in char_to_pron_to_word["錢"]["qian2"]
+
+    assert "ai2" in char_to_pron_to_word["癌"]

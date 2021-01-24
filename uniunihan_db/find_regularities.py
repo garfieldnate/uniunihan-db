@@ -11,6 +11,9 @@ from .util import (
     HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
     configure_logging,
+    filter_keys,
+    read_cedict,
+    read_ckip_20k,
     read_edict_freq,
     read_historical_on_yomi,
     read_joyo,
@@ -30,6 +33,21 @@ class CustomJsonEncoder(json.JSONEncoder):
             return vars(obj)
 
         return json.JSONEncoder.default(self, obj)
+
+
+def _incorporate_ckip_freq_data(char_to_pron_to_words):
+    ckip20k_entries = read_ckip_20k()
+    for pron_to_words in char_to_pron_to_words.values():
+        for words in pron_to_words.values():
+            for w in words:
+                if w_with_freq := ckip20k_entries.get(w["trad"]):
+                    # use first entry (highest frequency)
+                    w["freq"] = w_with_freq[0]["freq"]
+                else:
+                    # -1 to indicate it's unattested in the CKIP list
+                    w["freq"] = -1
+            # sort words descending by frequency and then orthographically
+            words.sort(key=lambda w: (-w["freq"], w["trad"]))
 
 
 @dataclass
@@ -268,12 +286,10 @@ def main():
         )
     elif args.language == "zh-HK":
         with open(HK_ED_CHARS_FILE) as f:
-            chars = json.load(f)
-        print(chars)
-        # Next: get char_to_prons, char_info from CEDICT; get frequencies from CKIP20K
-        # char_to_prons = read_hk_ed_chars(unihan)
-        # print(char_to_prons)
-        # # print(char_to_prons)
+            char_list = set(json.load(f))
+        char_to_pron_to_words = read_cedict(index_chars=True)
+        char_to_pron_to_words = filter_keys(char_to_pron_to_words, char_list)
+        _incorporate_ckip_freq_data(char_to_pron_to_words)
         # # get chars to prons from unihan where
         # index = _index(char_to_prons, comp_to_char)
         # char_to_pron_to_vocab = {}  # TODO

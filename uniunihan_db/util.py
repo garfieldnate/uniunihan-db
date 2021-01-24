@@ -42,6 +42,11 @@ def configure_logging(name):
 log = configure_logging(__name__)
 
 
+def filter_keys(d, s):
+    """Filter keys in d to just elements present in s"""
+    return {k: v for k, v in d.items() if k in s}
+
+
 @dataclass
 class Joyo:
     old_char_to_prons: Dict[str, List[str]]
@@ -182,59 +187,93 @@ def get_mandarin_pronunciation(unihan_entry):
     return []
 
 
-def read_ckip_20k():
+def read_ckip_20k(index_chars=False):
     ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
     log.info(f"Loading {ckip_path}")
 
-    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    if index_chars:
+        # char -> pronunciation -> word list
+        entries = defaultdict(lambda: defaultdict(list))
+    else:
+        # surface form -> word list
+        entries = defaultdict(list)
     with open(ckip_path) as f:
         num_words = 0
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
         for r in rows:
-            # word	function	roman	meaning	freq
+            # rows contains: word, function, roman, meaning, freq
             pronunciation = mandarin.pinyin_numbers_to_tone_marks(r["roman"])
-            syllables = pronunciation.split(" ")
             word = r["word"]
-            if len(syllables) != len(word):
-                raise ValueError(
-                    f"Number of pinyin syllables does not match number of characters: {word}/{pronunciation}"
-                )
-            else:
-                word_dict = {
-                    "surface": word,
-                    "pron": pronunciation,
-                    "freq": int(r["freq"]),
-                    "en": r["meaning"],
-                }
+            word_dict = {
+                "surface": word,
+                "pron": pronunciation,
+                "freq": int(r["freq"]),
+                "en": r["meaning"],
+            }
+            num_words += 1
+            if index_chars:
+                syllables = pronunciation.split(" ")
+                if len(syllables) != len(word):
+                    raise ValueError(
+                        f"Number of pinyin syllables does not match number of characters: {word}/{pronunciation}"
+                    )
                 for c, pron in zip(word, syllables):
-                    char_to_pron_to_words[c][pron].append(word_dict)
-                num_words += 1
+                    entries[c][pron].append(word_dict)
+            else:
+                entries[word].append(word_dict)
+
     log.info(f"  Read {num_words} words from CKIP frequency list")
-    return char_to_pron_to_words
+    return entries
 
 
-def read_cedict():
+def read_cedict(index_chars=False):
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
     num_words = 0
-    entries = defaultdict(list)
+    if index_chars:
+        # char -> pronunciation -> word list
+        entries = defaultdict(lambda: defaultdict(list))
+    else:
+        # surface form -> word list
+        entries = defaultdict(list)
     with open(cedict_file) as f:
         for line in f.readlines():
             # skip comments or empty lines
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
+
             # parse format: trad simp [pin yin] /en1/en2/en3/
             remaining, en = line.split("/", 1)
             en = en.rstrip("/")
             remaining, pron = remaining.split("[")
-            pron = pron.rstrip("] ")
+
             trad, simp = remaining.rstrip().split(" ")
-            pron = pron.lstrip("[").rstrip("]")
+            if len(trad) != len(simp):
+                raise ValueError(
+                    f"Number of characters for tradition and simplified forms do not match: {trad}/{simp}"
+                )
+
+            pron = pron.lstrip("[").rstrip("] ")
+            word_dict = {"en": en, "trad": trad, "simp": simp, "pron": pron}
 
             # store word
-            word = {"en": en, "trad": trad, "simp": simp, "pron": pron}
-            num_words += 1
-            entries[trad].append(word)
+            if index_chars:
+                syllables = pron.split(" ")
+                # We can't automatically (simply) align many words, e.g. those with
+                # numbers or letters or multi-syllabic characters like ㍻. So we just
+                # remove these from the index altogether
+                if len(syllables) != len(trad):
+                    continue
+                    # raise ValueError(
+                    #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
+                    # )
+                num_words += 1
+                for c, pron in zip(trad, syllables):
+                    entries[c][pron].append(word_dict)
+
+            else:
+                num_words += 1
+                entries[trad].append(word_dict)
     log.info(f"  Read {num_words} entries from CEDICT")
     return entries
