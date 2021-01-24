@@ -4,16 +4,14 @@
 
 Topic: groupings
 
-* possibly replace ytenx with phonetic series from Wikiped
+* possibly replace ytenx with phonetic series from Wikipedia
+
 Topic: Mandarin support
 
-* for all characters in HK-ed set:
-    - get all pronunciations and examples in CEDICT
-    - pick highest frequency examples for each pronunciation
 * If CKIP 20K doesn't work out:
     - try SUBTLEX-CH or BCC; licenses are restrictive, though :(
 
-* Provide simplified character along with traditional
+* Provide simplified characters along with traditional
 * Provide middle or old Chinese pronunciations
 * Get 三体 chapter 1 word list
 

@@ -1,6 +1,6 @@
 import argparse
 import json
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Set
 
@@ -161,7 +161,7 @@ def _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir):
         f.write(_format_json(sorted(list(missing_words))))
 
 
-def _print_final_output(index, char_to_words, char_supplement, out_dir):
+def _print_final_output_jp(index, char_to_words, char_supplement, out_dir):
     log.info("Constructing final output...")
     final = []
     for g in index.groups:
@@ -201,6 +201,74 @@ def _print_final_output(index, char_to_words, char_supplement, out_dir):
                 # already added this in pronunciation entries
                 c_entry.pop("historical_pron", None)
                 cluster_entry[c] = c_entry
+            cluster_entries.append(cluster_entry)
+        group_entry = {
+            "component": g.component,
+            "clusters": cluster_entries,
+            "purity": g.purity_type,
+            "chars": g.chars,
+            "highest_vocab_freq": highest_freq,
+        }
+        final.append(group_entry)
+
+    # Sort the entries by purity type, then number of characters descending, then frequency
+    # of most frequent word descending, and final orthographically by component
+    final.sort(
+        key=lambda g: (
+            g["purity"],
+            -len(g["chars"]),
+            -g["highest_vocab_freq"],
+            g["component"],
+        )
+    )
+
+    with open(out_dir / "final_output.json", "w") as f:
+        f.write(_format_json(final))
+
+
+def _print_final_output_zh(index, char_to_pron_to_vocab, char_supplement, out_dir):
+    log.info("Constructing final output...")
+    final = []
+    for g in index.groups:
+        # keep track of highest frequency vocab used in the group
+        highest_freq = -1
+        cluster_entries = []
+        for cluster in g.get_char_presentation():
+            cluster_entry = OrderedDict()
+            for c in cluster:
+                c_sup = char_supplement[c]
+                pron_entries = []
+                for pron, vocab_list in char_to_pron_to_vocab[c].items():
+                    # find a multi-char word if possible
+                    try:
+                        vocab = next(filter(lambda v: len(v["trad"]) > 1, vocab_list))
+                    except StopIteration:
+                        vocab = vocab_list[0]
+                    highest_freq = max(highest_freq, vocab["freq"])
+                    pron_entry = {
+                        "pron": pron,
+                        "vocab": vocab,
+                    }
+                    # TODO: add MC and OC reconstructions
+                    # if old_pron := c_sup.get("historical_pron", {}).get(pron):
+                    #     pron_entry["historical"] = old_pron
+                    pron_entries.append(pron_entry)
+                # sort pronunciations by vocab frequency and then alphabetically
+                pron_entries.sort(
+                    key=lambda item: (-item["vocab"]["freq"], item["pron"])
+                )
+                c_entry = {"prons": pron_entries}
+                c_entry.update(c_sup)
+                # already added this in pronunciation entries
+                # c_entry.pop("historical_pron", None)
+                cluster_entry[c] = c_entry
+            # sort characters by frequency of most frequent vocab, then by character
+            cluster_entry = OrderedDict(
+                sorted(
+                    cluster_entry.items(),
+                    key=lambda item: (-item[1]["prons"][0]["vocab"]["freq"], item[0]),
+                )
+            )
             cluster_entries.append(cluster_entry)
         group_entry = {
             "component": g.component,
@@ -278,7 +346,7 @@ def main():
         index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
 
         _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
-        _print_final_output(
+        _print_final_output_jp(
             index,
             char_to_pron_to_vocab,
             joyo.char_to_supplementary_info,
@@ -295,12 +363,14 @@ def main():
         # char_to_pron_to_vocab = {}  # TODO
         # char_to_supplementary_info = {}  # TODO
         _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
-        # _print_final_output(
-        #     index,
-        #     char_to_pron_to_vocab,
-        #     char_to_supplementary_info,
-        #     out_dir,
-        # )
+        # Next: make this work
+
+        _print_final_output_zh(
+            index,
+            char_to_pron_to_vocab,
+            defaultdict(dict),  # char_to_supplementary_info,
+            out_dir,
+        )
     # elif args.language == 'zh-Zh':
     else:
         log.error(f"Cannot handle language {args.language} yet")
