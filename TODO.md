@@ -6,9 +6,6 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* Provide simplified characters along with traditional
-    - top-level list
-    - ensure one vocab for each simplification?
 * Possibly use DDG to get frequency scores for CEDict
 * Get 三体 word list
     - simp to trad conversion

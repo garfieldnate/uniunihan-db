@@ -83,7 +83,7 @@ def test_read_ckip_20k():
 def test_read_cedict():
     entries = read_cedict()
     # Assuming the size of the dictionary will only grow over time
-    assert len(entries) >= 116751
+    assert len(entries) >= 113420
     assert entries["分錢"] == [
         {
             "en": "cent/penny",
@@ -97,7 +97,7 @@ def test_read_cedict():
 
     char_to_pron_to_word = read_cedict(index_chars=True)
     # Assuming the number of characters in the dictionary will only grow over time
-    assert len(char_to_pron_to_word) >= 11733
+    assert len(char_to_pron_to_word) >= 9997
     assert "qian2" in char_to_pron_to_word["錢"]
     assert {
         "en": "cent/penny",

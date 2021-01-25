@@ -224,7 +224,7 @@ def read_ckip_20k(index_chars=False):
     return entries
 
 
-def read_cedict(index_chars=False):
+def read_cedict(index_chars=False, filter=True):
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
     num_words = 0
@@ -244,6 +244,14 @@ def read_cedict(index_chars=False):
             # parse format: trad simp [pin yin] /en1/en2/en3/
             remaining, en = line.split("/", 1)
             en = en.rstrip("/")
+            if filter:
+                if (
+                    "variant of" in en
+                    or en.startswith("surname")
+                    or en.startswith("(old)")
+                ):
+                    continue
+
             remaining, pron = remaining.split("[")
 
             trad, simp = remaining.rstrip().split(" ")
