@@ -1,19 +1,22 @@
 # TODO
 
-* put language-specific logic in separate files
-
 Topic: groupings
 
 * possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
 
-* If CKIP 20K doesn't work out:
-    - try SUBTLEX-CH or BCC; licenses are restrictive, though :(
-
 * Provide simplified characters along with traditional
-* Provide middle or old Chinese pronunciations
-* Get 三体 chapter 1 word list
+    - top-level list
+    - ensure one vocab for each simplification?
+* Possibly use DDG to get frequency scores for CEDict
+* Get 三体 word list
+    - simp to trad conversion
+    - how to present? show chapter 1 vocab with rest of book as backup?
+* Possibly rovide middle Chinese pronunciations
+    - mostly in Ytenx
+* Possibly provide old Chinese pronunciations
+    - download Baxter/Sagart data
 
 Topic: Japanese Support
 

@@ -6,6 +6,7 @@ from typing import Dict, List, Set
 
 from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
+from .lingua.mandarin import pinyin_numbers_to_tone_marks
 from .util import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
@@ -244,9 +245,10 @@ def _print_final_output_zh(index, char_to_pron_to_vocab, char_supplement, out_di
                         vocab = next(filter(lambda v: len(v["trad"]) > 1, vocab_list))
                     except StopIteration:
                         vocab = vocab_list[0]
+                    vocab["pron"] = pinyin_numbers_to_tone_marks(vocab["pron"])
                     highest_freq = max(highest_freq, vocab["freq"])
                     pron_entry = {
-                        "pron": pron,
+                        "pron": pinyin_numbers_to_tone_marks(pron),
                         "vocab": vocab,
                     }
                     # TODO: add MC and OC reconstructions
