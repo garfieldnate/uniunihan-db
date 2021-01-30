@@ -21,6 +21,7 @@ INCLUDED_DATA_DIR = DATA_DIR / "included"
 LOG_FILE = GENERATED_DATA_DIR / "log.txt"
 
 HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
+KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
 
 
 def configure_logging(name):

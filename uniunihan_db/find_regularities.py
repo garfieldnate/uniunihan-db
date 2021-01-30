@@ -11,6 +11,7 @@ from .util import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
+    KO_ED_CHARS_FILE,
     configure_logging,
     filter_keys,
     read_cedict,
@@ -373,7 +374,9 @@ def main():
             defaultdict(dict),  # char_to_supplementary_info,
             out_dir,
         )
-    # elif args.language == 'zh-Zh':
+    elif args.language == "ko":
+        with open(KO_ED_CHARS_FILE) as f:
+            char_list = set(json.load(f))
     else:
         log.error(f"Cannot handle language {args.language} yet")
         exit()

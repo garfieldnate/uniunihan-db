@@ -6,7 +6,8 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* Possibly use DDG to get frequency scores for CEDict
+* Get rough frequencies from baidu
+* source English keywords from somewhere
 * Get 三体 word list
     - simp to trad conversion
     - how to present? show chapter 1 vocab with rest of book as backup?
@@ -22,13 +23,20 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
+* Download Hanja word list with frequency data: https://github.com/libhangul/libhangul
+    - align to get readings
 * Get name of each character from somewhere
-* Get Hanja word dictionary
 
 Topic: Vietnamese Support
 
 * Get word frequency list
 * Get han tu spellings for words
+    - hanviet: http://web.archive.org/web/20060218090101/http://perso.wanadoo.fr/dang.tk/langues/hanviet.htm
+    - try extracting from Wikipedia?
+* vnedict: http://www.denisowski.org/Vietnamese/vnedict.txt
+* zetamu: https://web.archive.org/web/20101022085207/http://zung.zetamu.com/Hantu/hantu_index.html
+* nomfoundation.org (use is explicitly listed as free!)
+
 
 ## Tasks
 

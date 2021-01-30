@@ -15,6 +15,7 @@ from .util import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
+    KO_ED_CHARS_FILE,
     configure_logging,
     read_unihan,
 )
@@ -25,6 +26,10 @@ UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
 YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
+
+LIB_HANGUL_URL = "https://github.com/libhangul/libhangul/archive/master.zip"
+LIB_HANGUL_ZIP_FILE = GENERATED_DATA_DIR / "libhangul-master.zip"
+LIB_HANGUL_DIR = LIB_HANGUL_ZIP_FILE.with_suffix("")
 
 EDICT_FREQ_URL = "http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz"
 EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"
@@ -428,6 +433,42 @@ def write_hk_ed_chars():
     log.info(f"  Wrote {len(chars)} characters to {HK_ED_CHARS_FILE.name}")
 
 
+def write_ko_ed_chars():
+    if KO_ED_CHARS_FILE.exists() and KO_ED_CHARS_FILE.stat().st_size > 0:
+        log.info(f"{KO_ED_CHARS_FILE.name} already exists; skipping unihan scan")
+        return
+    log.info("Scanning Unihan for Korea educational character list...")
+
+    unihan = get_unihan()
+    chars = []
+    for char, info in unihan.items():
+        if "kKoreanEducationHanja" in info:
+            chars.append(char)
+
+    export_json(chars, KO_ED_CHARS_FILE)
+    log.info(f"  Wrote {len(chars)} characters to {KO_ED_CHARS_FILE.name}")
+
+
+def hanja_wordlist_download():
+    """Download and unzip the libhangul hanja data."""
+    # download
+    if LIB_HANGUL_ZIP_FILE.exists() and LIB_HANGUL_ZIP_FILE.stat().st_size > 0:
+        log.info(f"{LIB_HANGUL_ZIP_FILE.name} already exists; skipping download")
+    else:
+        log.info(f"Downloading libhangul to {LIB_HANGUL_ZIP_FILE}...")
+        r = requests.get(LIB_HANGUL_URL, stream=True)
+        with open(LIB_HANGUL_ZIP_FILE, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    # unzip
+    if LIB_HANGUL_DIR.exists() and LIB_HANGUL_DIR.is_dir():
+        log.info(f"  {LIB_HANGUL_DIR.name} already exists; skipping unzip")
+    else:
+        with zipfile.ZipFile(LIB_HANGUL_ZIP_FILE, "r") as zip_ref:
+            zip_ref.extractall(GENERATED_DATA_DIR)
+
+
 def main():
     unihan_download()
 
@@ -441,8 +482,11 @@ def main():
 
     cedict_download()
 
+    hanja_wordlist_download()
+
     # expand_unihan()
     write_hk_ed_chars()
+    write_ko_ed_chars()
 
 
 if __name__ == "__main__":
