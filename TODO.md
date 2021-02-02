@@ -23,20 +23,25 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
-* Download Hanja word list with frequency data: https://github.com/libhangul/libhangul
-    - align to get readings
-* Get name of each character from somewhere
+* Load libhangul data, align to get readings
+* Download ezkorean dictionary
+* Load eumhun and Korean education data from kyoyuk_hanja.csv
 
 Topic: Vietnamese Support
 
 * Get word frequency list
 * Get han tu spellings for words
     - hanviet: http://web.archive.org/web/20060218090101/http://perso.wanadoo.fr/dang.tk/langues/hanviet.htm
-    - try extracting from Wikipedia?
+    - try extracting from Wiktionary?
+        - Doing now! Save script somewhere...
+    - Winvnkey has some great data! Particularly TuPhuc-HanViet.txt, which I haven't found anywhere else.
+    - DDB
 * vnedict: http://www.denisowski.org/Vietnamese/vnedict.txt
 * zetamu: https://web.archive.org/web/20101022085207/http://zung.zetamu.com/Hantu/hantu_index.html
-* nomfoundation.org (use is explicitly listed as free!)
-
+* nomfoundation.org
+    - use is explicitly listed as free!
+    - will require lots of work to make it usable
+* How to find modern words, though?
 
 ## Tasks
 
