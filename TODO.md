@@ -7,6 +7,7 @@ Topic: groupings
 Topic: Mandarin support
 
 * Get rough frequencies from baidu
+* Differentiate baidu and wendu
 * source English keywords from somewhere
 * Get 三体 word list
     - simp to trad conversion
@@ -36,6 +37,7 @@ Topic: Vietnamese Support
         - Doing now! Save script somewhere...
     - Winvnkey has some great data! Particularly TuPhuc-HanViet.txt, which I haven't found anywhere else.
     - DDB
+* Possibly an appendix on nom characters
 * vnedict: http://www.denisowski.org/Vietnamese/vnedict.txt
 * zetamu: https://web.archive.org/web/20101022085207/http://zung.zetamu.com/Hantu/hantu_index.html
 * nomfoundation.org
