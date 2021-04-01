@@ -39,8 +39,15 @@ from uniunihan_db.lingua import mandarin
     ],
 )
 def test_parse_legal_syllable(
-    input, onset, glide, nucleus, final, tone, tone_stripped, rhyme
-):
+    input: str,
+    onset: str,
+    glide: str,
+    nucleus: str,
+    final: str,
+    tone: int,
+    tone_stripped: str,
+    rhyme: str,
+) -> None:
     actual = mandarin.parse_syllable(input)
     assert actual is not None
     assert actual.surface == input.strip().lower()
@@ -53,16 +60,16 @@ def test_parse_legal_syllable(
     assert actual.rhyme == rhyme
 
 
-def test_parse_nonce_syllable():
+def test_parse_nonce_syllable() -> None:
     syl = mandarin.parse_syllable("xyadfs")
     assert syl is None
 
 
-def test_pinyin_tone_marks_to_numbers():
+def test_pinyin_tone_marks_to_numbers() -> None:
     s = "shén me"
     assert mandarin.pinyin_tone_marks_to_numbers(s) == "shen2 me"
 
 
-def test_pinyin_numbers_to_tone_marks():
+def test_pinyin_numbers_to_tone_marks() -> None:
     s = "Ni3 hao3 ma0?"
     assert mandarin.pinyin_numbers_to_tone_marks(s) == "Nǐ hǎo ma?"

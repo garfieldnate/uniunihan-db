@@ -3,24 +3,24 @@ import pytest
 from uniunihan_db.component_group import ComponentGroup, PurityType
 
 
-def test_no_chars_raises_error():
+def test_no_chars_raises_error() -> None:
     with pytest.raises(ValueError):
         ComponentGroup("x", {})
 
 
-def test_mixed_with_and_with_pron_raises_error():
+def test_mixed_with_and_with_pron_raises_error() -> None:
     with pytest.raises(ValueError):
         ComponentGroup("x", {"x": ["b", "a"], "y": [], "z": ["a"]})
 
 
-def test_chars():
+def test_chars() -> None:
     group = ComponentGroup(
         "x", {"x": ["b", "a"], "y": ["a"], "z": ["a"], "w": ["b"], "u": ["b"]}
     )
     assert group.chars == set(["x", "y", "z", "w", "u"])
 
 
-def test_pron_to_chars():
+def test_pron_to_chars() -> None:
     group = ComponentGroup(
         "x", {"x": ["b", "a"], "y": ["a"], "z": ["a"], "w": ["b"], "u": ["b"]}
     )
@@ -28,7 +28,7 @@ def test_pron_to_chars():
     assert pron_to_chars == {"a": ["x", "y", "z"], "b": ["u", "w", "x"]}
 
 
-def test_exceptions():
+def test_exceptions() -> None:
     group = ComponentGroup(
         "x",
         {
@@ -44,7 +44,7 @@ def test_exceptions():
     assert group.exceptions == {"c": "v", "d": "t"}
 
 
-def test_purity_type():
+def test_purity_type() -> None:
     char_to_prons = {"x": ["a"]}
     group = ComponentGroup("x", char_to_prons)
     assert group.purity_type == PurityType.SINGLETON
@@ -87,7 +87,7 @@ def test_purity_type():
     assert group.purity_type == PurityType.NO_PATTERN
 
 
-def test_get_char_presentation():
+def test_get_char_presentation() -> None:
     char_to_prons = {
         "x": ["a", "b"],
         "y": ["a"],
@@ -102,7 +102,7 @@ def test_get_char_presentation():
     assert char_clusters == [["x", "y", "z"], ["u", "w"], ["t"], ["v"]]
 
 
-def test_group_with_no_pronunciations():
+def test_group_with_no_pronunciations() -> None:
     group = ComponentGroup("x", {"a": [], "b": [], "c": []})
     assert group.chars == {"a", "b", "c"}
     assert group.purity_type == PurityType.NO_PRONUNCIATIONS

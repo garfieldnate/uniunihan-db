@@ -194,7 +194,7 @@ def alpha_to_kana(word: str, romanization: Romanization = Romanization.HEPBURN) 
     return word
 
 
-def kana_to_alpha(word: str, romanization=Romanization.IME) -> str:
+def kana_to_alpha(word: str, romanization: Romanization = Romanization.IME) -> str:
     """Romanize kana input; currently only supports IME"""
     for k, v in NIHONSIKI_TRIGRAPH.items():
         word = word.replace(v, k)
@@ -216,8 +216,8 @@ def kana_to_alpha(word: str, romanization=Romanization.IME) -> str:
 
 def alpha_to_alpha(
     word: str,
-    input_romanization=Romanization.HEPBURN,
-    output_romanization=Romanization.IME,
+    input_romanization: Romanization = Romanization.HEPBURN,
+    output_romanization: Romanization = Romanization.IME,
 ) -> str:
     """Convert from one romanization to another
     Currently only hepburn to IME conversion is supported"""
@@ -234,7 +234,7 @@ class HanSyllable:
     coda: str
     epenthetic_vowel: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.nucleus = self.semivowel + self.vowel
         self.rhyme = self.nucleus + self.coda
         # TODO: provide morae count (1,2 or 3)

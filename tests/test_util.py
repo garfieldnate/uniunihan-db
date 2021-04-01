@@ -3,13 +3,13 @@ import string
 from uniunihan_db.util import filter_keys, read_cedict, read_ckip_20k, read_joyo
 
 
-def test_filter_keys():
+def test_filter_keys() -> None:
     d = {c: ord(c) for c in string.ascii_lowercase}
     letters = "abc"
     assert filter_keys(d, letters) == {"a": ord("a"), "b": ord("b"), "c": ord("c")}
 
 
-def test_read_joyo():
+def test_read_joyo() -> None:
     joyo = read_joyo()
 
     # There should be 2136 joyo characters
@@ -54,7 +54,7 @@ def test_read_joyo():
     assert set("辨瓣辯辦辮") == joyo.new_to_old("弁")
 
 
-def test_read_ckip_20k():
+def test_read_ckip_20k() -> None:
     ckip_20k = read_ckip_20k()
     assert len(ckip_20k) == 18462
     assert ckip_20k["黴菌"] == [
@@ -80,7 +80,7 @@ def test_read_ckip_20k():
     }
 
 
-def test_read_cedict():
+def test_read_cedict() -> None:
     entries = read_cedict()
     # Assuming the size of the dictionary will only grow over time
     assert len(entries) >= 113420

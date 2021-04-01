@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 
 @dataclass
@@ -66,7 +66,7 @@ ONSETS = "tdkgpbwqryljhszxcnmf"
 SYLLABLE_RE = f"(?i)^(?P<onset>[{ONSETS}]h?)?(?P<glide>i|u|ü)?(?P<nucleus>[{VOWEL_LIST}])(?P<final>ng?|r|i|u|o)?$"
 
 
-def strip_tone(s):
+def strip_tone(s: str) -> Tuple[str, int]:
     tone = 0
     for t, matcher in TONE_MATCHERS.items():
         if re.search(matcher, s):
@@ -138,14 +138,12 @@ def parse_syllable(s: str) -> Optional[Syllable]:
     )
 
 
-def pinyin_tone_marks_to_numbers(s):
+def pinyin_tone_marks_to_numbers(s: str) -> str:
     words = s.split()
     new_words = []
     for w in words:
         s, tone = strip_tone(w)
-        if tone == 0:
-            tone = ""
-        new_words.append(f"{s}{tone}")
+        new_words.append(f"{s}{'' if tone == 0 else tone}")
     return " ".join(new_words)
 
 
@@ -167,9 +165,9 @@ pinyinToneMarks = {
 }
 
 
-def __convertPinyinCallback(m):
+def __convertPinyinCallback(m: re.Match[str]) -> str:
     tone = int(m.group(3)) % 5
-    r = m.group(1).replace("v", "ü").replace("V", "Ü")
+    r: str = m.group(1).replace("v", "ü").replace("V", "Ü")
     # for multple vowels, use first one if it is a/e/o, otherwise use second one
     pos = 0
     if len(r) > 1 and not r[0] in "aeoAEO":
@@ -179,7 +177,7 @@ def __convertPinyinCallback(m):
     return r + m.group(2)
 
 
-def pinyin_numbers_to_tone_marks(s):
+def pinyin_numbers_to_tone_marks(s: str) -> str:
     return re.sub(
         r"([aeiouüvÜ]{1,3})(n?g?r?)([012345])",
         __convertPinyinCallback,

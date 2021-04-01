@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from typing import Any, Collection, Tuple, Union
 
 import pytest
 
@@ -8,14 +9,14 @@ from uniunihan_db.lingua import japanese
 CODE_DIR = Path(__file__).parents[0]
 
 
-def idfn(val):
-    if type(val) == str:
+def idfn(val: Union[object, str]) -> str:
+    if isinstance(val, str):
         return "empty string" if not len(val) else val
     else:
         return str(val)
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc: Any) -> None:
     if "hepburn" in metafunc.fixturenames:
         data = read_hepburn_test_data()
         metafunc.parametrize("hepburn,expected", data, ids=idfn)
@@ -24,7 +25,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("kana,expected_ime", data, ids=idfn)
 
 
-def read_hepburn_test_data():
+def read_hepburn_test_data() -> Collection[Tuple[str, str]]:
     data_csv = Path(CODE_DIR, "romaji_kanaization.csv")
     data = []
 
@@ -34,7 +35,7 @@ def read_hepburn_test_data():
     return data
 
 
-def read_ime_test_data():
+def read_ime_test_data() -> Collection[Tuple[str, str]]:
     data_csv = Path(CODE_DIR, "kana_romanization.csv")
     data = []
 
@@ -53,12 +54,12 @@ def read_csv(path: Path) -> csv.DictReader:
 ###### Tests ######
 
 
-def test_hepburn_to_kana(hepburn, expected):
+def test_hepburn_to_kana(hepburn: str, expected: str) -> None:
     actual = japanese.alpha_to_kana(hepburn)
     assert actual == expected
 
 
-def test_kana_to_ime(kana, expected_ime):
+def test_kana_to_ime(kana: str, expected_ime: str) -> None:
     actual = japanese.kana_to_alpha(kana)
     assert actual == expected_ime
 
@@ -67,7 +68,7 @@ def test_kana_to_ime(kana, expected_ime):
     "input,expected",
     [("katsu", "katu"), ("jachunfu", "zyatyunhu"), ("saan'i", "saan'i")],
 )
-def test_hepburn_to_ime(input, expected):
+def test_hepburn_to_ime(input: str, expected: str) -> None:
     actual = japanese.alpha_to_alpha(input)
     assert actual == expected
 
@@ -93,8 +94,14 @@ def test_hepburn_to_ime(input, expected):
     ],
 )
 def test_parse_legal_han_syllable(
-    input, onset, semivowel, vowel, coda, epenthetic_vowel, rhyme
-):
+    input: str,
+    onset: str,
+    semivowel: str,
+    vowel: str,
+    coda: str,
+    epenthetic_vowel: str,
+    rhyme: str,
+) -> None:
     actual = japanese.parse_han_syllable(input)
     assert actual is not None
     assert actual.surface == input.strip().lower()
@@ -106,6 +113,6 @@ def test_parse_legal_han_syllable(
     assert actual.rhyme == rhyme
 
 
-def test_parse_nonce_han_syllable():
+def test_parse_nonce_han_syllable() -> None:
     syl = japanese.parse_han_syllable("xyadfs")
     assert syl is None

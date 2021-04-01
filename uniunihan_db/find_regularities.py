@@ -2,7 +2,7 @@ import argparse
 import json
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Mapping, Sequence, Set
 
 from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
@@ -28,7 +28,7 @@ OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
 
 class CustomJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> object:
         if isinstance(obj, set):
             return list(obj)
         elif isinstance(obj, ComponentGroup):
@@ -37,7 +37,7 @@ class CustomJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def _incorporate_ckip_freq_data(char_to_pron_to_words):
+def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
     ckip20k_entries = read_ckip_20k()
     for pron_to_words in char_to_pron_to_words.values():
         for words in pron_to_words.values():
@@ -56,16 +56,16 @@ def _incorporate_ckip_freq_data(char_to_pron_to_words):
 class Index:
     groups: List[ComponentGroup]
     # char -> pronuncitions
-    char_to_prons: Dict[str, List[str]]
+    char_to_prons: Mapping[str, Sequence[str]]
     # unique pronunciations and their corresponding character
-    unique_pron_to_char: Dict[str, str]
+    unique_pron_to_char: Mapping[str, str]
     # characters without any pronunciations
-    no_pron_chars: List[str]
+    no_pron_chars: Set[str]
     # characters with no pronunciation components
     no_comp_chars: Set[str]
 
 
-def _index(char_to_prons, comp_to_char):
+def _index(char_to_prons, comp_to_char) -> Index:
     # Group and classify characters by component
     chars_assigned_to_a_group = set()
     groups = []
@@ -113,7 +113,7 @@ def _index(char_to_prons, comp_to_char):
     )
 
 
-def _format_json(data):
+def _format_json(data: object) -> str:
     return json.dumps(
         data,
         cls=CustomJsonEncoder,
@@ -122,15 +122,13 @@ def _format_json(data):
     )
 
 
-def _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir):
+def _print_reports(index: Index, char_to_prons, char_to_pron_to_vocab, out_dir) -> None:
     purity_to_chars = defaultdict(set)
-    purity_to_groups = defaultdict(int)
-    exceptional_chars = set()
+    purity_to_groups: Dict[PurityType, int] = defaultdict(int)
     missing_words = set()
     for g in index.groups:
         purity_to_chars[g.purity_type].update(g.chars)
         purity_to_groups[g.purity_type] += 1
-        exceptional_chars.update(g.exceptions.values())
         for c in g.chars:
             missing = set(char_to_prons[c]) - set(char_to_pron_to_vocab[c].keys())
             for p in missing:
@@ -163,7 +161,7 @@ def _print_reports(index, char_to_prons, char_to_pron_to_vocab, out_dir):
         f.write(_format_json(sorted(list(missing_words))))
 
 
-def _print_final_output_jp(index, char_to_words, char_supplement, out_dir):
+def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> None:
     log.info("Constructing final output...")
     final = []
     for g in index.groups:
@@ -228,7 +226,9 @@ def _print_final_output_jp(index, char_to_words, char_supplement, out_dir):
         f.write(_format_json(final))
 
 
-def _print_final_output_zh(index, char_to_pron_to_vocab, char_supplement, out_dir):
+def _print_final_output_zh(
+    index, char_to_pron_to_vocab, char_supplement, out_dir
+) -> None:
     log.info("Constructing final output...")
     final = []
     for g in index.groups:
@@ -297,7 +297,7 @@ def _print_final_output_zh(index, char_to_pron_to_vocab, char_supplement, out_di
         f.write(_format_json(final))
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-l",

@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Collection, Mapping, Sequence, Set, TypeVar
 
 import jaconv
 
@@ -24,7 +24,7 @@ HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
 KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
 
 
-def configure_logging(name):
+def configure_logging(name: str) -> logging.Logger:
     logging.basicConfig(
         level=os.environ.get("LOGLEVEL", "INFO"),
         format="[%(levelname)s] %(name)s: %(message)s",
@@ -40,26 +40,29 @@ def configure_logging(name):
 
 log = configure_logging(__name__)
 
+T = TypeVar("T")
+U = TypeVar("U")
 
-def filter_keys(d, s):
+
+def filter_keys(d: Mapping[T, U], s: Collection[T]) -> Mapping[T, U]:
     """Filter keys in d to just elements present in s"""
     return {k: v for k, v in d.items() if k in s}
 
 
 @dataclass
 class Joyo:
-    old_char_to_prons: Dict[str, List[str]]
-    new_char_to_prons: Dict[str, List[str]]
-    char_to_supplementary_info: Dict[str, Dict[str, Any]]
+    old_char_to_prons: Mapping[str, Sequence[str]]
+    new_char_to_prons: Mapping[str, Sequence[str]]
+    char_to_supplementary_info: Mapping[str, Mapping[str, Any]]
 
-    def __post_init__(self):
-        self._new_to_old = defaultdict(set)
+    def __post_init__(self) -> None:
+        self._new_to_old: Mapping[str, Set[str]] = defaultdict(set)
         for c_sup in self.char_to_supplementary_info.values():
             new_c = c_sup["new"]
             old_c = c_sup["old"] or c_sup["new"]
             self._new_to_old[new_c].add(old_c)
 
-    def new_to_old(self, new_char):
+    def new_to_old(self, new_char: str) -> Set[str]:
         return self._new_to_old[new_char]
 
 
@@ -159,7 +162,7 @@ def read_historical_on_yomi(normalizer=jaconv.hira2kata):
     return char_to_new_to_old_pron
 
 
-def read_unihan():
+def read_unihan() -> Mapping[str, Any]:
     log.info("Loading unihan data...")
     # TODO: read path from constants file
     with open(GENERATED_DATA_DIR / "unihan.json") as f:
@@ -186,13 +189,13 @@ def get_mandarin_pronunciation(unihan_entry):
     return []
 
 
-def read_ckip_20k(index_chars=False):
+def read_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
     log.info(f"Loading {ckip_path}")
 
     if index_chars:
         # char -> pronunciation -> word list
-        entries = defaultdict(lambda: defaultdict(list))
+        entries: Mapping[str, Any] = defaultdict(lambda: defaultdict(list))
     else:
         # surface form -> word list
         entries = defaultdict(list)
@@ -225,13 +228,13 @@ def read_ckip_20k(index_chars=False):
     return entries
 
 
-def read_cedict(index_chars=False, filter=True):
+def read_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, Any]:
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
     num_words = 0
     if index_chars:
         # char -> pronunciation -> word list
-        entries = defaultdict(lambda: defaultdict(list))
+        entries: Mapping[str, Any] = defaultdict(lambda: defaultdict(list))
     else:
         # surface form -> word list
         entries = defaultdict(list)

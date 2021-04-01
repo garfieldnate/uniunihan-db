@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from enum import IntEnum
-from typing import Dict, Iterable
+from typing import Collection, Iterable, Mapping, Sequence, Tuple
 
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
@@ -27,7 +27,7 @@ class PurityType(IntEnum):
 
 
 class ComponentGroup:
-    def __init__(self, component: str, char_to_prons: Dict[str, Iterable[str]]):
+    def __init__(self, component: str, char_to_prons: Mapping[str, Iterable[str]]):
         """component: phonetic component common to all characters in the group
         char_to_prons: dict[char -> [pronunciations]] for all characters in the group"""
         self.component = component
@@ -83,11 +83,11 @@ class ComponentGroup:
         elif len(self.exceptions) != num_prons:
             self.purity_type = PurityType.MIXED_D
 
-    def get_char_presentation(self):
+    def get_char_presentation(self) -> Sequence[Sequence[str]]:
         """Returns a list of lists of characters which share a pronunciation.
         The lists are sorted by their size and then by the pronunciation which they share."""
         # sort by number of characters descending and then orthographically by pronunciation
-        def sorter(item):
+        def sorter(item: Tuple[str, Collection[str]]) -> Tuple[int, str]:
             return (-len(item[1]), item[0])
 
         pron_to_chars = copy.deepcopy(self.pron_to_chars)
