@@ -1,5 +1,7 @@
 <!-- https://codepen.io/garfieldnate/pen/oNwjQqW -->
-<div class="cell" id="Japanese-cell-{{ id }}">
+{% extends "base.html.jinja" %}
+{% block jp_content %}
+<div class="cell" id="日-cell-{{ id }}">
     <div class="box left-column border">
         <div class="box character">{{ char.new }}</div>
         <div class="box id">{{ id }}</div>
@@ -50,3 +52,4 @@
     </div>
 
 </div>
+{% endblock %}

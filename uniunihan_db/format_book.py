@@ -40,7 +40,8 @@ CHAR_DATA = {
     "old": None,
     "non-joyo": ["キョウ"],
     "readings": ["キョウ", "ケイ"],
-    "cross_ref": {"Mandarin": 478, "Korean": 12, "Vietnamese": 924},
+    "cross_ref": {"中": 478, "韓": 12, "越": 924},
+    "comment": "Cursive form became hiragana と; can't think of what else to say, so I'll just adding this long-winded sentence, or sentence fragment, rather, to fill in some space so that I can test multi-line comment display.",
 }
 
 if __name__ == "__main__":
