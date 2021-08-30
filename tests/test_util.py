@@ -1,6 +1,12 @@
 import string
 
-from uniunihan_db.util import filter_keys, read_cedict, read_ckip_20k, read_joyo
+from uniunihan_db.util import (
+    filter_keys,
+    read_cedict,
+    read_ckip_20k,
+    read_historical_on_yomi,
+    read_joyo,
+)
 
 
 def test_filter_keys() -> None:
@@ -107,3 +113,12 @@ def test_read_cedict() -> None:
     } in char_to_pron_to_word["錢"]["qian2"]
 
     assert "ai2" in char_to_pron_to_word["癌"]
+
+
+def test_read_historical_on_yomi():
+    char_to_new_to_old_pron = read_historical_on_yomi()
+    assert "明" in char_to_new_to_old_pron
+    char = char_to_new_to_old_pron["明"]
+    assert "ミョウ" in char
+    old_kana = char["ミョウ"]
+    assert old_kana == "みゃう"
