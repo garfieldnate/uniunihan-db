@@ -1,0 +1,52 @@
+<!-- https://codepen.io/garfieldnate/pen/oNwjQqW -->
+<div class="cell" id="Japanese-cell-{{ id }}">
+    <div class="box left-column border">
+        <div class="box character">{{ char.new }}</div>
+        <div class="box id">{{ id }}</div>
+    </div>
+
+    <div class="box right-column border">
+        <div class="char-data">
+
+            <div class="box old-form">{{ char.old or '' }}</div>
+            <div class="box pron">{%-
+                set comma = joiner("、") %}{%-
+                for p in char.prons %}{{ comma() }}{{
+                p['pron']}}{%
+                if 'historical' in p %}({{
+                p['historical']}}){%
+                endif %}{%
+                endfor %}
+            </div>
+            <div class="box keywords">{{ char.keyword }}</div>
+            <div class="box vocab">{{
+                char.prons|
+                map(attribute='vocab')|
+                map(attribute='surface')|
+                join('<br />')
+                }}</div>
+            <div class="box vocab-pron">{{
+                char.prons|
+                map(attribute='vocab')|
+                map(attribute='pron')|
+                join('<br />')
+                }}</div>
+            <div class="box vocab-meaning">{{
+                char.prons|
+                map(attribute='vocab')|
+                map(attribute='en')|
+                join('<br />')
+                }}</div>
+            <div class="box cross-ref">
+                <div>{% set break = joiner("<br />")
+                    %}{% for lang, id in char.cross_ref.items() %}{{ break()}}
+                    <a href="#{{ lang }}-cell-{{ id }}">{{ lang }}: {{ id }}</a>{% endfor %}
+                </div>
+            </div>
+        </div>
+        {% if 'comment' in char
+        %}<div class="comment">{{ char['comment'] }}</div>{%
+        endif %}
+    </div>
+
+</div>

@@ -1,5 +1,14 @@
 # TODO
 
+Topic: final output
+
+* Sketch cell format
+    - character in correct local glyph
+    - ID
+    -
+* Determine entire section format (component, pronunciations?, link to component sections for other languages, ancient pronunciation?, cell sorting, completely irregular reading word examples)
+* Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
+
 Topic: groupings
 
 * possibly replace ytenx with phonetic series from Wikipedia
@@ -12,13 +21,14 @@ Topic: Mandarin support
 * Get 三体 word list
     - simp to trad conversion
     - how to present? show chapter 1 vocab with rest of book as backup?
-* Possibly rovide middle Chinese pronunciations
+* Possibly provide middle Chinese pronunciations
     - mostly in Ytenx
 * Possibly provide old Chinese pronunciations
     - download Baxter/Sagart data
 
 Topic: Japanese Support
 
+* non-joyo field should always be list, never `False`
 * possibly output kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 
