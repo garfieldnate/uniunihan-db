@@ -2,10 +2,7 @@
 
 Topic: final output
 
-* Sketch cell format
-    - character in correct local glyph
-    - ID
-    -
+* Indexing step
 * Determine entire section format (component, pronunciations?, link to component sections for other languages, ancient pronunciation?, cell sorting, completely irregular reading word examples)
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 
@@ -28,7 +25,9 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* Use separating dot instead of dash in kun-yomi furigana
 * Vocab pronunciations would be more natural in hiragana
+* More example compounds would actually be quite nice, particularly for the more common characters
 * Would be nice to be able to sort キョウダイ before ケイテイ (need frequency of readings to do this)
 * move POS into separate field in vocab (is currently part of definition).
 * What is "/(P)" in definition field?
