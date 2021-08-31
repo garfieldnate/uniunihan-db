@@ -28,6 +28,7 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* Vocab pronunciations would be more natural in hiragana
 * Would be nice to be able to sort キョウダイ before ケイテイ (need frequency of readings to do this)
 * move POS into separate field in vocab (is currently part of definition).
 * What is "/(P)" in definition field?

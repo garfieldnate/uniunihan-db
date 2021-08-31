@@ -6,6 +6,19 @@ html {
     font-family: sans-serif;
 }
 
+@media print {
+    html {
+        font-family: serif;
+        font-size: 12pt;
+    }
+}
+
+@media screen {
+    html {
+        font-size: 150%;
+    }
+}
+
 body {
     margin: 40px;
 }
@@ -15,10 +28,13 @@ body {
     grid-template-columns: 10% 90%;
     background-color: #fff;
     color: #444;
-    font-size: 110%;
     line-height: 1.5em;
-    font-size: 150%;
     width: 100%;
+}
+
+.cell:not(:first-child) {
+    /* Collapse top border with previous cell*/
+    margin-top: -1px;
 }
 
 .border {
@@ -52,7 +68,7 @@ body {
 
 .char-data {
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
 }
 
 .char-info-container {
