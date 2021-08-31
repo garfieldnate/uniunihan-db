@@ -56,9 +56,13 @@ body {
     justify-content: space-between;
 }
 
-.character {}
+.character {
+    font-size: 200%;
+}
 
-.id {}
+.id {
+    font-size: 110%;
+}
 
 .right-column {
     grid-template-rows: 1fr min-content;
