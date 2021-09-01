@@ -12,6 +12,7 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* restructure output like for Japanese
 * parse out classifiers for vocab
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
@@ -26,6 +27,8 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* track down unfound Baxter/Sagart data for 125 components
+* Would be nice to have Japanese names for components
 * More example compounds would actually be quite nice, particularly for the more common characters
 * Would be nice to be able to sort キョウダイ before ケイテイ (need frequency of readings to do this)
 * move POS into separate field in vocab (is currently part of definition).

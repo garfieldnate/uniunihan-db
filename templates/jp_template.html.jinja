@@ -8,9 +8,7 @@
         </div>
         {% for component in groups %}
         <div class="component" id="日-component-TODO-component-id">
-            <div class="component-header">
-                <h2>{{ component.component }} - TODO: reconstructed pronunciation</h2>
-            </div>
+            {{ component_header(component.component) }}
             {%- set spacing = joiner("<br />") %}
             {% for cluster in component.clusters %}{{ spacing() }}
             <div class="cluster" id="日-cluster-TODO-cluster-id">
