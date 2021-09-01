@@ -3,8 +3,9 @@ from pathlib import Path
 
 import jaconv
 import jinja2
-from component_group import PurityType
 from jinja2 import Environment, FileSystemLoader
+
+from .component_group import PurityType
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 JINJA_ENV = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
@@ -52,7 +53,7 @@ def index(data):
                     counter += 1
 
 
-if __name__ == "__main__":
+def main():
     jp_template = JINJA_ENV.get_template("jp_template.html.jinja")
     jp_data = json.load(JP_DATA_FILE.open("r"))
     index(jp_data)
@@ -60,3 +61,7 @@ if __name__ == "__main__":
     result = jp_template.render(id=20, purity_groups=jp_data)
 
     print(result)
+
+
+if __name__ == "__main__":
+    main()

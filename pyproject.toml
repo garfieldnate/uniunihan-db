@@ -38,6 +38,7 @@ testpaths = ["tests"]
 [tool.poetry.scripts]
 build-db = "uniunihan_db.build_db:main"
 find-regularities = "uniunihan_db.find_regularities:main"
+format-book = "uniunihan_db.format_book:main"
 # test = "pre-commit run --all-files"
 
 [tool.isort]
