@@ -68,7 +68,7 @@ class PurityType(IntEnum):
     # No pronunciations are available to judge the group's purity
     NO_PRONUNCIATIONS = (
         9,
-        "neologism"
+        "neologism",
         "The characters in these groups have no pronunciations based on ancient Chinese.",
     )
 
