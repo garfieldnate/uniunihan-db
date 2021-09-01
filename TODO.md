@@ -3,7 +3,6 @@
 Topic: final output
 
 * Indexing step
-* fix formatting in kokuji section
 * add poetry run target (requires fixing imports)
 * Determine entire section format (component, pronunciations?, link to component sections for other languages, ancient pronunciation?, cell sorting, completely irregular reading word examples)
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)

@@ -1,12 +1,12 @@
 {% extends "base.html.jinja" %}
 {% block jp_content %}
 <div id="jp_content">
-    {% for purity_type, group in purity_groups.items() %}
+    {% for purity_type, groups in purity_groups.items() %}
     <div class="purity-group" id="日-purity-group-{{ purity_type }}">
         <div class="purity-group-header">
             {{ purity_group_header(purity_type) }}
         </div>
-        {% for component in group %}
+        {% for component in groups %}
         <div class="component" id="日-component-TODO-component-id">
             <div class="component-header">
                 <h2>{{ component.component }} - TODO: reconstructed pronunciation</h2>
