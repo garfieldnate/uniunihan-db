@@ -23,6 +23,8 @@ LOG_FILE = GENERATED_DATA_DIR / "log.txt"
 HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
 KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
 
+BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
+
 
 def configure_logging(name: str) -> logging.Logger:
     logging.basicConfig(
@@ -287,3 +289,22 @@ def read_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, 
                 entries[trad].append(word_dict)
     log.info(f"  Read {num_words} entries from CEDICT")
     return entries
+
+
+def read_baxter_sagart():
+    log.info("Loading Baxter/Sagart reconstruction data...")
+    char_to_info = defaultdict(list)
+    with BAXTER_SAGART_FILE.open() as f:
+        # filter comments
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
+        for r in rows:
+            # rows contains: zi,py,MC,,OC,gloss,GSR,HYDZD,rad,str,Unicode
+            info = {
+                "pinyin": r["py"],
+                "middle_chinese": r["MC"],
+                "old_chinese": r["OC"],
+                "keyword": r["gloss"],
+            }
+            char = r["zi"]
+            char_to_info[char].append(info)
+    return char_to_info
