@@ -1,70 +1,76 @@
-<!-- https://codepen.io/garfieldnate/pen/oNwjQqW -->
 {% extends "base.html.jinja" %}
 {% block jp_content %}
 <div id="jp_content">
-    {% for component in components %}
-    <div class="component" id="日-component-TODO-component-id">
-        <div class="component-header">
-            <h2>{{ component.component }} - TODO: reconstructed pronunciation</h2>
+    {% for purity_type, group in purity_groups.items() %}
+    <div class="purity-group" id="日-purity-group-{{ purity_type }}">
+        <div class="purity-group-header">
+            {{ purity_group_header(purity_type) }}
         </div>
-        {%- set spacing = joiner("<br />") %}
-        {% for cluster in component.clusters %}{{ spacing() }}
-        <div class="cluster" id="日-cluster-TODO-cluster-id">
-            {% for char in cluster.values() %}
-            <div class="cell" id="日-cell-{{ char.id }}">
-                <div class="box left-column border">
-                    <div class="box character">{{ char.new }}</div>
-                    <div class="box id">{{ char.id }}</div>
-                </div>
-
-                <div class="box right-column border">
-                    <div class="char-data">
-
-                        <div class="box old-form">{{ char.old or '' }}</div>
-                        <div class="box pron">{%-
-                            set comma = joiner("、") %}{%-
-                            for p in char.prons %}{{ comma() }}{{
-                            p['pron']}}{%
-                            if 'historical' in p %}（{{
-                            p['historical']}}）{%
-                            endif %}{%
-                            endfor %}
-                        </div>
-                        <div class="box keywords">{{ char.keyword }}</div>
-                        <div class="box vocab">{{
-                            char.prons|
-                            map(attribute='vocab')|
-                            map(attribute='surface')|
-                            join('<br />')
-                            }}</div>
-                        <div class="box vocab-pron">{{
-                            char.prons|
-                            map(attribute='vocab')|
-                            map(attribute='pron')|
-                            map('kata2hira')|
-                            join('<br />')
-                            }}</div>
-                        <div class="box vocab-meaning">{{
-                            char.prons|
-                            map(attribute='vocab')|
-                            map(attribute='en')|
-                            map('break_slashes')|
-                            join('<br />')
-                            }}</div>
-                        <div class="box cross-ref">
-                            {%- if 'cross_ref' in char -%}
-                            <div>{% set break = joiner("<br />")
-                                %}{% for lang, id in char.cross_ref.items() %}{{ break()}}
-                                <a href="#{{ lang }}-cell-{{ id }}">{{ lang }}: {{ id }}</a>{% endfor %}
-                            </div>
-                            {%- endif -%}
-                        </div>
+        {% for component in group %}
+        <div class="component" id="日-component-TODO-component-id">
+            <div class="component-header">
+                <h2>{{ component.component }} - TODO: reconstructed pronunciation</h2>
+            </div>
+            {%- set spacing = joiner("<br />") %}
+            {% for cluster in component.clusters %}{{ spacing() }}
+            <div class="cluster" id="日-cluster-TODO-cluster-id">
+                {% for char in cluster.values() %}
+                <div class="cell" id="日-cell-{{ char.id }}">
+                    <div class="box left-column border">
+                        <div class="box character">{{ char.new }}</div>
+                        <div class="box id">{{ char.id }}</div>
                     </div>
-                    {% if 'comment' in char
-                    %}<div class="comment">{{ char['comment'] }}</div>{%
-                    endif %}
+
+                    <div class="box right-column border">
+                        <div class="char-data">
+
+                            <div class="box old-form">{{ char.old or '' }}</div>
+                            <div class="box pron">{%-
+                                set comma = joiner("、") %}{%-
+                                for p in char.prons %}{{ comma() }}{{
+                                p['pron']}}{%
+                                if 'historical' in p %}（{{
+                                p['historical']}}）{%
+                                endif %}{%
+                                endfor %}
+                            </div>
+                            <div class="box keywords">{{ char.keyword }}</div>
+                            <div class="box vocab">{{
+                                char.prons|
+                                map(attribute='vocab')|
+                                map(attribute='surface')|
+                                join('<br />')
+                                }}</div>
+                            <div class="box vocab-pron">{{
+                                char.prons|
+                                map(attribute='vocab')|
+                                map(attribute='pron')|
+                                map('kata2hira')|
+                                join('<br />')
+                                }}</div>
+                            <div class="box vocab-meaning">{{
+                                char.prons|
+                                map(attribute='vocab')|
+                                map(attribute='en')|
+                                map('break_slashes')|
+                                join('<br />')
+                                }}</div>
+                            <div class="box cross-ref">
+                                {%- if 'cross_ref' in char -%}
+                                <div>{% set break = joiner("<br />")
+                                    %}{% for lang, id in char.cross_ref.items() %}{{ break()}}
+                                    <a href="#{{ lang }}-cell-{{ id }}">{{ lang }}: {{ id }}</a>{% endfor %}
+                                </div>
+                                {%- endif -%}
+                            </div>
+                        </div>
+                        {% if 'comment' in char
+                        %}<div class="comment">{{ char['comment'] }}</div>{%
+                        endif %}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>

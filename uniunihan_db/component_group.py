@@ -6,24 +6,71 @@ from typing import Collection, Iterable, Mapping, Sequence, Tuple
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
 class PurityType(IntEnum):
+    # Custom constructor to allow specifying documentation string;
+    # See https://stackoverflow.com/a/50473952/474819 for discussion
+    def __new__(cls, value, display=None, doc=None):
+        self = int.__new__(cls, value)  # calling super().__new__(value) here would fail
+        self._value_ = value
+        if display is not None:
+            self.display = display
+        if doc is not None:
+            self.__doc__ = doc
+        return self
+
     # Only one pronunciation for the whole group
-    PURE = 1
+    PURE = (
+        1,
+        "pure",
+        "These groups have only a single pronunciation shared by all characters in the group, making them the easiest to learn and remember.",
+    )
     # 2 Pronunciations, one of them contains only one character
-    SEMI_PURE = 2
+    SEMI_PURE = (
+        2,
+        "single-exception",
+        "These groups contain only 1 exceptional character pronunciation.",
+    )
     # At least 4 chars, only 2 pronunciations
-    MIXED_A = 3
+    MIXED_A = (
+        3,
+        "mixed-A",
+        "These groups have at least 4 characters and only 2 pronunciations.",
+    )
     # At least 4 chars, only 3 pronunciations
-    MIXED_B = 4
+    MIXED_B = (
+        4,
+        "mixed-B",
+        "These groups have at least 4 characters and only 3 pronunciations.",
+    )
     # At least 4 chars, at least 1 shared pronunciation
-    MIXED_C = 5
+    MIXED_C = (
+        5,
+        "mixed-C",
+        "These groups have at least 4 characters and share at least 1 pronunciation.",
+    )
     # At least one shared pronunciation
-    MIXED_D = 6
+    MIXED_D = (
+        6,
+        "mixed-D",
+        "These groups have less than 4 characters and share at least 1 pronunciation.",
+    )
     # Multiple characters, no pattern found
-    NO_PATTERN = 7
+    NO_PATTERN = (
+        7,
+        "potpourri",
+        "There are no shared pronunciations in these groups. However, the pronunciations are still related, since they have a common ancestor in ancient Chinese.",
+    )
     # Only one character in the group
-    SINGLETON = 8
+    SINGLETON = (
+        8,
+        "loner",
+        "These groups each contain only one character. It is still of use to know the phonetic component, since it may be of use in learning new characters not treated here, or in relating pronunciations to those found in other languages.",
+    )
     # No pronunciations are available to judge the group's purity
-    NO_PRONUNCIATIONS = 9
+    NO_PRONUNCIATIONS = (
+        9,
+        "neologism"
+        "The characters in these groups have no pronunciations based on ancient Chinese.",
+    )
 
 
 class ComponentGroup:

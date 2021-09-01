@@ -2,7 +2,7 @@ import argparse
 import json
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Sequence, Set
+from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
 
 from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
@@ -163,7 +163,7 @@ def _print_reports(index: Index, char_to_prons, char_to_pron_to_vocab, out_dir) 
 
 def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> None:
     log.info("Constructing final output...")
-    final = []
+    purity_2_groups = DefaultDict(list)
     for g in index.groups:
         # keep track of highest frequency vocab used in the group
         highest_freq = -1
@@ -209,18 +209,21 @@ def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> No
             "chars": g.chars,
             "highest_vocab_freq": highest_freq,
         }
-        final.append(group_entry)
+        purity_2_groups[group_entry["purity"]].append(group_entry)
 
-    # Sort the entries by purity type, then number of characters descending, then frequency
-    # of most frequent word descending, and final orthographically by component
-    final.sort(
-        key=lambda g: (
-            g["purity"],
-            -len(g["chars"]),
-            -g["highest_vocab_freq"],
-            g["component"],
+    for groups in purity_2_groups.values():
+        # Sort the entries by purity type, then number of characters descending, then frequency
+        # of most frequent word descending, and final orthographically by component
+        groups.sort(
+            key=lambda g: (
+                g["purity"],
+                -len(g["chars"]),
+                -g["highest_vocab_freq"],
+                g["component"],
+            )
         )
-    )
+
+    final = OrderedDict(sorted(purity_2_groups.items(), key=lambda kv: kv[0]))
 
     with open(out_dir / "final_output.json", "w") as f:
         f.write(_format_json(final))
