@@ -189,13 +189,13 @@ def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> No
                     pron_entry = {
                         "pron": pron,
                         "vocab": vocab,
-                        "non-joyo": pron in c_sup["non-joyo"],
+                        "non_joyo": pron in c_sup["non_joyo"],
                     }
                     if old_pron := c_sup.get("historical_pron", {}).get(pron):
                         pron_entry["historical"] = old_pron
                     pron_entries.append(pron_entry)
                 # put the Joyo pronunciations before the non-joyo ones
-                pron_entries.sort(key=lambda item: (item["non-joyo"], item["pron"]))
+                pron_entries.sort(key=lambda item: (item["non_joyo"], item["pron"]))
                 c_entry = {"prons": pron_entries}
                 c_entry.update(c_sup)
                 # already added this in pronunciation entries

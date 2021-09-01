@@ -25,17 +25,17 @@ def test_read_joyo() -> None:
 
     assert joyo.char_to_supplementary_info["辯"] == {
         "keyword": "articulate",
-        "kun-yomi": "",
+        "kun_yomi": [],
         "grade": "5",
         "strokes": "5",
         "new": "弁",
-        "non-joyo": [],
+        "non_joyo": [],
         "readings": ["ベン"],
         "old": "辯",
     }
     # make sure these are properly recognized as separate characters
     assert joyo.char_to_supplementary_info["辮"]["old"] == "辮"
-    assert joyo.char_to_supplementary_info["和"]["non-joyo"] == ["オ"]
+    assert joyo.char_to_supplementary_info["和"]["non_joyo"] == ["オ"]
 
     assert joyo.new_char_to_prons["労"] == ["ロウ"]
 
@@ -58,6 +58,8 @@ def test_read_joyo() -> None:
     )
 
     assert set("辨瓣辯辦辮") == joyo.new_to_old("弁")
+
+    assert joyo.char_to_supplementary_info["抱"]["kun_yomi"] == ["だ-く", "いだ-く", "かか-える"]
 
 
 def test_read_ckip_20k() -> None:

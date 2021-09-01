@@ -75,9 +75,10 @@ def read_joyo():
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
+            kun_yomi = [yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi]
             supplementary_info = {
                 "keyword": r["English_meaning"],
-                "kun-yomi": r["kun-yomi"],
+                "kun_yomi": kun_yomi,
                 "grade": r["grade"],
                 "strokes": r["strokes"],
                 "new": r["new"],
@@ -86,7 +87,7 @@ def read_joyo():
             # remove empty readings
             readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
             # note the non-Joyo readings and strip the indicator asterisk
-            supplementary_info["non-joyo"] = [
+            supplementary_info["non_joyo"] = [
                 yomi[:-1] for yomi in readings if yomi[-1] == "*"
             ]
             readings = [yomi.rstrip("*") for yomi in readings if yomi]

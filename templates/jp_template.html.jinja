@@ -34,6 +34,12 @@
                                 endif %}{%
                                 endfor %}
                             </div>
+                            <div class="box kun-yomi">{%-
+                                set comma = joiner("、") %}{%-
+                                for p in char.kun_yomi %}{{ comma() }}{{
+                                p }}{%
+                                endfor %}
+                            </div>
                             <div class="box keywords">{{ char.keyword }}</div>
                             <div class="box vocab">{{
                                 char.prons|
