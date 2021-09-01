@@ -144,7 +144,7 @@ def read_edict_freq(aligner):
     return char_to_pron_to_words
 
 
-def read_historical_on_yomi(normalizer=jaconv.hira2kata):
+def read_historical_on_yomi():
     log.info("Loading historical on-yomi data...")
     char_to_new_to_old_pron = defaultdict(dict)
     with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
@@ -152,9 +152,8 @@ def read_historical_on_yomi(normalizer=jaconv.hira2kata):
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
             modern = r["現代仮名遣い"]
-            historical = r["字音仮名遣い"]
-            historical_kata = normalizer(historical)
-            if historical_kata != modern:
+            historical = jaconv.hira2kata(r["字音仮名遣い"])
+            if historical != modern:
                 chars = r["字"]
                 for c in chars:
                     char_to_new_to_old_pron[c][modern] = historical

@@ -2,6 +2,7 @@
 
 Topic: final output
 
+* add purity to hierarchy structure
 * Indexing step
 * Determine entire section format (component, pronunciations?, link to component sections for other languages, ancient pronunciation?, cell sorting, completely irregular reading word examples)
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
@@ -12,6 +13,7 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* parse out classifiers for vocab
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
 * source English keywords from somewhere

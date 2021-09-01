@@ -117,8 +117,8 @@ def test_read_cedict() -> None:
 
 def test_read_historical_on_yomi():
     char_to_new_to_old_pron = read_historical_on_yomi()
-    assert "明" in char_to_new_to_old_pron
-    char = char_to_new_to_old_pron["明"]
-    assert "ミョウ" in char
-    old_kana = char["ミョウ"]
-    assert old_kana == "みゃう"
+    assert "位" in char_to_new_to_old_pron
+    char = char_to_new_to_old_pron["位"]
+    assert "イ" in char
+    old_kana = char["イ"]
+    assert old_kana == "ヰ"
