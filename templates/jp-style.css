@@ -25,7 +25,7 @@ body {
 
 .cell {
     display: grid;
-    grid-template-columns: 10% 90%;
+    grid-template-columns: 10% 80% 10%;
     background-color: #fff;
     color: #444;
     line-height: 1.5em;
@@ -108,10 +108,19 @@ body {
     grid-row: 2;
 }
 
-.cross-ref {
+.kun-yomi {
     grid-column: 4;
-    grid-row: span 2;
     text-align: right;
+}
+
+.cross-ref {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    grid-row: span 2;
+    /* Collapse border with left column*/
+    margin-left: -1px;
 }
 
 .comment {

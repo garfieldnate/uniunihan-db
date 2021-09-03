@@ -1,6 +1,7 @@
 {% extends "base.html.jinja" %}
 {% block jp_content %}
 <div id="jp_content">
+    {{ jp_intro }}
     {% for purity_type, groups in purity_groups.items() %}
     <div class="purity-group" id="日-purity-group-{{ purity_type }}">
         <div class="purity-group-header">
@@ -59,20 +60,21 @@
                                 map('break_slashes')|
                                 join('<br />')
                                 }}</div>
-                            <div class="box cross-ref">
-                                {%- if 'cross_ref' in char -%}
-                                <div>{% set break = joiner("<br />")
-                                    %}{% for lang, id in char.cross_ref.items() %}{{ break()}}
-                                    <a href="#{{ lang }}-cell-{{ id }}">{{ lang }}: {{ id }}</a>{% endfor %}
-                                </div>
-                                {%- endif -%}
-                            </div>
                         </div>
                         {% if 'comment' in char
                         %}<div class="comment">{{ char['comment'] }}</div>{%
                         endif %}
                     </div>
+                    <div class="box cross-ref border">
+                        {%- if 'cross_ref' in char -%}
+                        <div>{% set break = joiner("<br />")
+                            %}{% for lang, id in char.cross_ref.items() %}{{ break()}}
+                            <a href="#{{ lang }}-cell-{{ id }}">{{ lang }}: {{ id }}</a>{% endfor %}
+                        </div>
+                        {%- endif -%}
+                    </div>
                 </div>
+                {% endfor %}
             </div>
             {% endfor %}
         </div>
@@ -80,5 +82,4 @@
     </div>
     {% endfor %}
 </div>
-{% endfor %}
 {% endblock %}
