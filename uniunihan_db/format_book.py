@@ -91,13 +91,27 @@ def index(jp_data, zh_data):
         if char in zh_index:
             if "cross_ref" not in char_info:
                 char_info["cross_ref"] = {}
-            char_info["cross_ref"]["中"] = char_info["id"]
+            char_info["cross_ref"]["中"] = zh_index[char]["id"]
         else:
             jp_missing_zh_chars.append(char)
 
     if jp_missing_zh_chars:
         log.warn(
             f"{len(jp_missing_zh_chars)} JP chars missing ZH indices: {jp_missing_zh_chars}"
+        )
+
+    zh_missing_jp_chars = []
+    for char, char_info in zh_index.items():
+        if char in jp_index:
+            if "cross_ref" not in char_info:
+                char_info["cross_ref"] = {}
+            char_info["cross_ref"]["日"] = jp_index[char]["id"]
+        else:
+            zh_missing_jp_chars.append(char)
+
+    if zh_missing_jp_chars:
+        log.warn(
+            f"{len(zh_missing_jp_chars)} zh-HK chars missing JP indices: {zh_missing_jp_chars}"
         )
 
 
@@ -115,7 +129,7 @@ def get_jinja_env():
 
 def main():
     jinja_env = get_jinja_env()
-    components_missing_data = []
+    components_missing_data = set()
     total_components = 0
 
     def logged_component_header(component):
@@ -123,17 +137,21 @@ def main():
         nonlocal total_components
         total_components += 1
         if no_info:
-            components_missing_data.append(component)
+            components_missing_data.add(component)
         return header
 
     jinja_env.globals["component_header"] = logged_component_header
 
-    jp_template = jinja_env.get_template("jp_template.html.jinja")
+    template = jinja_env.get_template("base.html.jinja")
     jp_data = json.load(JP_DATA_FILE.open("r"))
     zh_data = json.load(ZH_HK_DATA_FILE.open("r"))
     index(jp_data, zh_data)
-    result = jp_template.render(
-        id=20, purity_groups=jp_data, jp_intro="<h1>Japanese (joyo)</h1>"
+    result = template.render(
+        id=20,
+        jp_data=jp_data,
+        jp_intro="<h1>Japanese (joyo)</h1>",
+        zh_hk_data=zh_data,
+        zh_hk_intro="<h1>Mandarin (HSK)</h1>",
     )
 
     print(result)

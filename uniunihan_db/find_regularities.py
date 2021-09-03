@@ -20,6 +20,7 @@ from .util import (
     read_historical_on_yomi,
     read_joyo,
     read_phonetic_components,
+    read_unihan,
 )
 
 log = configure_logging(__name__)
@@ -50,6 +51,17 @@ def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
                     w["freq"] = -1
             # sort words descending by frequency and then orthographically
             words.sort(key=lambda w: (-w["freq"], w["trad"]))
+
+
+def _zh_supplementary_info(char_list):
+    unihan = read_unihan()
+    sup_info = defaultdict(dict)
+    for char in char_list:
+        sup_info[char]["trad"] = char
+        if simplified := unihan[char].get("kSimplifiedVariant", []):
+            sup_info[char]["simp"] = simplified
+
+    return sup_info
 
 
 @dataclass
@@ -372,14 +384,14 @@ def main() -> None:
         # # get chars to prons from unihan where
         index = _index(char_to_pron_to_vocab, comp_to_char)
         # char_to_pron_to_vocab = {}  # TODO
-        # char_to_supplementary_info = {}  # TODO
+        char_to_supplementary_info = _zh_supplementary_info(char_list)
         _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
         # Next: make this work
 
         _print_final_output_zh(
             index,
             char_to_pron_to_vocab,
-            defaultdict(dict),  # char_to_supplementary_info,
+            char_to_supplementary_info,
             out_dir,
         )
     elif args.language == "ko":

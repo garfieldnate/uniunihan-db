@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 class Syllable:
     """
     The structure of this class follows the traditional classification of Mandarin syllables,
-    which are traditionally divided into
+    which are divided into
     C, G, V and X. These are an initial consonant, a glide or prenuclear vowel, the nucleus
     or nuclear vowel, and a final vowel or nasal consonant.
     See http://orient.avcr.cz/miranda2/export/sitesavcr/data.avcr.cz/humansci/orient/kontakty/pracovnici/publikace/Triskova/ArOr_Mandarin_Syllable.pdf

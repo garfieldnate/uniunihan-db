@@ -1,28 +1,33 @@
-{% block jp_content %}
-<div id="jp_content">
-    {{ jp_intro }}
-    {% for purity_type, groups in jp_data.items() %}
-    <div class="purity-group" id="日-purity-group-{{ purity_type }}">
+{% block zh_hk_content %}
+<div id="zh_hk_content">
+    {{ zh_hk_intro }}
+    {% for purity_type, groups in zh_hk_data.items() %}
+    <div class="purity-group" id="中-purity-group-{{ purity_type }}">
         <div class="purity-group-header">
             {{ purity_group_header(purity_type) }}
         </div>
         {% for component in groups %}
-        <div class="component" id="日-component-TODO-component-id">
+        <div class="component" id="中-component-TODO-component-id">
             {{ component_header(component.component) }}
             {%- set spacing = joiner("<br />") %}
             {% for cluster in component.clusters %}{{ spacing() }}
-            <div class="cluster" id="日-cluster-TODO-cluster-id">
+            <div class="cluster" id="中-cluster-TODO-cluster-id">
                 {% for char in cluster.values() %}
-                <div class="cell" id="日-cell-{{ char.id }}">
+                <div class="cell" id="中-cell-{{ char.id }}">
                     <div class="box left-column border">
-                        <div class="box character">{{ char.new }}</div>
+                        <div class="box character">{{ char.trad }}</div>
                         <div class="box id">{{ char.id }}</div>
                     </div>
 
                     <div class="box right-column border">
                         <div class="char-data">
 
-                            <div class="box old-form">{{ char.old or '' }}</div>
+                            <div class="box simp-form">{%-
+                                set comma = joiner(",")
+                                %}{%
+                                for c in char.simp %}{{ comma() }}{{
+                                c}}{%
+                                endfor %}</div>
                             <div class="box pron">{%-
                                 set comma = joiner("、") %}{%-
                                 for p in char.prons %}{{ comma() }}{{
@@ -42,7 +47,7 @@
                             <div class="box vocab">{{
                                 char.prons|
                                 map(attribute='vocab')|
-                                map(attribute='surface')|
+                                map(attribute='trad')|
                                 join('<br />')
                                 }}</div>
                             <div class="box vocab-pron">{{

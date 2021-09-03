@@ -2,8 +2,7 @@
 
 Topic: final output
 
-* Indexing step
-* Determine entire section format (component, pronunciations?, link to component sections for other languages, ancient pronunciation?, cell sorting, completely irregular reading word examples)
+* Re-do structure: vocab surface, pron, meaning need to be in single divs together so that heigh changes in sync.
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 
 Topic: groupings
@@ -12,8 +11,7 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* restructure output like for Japanese
-* parse out classifiers for vocab
+* parse out classifiers for vocab, remove pronunciation
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
 * source English keywords from somewhere

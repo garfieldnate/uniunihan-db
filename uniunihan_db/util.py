@@ -263,7 +263,7 @@ def read_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, 
             trad, simp = remaining.rstrip().split(" ")
             if len(trad) != len(simp):
                 raise ValueError(
-                    f"Number of characters for tradition and simplified forms do not match: {trad}/{simp}"
+                    f"Number of characters for traditional and simplified forms do not match: {trad}/{simp}"
                 )
 
             pron = pron.lstrip("[").rstrip("] ").lower()
