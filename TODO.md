@@ -2,16 +2,17 @@
 
 Topic: final output
 
-* Missing BS data: 从->從,
+* Get English keywords for components whose info is taken from ytenx
+* Use character normalization to retrieve more BS data for components: 从->從, etc.
 * Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 
 Topic: groupings
 
-* possibly replace ytenx with phonetic series from Wikipedia
 
 Topic: Mandarin support
 
+* nǎi nai listed twice because it represents two different pronunciations
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
 * Get rough frequencies from baidu

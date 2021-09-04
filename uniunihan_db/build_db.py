@@ -1,4 +1,3 @@
-import csv
 import dataclasses
 import json
 import tarfile
@@ -10,6 +9,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
+from .data.raw_datasets import get_ytenx_rhymes, get_ytenx_variants
 from .lingua import japanese, mandarin
 from .util import (
     GENERATED_DATA_DIR,
@@ -22,10 +22,6 @@ from .util import (
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
-
-YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
-YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
-YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
 
 LIB_HANGUL_URL = "https://github.com/libhangul/libhangul/archive/master.zip"
 LIB_HANGUL_ZIP_FILE = GENERATED_DATA_DIR / "libhangul-master.zip"
@@ -124,26 +120,6 @@ def unihan_download():
     UNIHAN_DICT = unihan_dict
 
 
-def ytenx_download():
-    """Download and unzip the ytenx rhyming data."""
-    # download
-    if YTENX_ZIP_FILE.exists() and YTENX_ZIP_FILE.stat().st_size > 0:
-        log.info(f"{YTENX_ZIP_FILE.name} already exists; skipping download")
-    else:
-        log.info(f"Downloading ytenx rhyming data to {YTENX_ZIP_FILE}...")
-        r = requests.get(YTENX_URL, stream=True)
-        with open(YTENX_ZIP_FILE, "wb") as fd:
-            for chunk in r.iter_content(chunk_size=128):
-                fd.write(chunk)
-
-    # unzip
-    if YTENX_DIR.exists() and YTENX_DIR.is_dir():
-        log.info(f"  {YTENX_DIR.name} already exists; skipping unzip")
-    else:
-        with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
-            zip_ref.extractall(GENERATED_DATA_DIR)
-
-
 def edict_freq_download():
     """Download and unzip Utsumi Hiroshi's frequency-annotated EDICT"""
 
@@ -232,15 +208,12 @@ def write_phonetic_components():
 
     log.info("Determining phonetic components...")
 
-    char_to_component = {}
-    with open(YTENX_DIR / "ytenx" / "sync" / "dciangx" / "DrienghTriang.txt") as f:
-        rows = csv.DictReader(f, delimiter=" ")
-        for r in rows:
-            char = r["#字"]
-            component = r["聲符"]
-            char_to_component[char] = component
+    ytenx_rhyme_data = get_ytenx_rhymes()
+    char_to_component = {char: info[0]["聲符"] for char, info in ytenx_rhyme_data.items()}
+
     with open(INCLUDED_DATA_DIR / "manual_components.json") as f:
         extra_char_to_components = json.load(f)
+        # ignore JSON comments TODO: use commentjson
         del extra_char_to_components["//"]
         char_to_component.update(extra_char_to_components)
 
@@ -334,22 +307,8 @@ def get_variants():
                 for v in comp_variant:
                     char_to_variants[v].add(char)
 
-    log.info("  Reading variants from ytenx...")
-    with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "JihThex.csv") as f:
-        rows = csv.DictReader(f)
-        for r in rows:
-            char = r["#字"]
-            for field in ["全等", "語義交疊", "簡體", "繁體"]:
-                if variants := r[field]:
-                    for v in variants:
-                        char_to_variants[char].add(v)
-    with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "ThaJihThex.csv") as f:
-        rows = csv.DictReader(f)
-        for r in rows:
-            char = r["#字"]
-            if variants := r["其他異體"]:
-                for v in variants:
-                    char_to_variants[char].add(v)
+    for char, variants in get_ytenx_variants().items():
+        char_to_variants[char].update(variants)
 
     return char_to_variants
 
@@ -472,7 +431,6 @@ def hanja_wordlist_download():
 def main():
     unihan_download()
 
-    ytenx_download()
     write_phonetic_components()
 
     edict_freq_download()

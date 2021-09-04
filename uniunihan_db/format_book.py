@@ -5,11 +5,12 @@ import jaconv
 import jinja2
 from jinja2 import Environment, FileSystemLoader
 
-from uniunihan_db.util import configure_logging, read_baxter_sagart
-
 from .component_group import PurityType
+from .data.raw_datasets import get_ytenx_rhymes
+from .util import configure_logging, read_baxter_sagart
 
 BAXTER_SAGART_DATA = read_baxter_sagart()
+YTENX_RHYMES = get_ytenx_rhymes()
 
 log = configure_logging(__name__)
 
@@ -36,23 +37,49 @@ def purity_group_header(s):
 
 
 def component_header(component):
-    infos = BAXTER_SAGART_DATA[component]
-    requires_numbers = len(infos) > 1
+    bs_infos = BAXTER_SAGART_DATA[component]
+    ytenx_infos = YTENX_RHYMES[component]
     output = ['<div class="component-header">']
     output.append(f"<h2>{component}</h2>")
-    for i, info in enumerate(infos):
-        output.append('<div class="component-etymology-section">')
-        num_text = f"{i+1}: " if requires_numbers else ""
-        output.append(
-            f"""
-            <p class="component-keyword">{num_text}{info['keyword']}</p>
-            <p class="component-pronunciation"><em>Middle Chinese:</em> {info['middle_chinese']}</p>
-            <p class="component-pronunciation"><em>Old Chinese:</em> {info['old_chinese']}</p>
-        </div>
-        """
-        )
+    has_old_pron = False
+    if bs_infos:
+        requires_numbers = len(bs_infos) > 1
+        for i, info in enumerate(bs_infos):
+            has_old_pron = True
+            output.append('<div class="component-etymology-section">')
+            num_text = f"{i+1}: " if requires_numbers else ""
+            output.append(
+                f"""
+                <p class="component-keyword">{num_text}{info['keyword']}</p>
+                <p class="component-pronunciation"><em>Old Chinese:</em> {info['old_chinese']}</p>
+                <p class="component-pronunciation"><em>Middle Chinese:</em> {info['middle_chinese']}</p>
+            </div>
+            """
+            )
+    else:
+        requires_numbers = len(ytenx_infos) > 1
+        for i, info in enumerate(ytenx_infos):
+            has_old_pron = True
+            output.append('<div class="component-etymology-section">')
+            num_text = f"{i+1}: " if requires_numbers else ""
+            log.warn(f"Missing keyword for component {component}")
+            output.append(
+                f"""
+                <p class="component-keyword">{num_text} TODO: keyword</p>
+                <p class="component-pronunciation"><em>Old Chinese:</em> {info['擬音']}</p>
+            """
+            )
+            if "擬音（後世）" in info:
+                output.append(
+                    f'<p class="component-pronunciation"><em>Middle Chinese:</em> {info["擬音（後世）"]}</p>\n'
+                )
+            if "擬音（更後世）" in info:
+                output.append(
+                    f'<p class="component-pronunciation"><em>Late Middle Chinese:</em> {info["擬音（更後世）"]}</p>\n'
+                )
+            output.append("</div>")
     output.append("</div>")
-    return "\n".join(output), len(infos) == 0
+    return "\n".join(output), not has_old_pron
 
 
 GENERATED_DIR = Path(__file__).parent.parent / "data" / "generated"
@@ -158,7 +185,7 @@ def main():
 
     if components_missing_data:
         log.warn(
-            f"{len(components_missing_data)}/{total_components} components missing Baxter/Sagart info: {components_missing_data}"
+            f"{len(components_missing_data)}/{total_components} components missing info: {components_missing_data}"
         )
 
 
