@@ -2,7 +2,8 @@
 
 Topic: final output
 
-* Re-do structure: vocab surface, pron, meaning need to be in single divs together so that heigh changes in sync.
+* Missing BS data: 从->從,
+* Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 
 Topic: groupings
@@ -11,7 +12,8 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* parse out classifiers for vocab, remove pronunciation
+* messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
+* parse out classifiers for vocab, remove pronunciation: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
 * source English keywords from somewhere
@@ -25,6 +27,7 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* Char notes: kokuji section, 動 is also kokuji but has a phonetic component
 * track down unfound Baxter/Sagart data for 125 components
 * Would be nice to have Japanese names for components
 * More example compounds would actually be quite nice, particularly for the more common characters
