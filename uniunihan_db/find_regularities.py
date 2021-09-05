@@ -8,6 +8,15 @@ from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
 import commentjson as json
 
 from .component_group import ComponentGroup, PurityType
+from .data.raw_datasets import (
+    get_cedict,
+    get_ckip_20k,
+    get_edict_freq,
+    get_historical_on_yomi,
+    get_joyo,
+    get_phonetic_components,
+    get_unihan,
+)
 from .lingua.jp.aligner import Aligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
 from .util import (
@@ -17,13 +26,6 @@ from .util import (
     KO_ED_CHARS_FILE,
     configure_logging,
     filter_keys,
-    read_cedict,
-    read_ckip_20k,
-    read_edict_freq,
-    read_historical_on_yomi,
-    read_joyo,
-    read_phonetic_components,
-    read_unihan,
 )
 
 log = configure_logging(__name__)
@@ -45,7 +47,7 @@ class CustomJsonEncoder(JSONEncoder):
 
 
 def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
-    ckip20k_entries = read_ckip_20k()
+    ckip20k_entries = get_ckip_20k()
     for pron_to_words in char_to_pron_to_words.values():
         for words in pron_to_words.values():
             for w in words:
@@ -60,7 +62,7 @@ def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
 
 
 def _zh_supplementary_info(char_list):
-    unihan = read_unihan()
+    unihan = get_unihan()
     sup_info = defaultdict(dict)
     for char in char_list:
         sup_info[char]["trad"] = char
@@ -337,14 +339,14 @@ def main() -> None:
     args = parser.parse_args()
     out_dir = OUTPUT_DIR / args.language
 
-    comp_to_char = read_phonetic_components()
+    comp_to_char = get_phonetic_components()
 
     if args.language == "jp":
         # read initial character data
-        joyo = read_joyo()
+        joyo = get_joyo()
 
         # update character information with historical kana spellings
-        char_to_new_to_old_pron = read_historical_on_yomi()
+        char_to_new_to_old_pron = get_historical_on_yomi()
         for c, new_to_old_pron in char_to_new_to_old_pron.items():
             if c_sup := joyo.char_to_supplementary_info.get(c):
                 c_sup["historical_pron"] = new_to_old_pron
@@ -355,7 +357,7 @@ def main() -> None:
         # Create aligner to determine which character pronunciations are used in a word
         aligner = Aligner(joyo.new_char_to_prons)
         # Read initial vocab list
-        char_to_pron_to_vocab = read_edict_freq(aligner)
+        char_to_pron_to_vocab = get_edict_freq(aligner)
         # Add mappings for old character glyphs
         old_char_to_words = {}
         for new_char, words in char_to_pron_to_vocab.items():
@@ -383,7 +385,7 @@ def main() -> None:
     elif args.language == "zh-HK":
         with open(HK_ED_CHARS_FILE) as f:
             char_list = set(json.load(f))
-        char_to_pron_to_vocab = read_cedict(index_chars=True)
+        char_to_pron_to_vocab = get_cedict(index_chars=True)
         char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
         _incorporate_ckip_freq_data(char_to_pron_to_vocab)
         # # get chars to prons from unihan where

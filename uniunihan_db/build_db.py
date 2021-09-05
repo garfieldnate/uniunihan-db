@@ -10,7 +10,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from .data.raw_datasets import get_ytenx_rhymes, get_ytenx_variants
+from .data.raw_datasets import get_unihan, get_ytenx_rhymes, get_ytenx_variants
 from .lingua import japanese, mandarin
 from .util import (
     GENERATED_DATA_DIR,
@@ -18,7 +18,6 @@ from .util import (
     INCLUDED_DATA_DIR,
     KO_ED_CHARS_FILE,
     configure_logging,
-    read_unihan,
 )
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
@@ -45,16 +44,6 @@ CEDICT_ZIP = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg.zip"
 CEDICT_DIR = CEDICT_ZIP.with_suffix("")
 
 log = configure_logging(__name__)
-
-# lazy load this, since it's a lot of data
-UNIHAN_DICT = None
-
-
-def get_unihan():
-    global UNIHAN_DICT
-    if not UNIHAN_DICT:
-        UNIHAN_DICT = read_unihan()
-    return UNIHAN_DICT
 
 
 def unihan_download():
