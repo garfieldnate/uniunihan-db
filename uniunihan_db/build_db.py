@@ -1,9 +1,10 @@
 import dataclasses
-import json
 import tarfile
 import zipfile
 from collections import defaultdict
 
+# allows commenting lines with # or //
+import commentjson as json
 import jaconv
 import requests
 from unihan_etl.process import Packager as unihan_packager
@@ -213,8 +214,6 @@ def write_phonetic_components():
 
     with open(INCLUDED_DATA_DIR / "manual_components.json") as f:
         extra_char_to_components = json.load(f)
-        # ignore JSON comments TODO: use commentjson
-        del extra_char_to_components["//"]
         char_to_component.update(extra_char_to_components)
 
     variants = get_variants()

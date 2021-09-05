@@ -1,8 +1,11 @@
 import argparse
-import json
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
+from json import JSONEncoder
 from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
+
+# allows commenting lines with # or //
+import commentjson as json
 
 from .component_group import ComponentGroup, PurityType
 from .lingua.jp.aligner import Aligner
@@ -28,14 +31,17 @@ log = configure_logging(__name__)
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
 
-class CustomJsonEncoder(json.JSONEncoder):
+class CustomJsonEncoder(JSONEncoder):
+    """Handles structures that the default encoder cannot,
+    then delegates everything else to the default encoder"""
+
     def default(self, obj: Any) -> object:
         if isinstance(obj, set):
             return list(obj)
         elif isinstance(obj, ComponentGroup):
             return vars(obj)
 
-        return json.JSONEncoder.default(self, obj)
+        return JSONEncoder.default(self, obj)
 
 
 def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
@@ -360,7 +366,6 @@ def main() -> None:
         jp_vocab_override = json.load(
             open(INCLUDED_DATA_DIR / "jp_vocab_override.json")
         )
-        del jp_vocab_override["//"]
         char_to_pron_to_vocab.update(jp_vocab_override)
 
         # Extract character groups and grade their pronunciation regularities

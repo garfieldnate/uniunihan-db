@@ -91,6 +91,17 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
+name = "commentjson"
+version = "0.9.0"
+description = "Add Python and JavaScript style comments in your JSON files."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+lark-parser = ">=0.7.1,<0.8.0"
+
+[[package]]
 name = "coverage"
 version = "5.4"
 description = "Code coverage measurement for Python"
@@ -218,6 +229,14 @@ description = "A fast implementation of the Cassowary constraint solver"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "lark-parser"
+version = "0.7.8"
+description = "a modern parsing library"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "markupsafe"
@@ -600,7 +619,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "191f055f0012a78159fcc16995eda7c1214a601c53f30c0e976fb6976e669512"
+content-hash = "2008eee1b7d6f834f066d39cf8a4d7a02dc7a415fa3bd83a0bf3321ade1bd9b8"
 
 [metadata.files]
 appdirs = [
@@ -636,6 +655,9 @@ click = [
 ]
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
+]
+commentjson = [
+    {file = "commentjson-0.9.0.tar.gz", hash = "sha256:42f9f231d97d93aff3286a4dc0de39bfd91ae823d1d9eba9fa901fe0c7113dd4"},
 ]
 coverage = [
     {file = "coverage-5.4-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:6d9c88b787638a451f41f97446a1c9fd416e669b4d9717ae4615bd29de1ac135"},
@@ -764,6 +786,9 @@ kiwisolver = [
     {file = "kiwisolver-1.3.1-pp36-pypy36_pp73-manylinux2010_x86_64.whl", hash = "sha256:33449715e0101e4d34f64990352bce4095c8bf13bed1b390773fc0a7295967b3"},
     {file = "kiwisolver-1.3.1-pp36-pypy36_pp73-win32.whl", hash = "sha256:401a2e9afa8588589775fe34fc22d918ae839aaaf0c0e96441c0fdbce6d8ebe6"},
     {file = "kiwisolver-1.3.1.tar.gz", hash = "sha256:950a199911a8d94683a6b10321f9345d5a3a8433ec58b217ace979e18f16e248"},
+]
+lark-parser = [
+    {file = "lark-parser-0.7.8.tar.gz", hash = "sha256:26215ebb157e6fb2ee74319aa4445b9f3b7e456e26be215ce19fdaaa901c20a4"},
 ]
 markupsafe = [
     {file = "MarkupSafe-2.0.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:f9081981fe268bd86831e5c75f7de206ef275defcb82bc70740ae6dc507aee51"},
