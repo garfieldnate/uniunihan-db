@@ -7,7 +7,7 @@ from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
 # allows commenting lines with # or //
 import commentjson as json
 
-from uniunihan_db.constants import (
+from uniunihan_db.data_paths import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,

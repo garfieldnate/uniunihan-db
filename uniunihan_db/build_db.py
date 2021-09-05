@@ -5,7 +5,7 @@ from collections import defaultdict
 import commentjson as json
 from unihan_etl.process import export_json
 
-from uniunihan_db.constants import (
+from uniunihan_db.data_paths import (
     HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
     KO_ED_CHARS_FILE,

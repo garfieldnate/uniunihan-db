@@ -1,4 +1,3 @@
-from uniunihan_db.constants import TEST_CORPUS_DIR
 from uniunihan_db.data.datasets import (
     BaxterSagart,
     get_baxter_sagart,
@@ -10,6 +9,7 @@ from uniunihan_db.data.datasets import (
     get_ytenx_rhymes,
     get_ytenx_variants,
 )
+from uniunihan_db.data_paths import TEST_CORPUS_DIR
 
 
 def test_get_ytenx_rhymes():

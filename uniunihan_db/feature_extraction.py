@@ -6,8 +6,8 @@ from collections import defaultdict
 
 from opencc import OpenCC
 
-from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
 from uniunihan_db.data.datasets import get_unihan
+from uniunihan_db.data_paths import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
 
 from .lingua import japanese, mandarin
 from .util import configure_logging

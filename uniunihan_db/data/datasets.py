@@ -12,7 +12,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from uniunihan_db.constants import (
+from uniunihan_db.data_paths import (
     CEDICT_URL,
     CEDICT_ZIP,
     EDICT_FREQ_DIR,
@@ -608,10 +608,9 @@ def get_historical_on_yomi():
 
 
 @cache
-def get_unihan(file=GENERATED_DATA_DIR / "unihan.json") -> Mapping[str, Any]:
+def get_unihan(file=UNIHAN_FILE) -> Mapping[str, Any]:
     __download_unihan()
     log.info("Loading unihan data...")
-    # TODO: read path from constants file
     with open(file) as f:
         unihan = json.load(f)
     log.info(f"  Read {len(unihan)} characters from Unihan DB")
