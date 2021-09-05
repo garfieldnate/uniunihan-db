@@ -4,6 +4,7 @@ import logging
 import os
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Any, Collection, Mapping, Sequence, Set, TypeVar
 
@@ -66,6 +67,7 @@ class Joyo:
         return self._new_to_old[new_char]
 
 
+@cache
 def read_joyo():
     log.info("Loading joyo data...")
     new_char_to_prons = {}
@@ -107,6 +109,7 @@ def read_joyo():
     return Joyo(old_char_to_prons, new_char_to_prons, char_info)
 
 
+@cache
 def read_phonetic_components():
     log.info("Loading phonetic components...")
     comp_to_char = {}
@@ -120,6 +123,7 @@ def read_phonetic_components():
     return comp_to_char
 
 
+@cache
 def read_edict_freq(aligner):
     log.info("Loading EDICT frequency list...")
     char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
@@ -145,6 +149,7 @@ def read_edict_freq(aligner):
     return char_to_pron_to_words
 
 
+@cache
 def read_historical_on_yomi():
     log.info("Loading historical on-yomi data...")
     char_to_new_to_old_pron = defaultdict(dict)
@@ -162,6 +167,7 @@ def read_historical_on_yomi():
     return char_to_new_to_old_pron
 
 
+@cache
 def read_unihan() -> Mapping[str, Any]:
     log.info("Loading unihan data...")
     # TODO: read path from constants file
@@ -189,6 +195,7 @@ def get_mandarin_pronunciation(unihan_entry):
     return []
 
 
+@cache
 def read_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
     log.info(f"Loading {ckip_path}")
@@ -228,6 +235,7 @@ def read_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     return entries
 
 
+@cache
 def read_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, Any]:
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"

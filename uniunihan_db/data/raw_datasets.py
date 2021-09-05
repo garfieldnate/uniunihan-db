@@ -2,6 +2,7 @@ import csv
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import cache
 
 import requests
 
@@ -36,14 +37,8 @@ def __ytenx_download():
             zip_ref.extractall(GENERATED_DATA_DIR)
 
 
-YTENX_RHYMES = None
-
-
+@cache
 def get_ytenx_rhymes():
-    global YTENX_RHYMES
-    if YTENX_RHYMES:
-        return YTENX_RHYMES
-
     __ytenx_download()
 
     log.info("  Reading rhymes from ytenx...")
@@ -62,8 +57,7 @@ def get_ytenx_rhymes():
             char_info = {k: v for k, v in r.items() if v}
             char_to_component[char].append(char_info)
 
-    YTENX_RHYMES = char_to_component
-    return YTENX_RHYMES
+    return char_to_component
 
 
 @dataclass
@@ -75,6 +69,7 @@ class BaxterSagart:
     gloss: str
 
 
+@cache
 def get_baxter_sagart():
     log.info("Loading Baxter/Sagart reconstruction data...")
     char_to_info = defaultdict(list)
@@ -95,14 +90,8 @@ def get_baxter_sagart():
     return char_to_info
 
 
-YTENX_VARIANTS = None
-
-
+@cache
 def get_ytenx_variants():
-    global YTENX_VARIANTS
-    if YTENX_VARIANTS:
-        return YTENX_VARIANTS
-
     __ytenx_download()
 
     log.info("  Reading variants from ytenx...")
@@ -123,5 +112,4 @@ def get_ytenx_variants():
                 for v in variants:
                     char_to_variants[char].add(v)
 
-    YTENX_VARIANTS = char_to_variants
     return char_to_variants
