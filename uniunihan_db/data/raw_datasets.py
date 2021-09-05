@@ -1,15 +1,17 @@
 import csv
 import zipfile
 from collections import defaultdict
+from dataclasses import dataclass
 
 import requests
 
-from uniunihan_db.util import GENERATED_DATA_DIR, configure_logging
+from uniunihan_db.util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
 YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
-PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "components_to_chars.tsv"
+
+BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
 
 log = configure_logging(__name__)
 
@@ -62,6 +64,35 @@ def get_ytenx_rhymes():
 
     YTENX_RHYMES = char_to_component
     return YTENX_RHYMES
+
+
+@dataclass
+class BaxterSagart:
+    char: str
+    pinyin: str
+    middle_chinese: str
+    old_chinese: str
+    gloss: str
+
+
+def get_baxter_sagart():
+    log.info("Loading Baxter/Sagart reconstruction data...")
+    char_to_info = defaultdict(list)
+    with BAXTER_SAGART_FILE.open() as f:
+        # filter comments
+        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
+        for r in rows:
+            char = r["zi"]
+            char_to_info[char].append(
+                BaxterSagart(
+                    char=char.strip(),
+                    pinyin=r["py"].strip(),
+                    middle_chinese=r["MC"].strip(),
+                    old_chinese=r["OC"].strip(),
+                    gloss=r["gloss"].strip(),
+                )
+            )
+    return char_to_info
 
 
 YTENX_VARIANTS = None

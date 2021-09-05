@@ -2,7 +2,6 @@ import string
 
 from uniunihan_db.util import (
     filter_keys,
-    read_baxter_sagart,
     read_cedict,
     read_ckip_20k,
     read_historical_on_yomi,
@@ -125,15 +124,3 @@ def test_read_historical_on_yomi():
     assert "イ" in char
     old_kana = char["イ"]
     assert old_kana == "ヰ"
-
-
-def test_read_baxter_sagart():
-    char_to_info = read_baxter_sagart()
-    assert "坐" in char_to_info
-    assert len(char_to_info["坐"]) == 3
-    assert char_to_info["坐"][0] == {
-        "keyword": "sit",
-        "middle_chinese": "dzwaX",
-        "old_chinese": "*[dz]ˤo[j]ʔ ",
-        "pinyin": "zuò",
-    }

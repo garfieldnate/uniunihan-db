@@ -2,6 +2,7 @@
 
 Topic: final output
 
+* output language-specific names of components (BS gives pinyin but not Japanese, etc.)
 * Get English keywords for components whose info is taken from ytenx
 * Use character normalization to retrieve more BS data for components: 从->從, etc.
 * Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
@@ -28,6 +29,7 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* 文字もんじ is a serious problem! Need to list もじ pronunciation
 * Char notes: kokuji section, 動 is also kokuji but has a phonetic component
 * track down unfound Baxter/Sagart data for 125 components
 * Would be nice to have Japanese names for components

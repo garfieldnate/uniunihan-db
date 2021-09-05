@@ -6,10 +6,10 @@ import jinja2
 from jinja2 import Environment, FileSystemLoader
 
 from .component_group import PurityType
-from .data.raw_datasets import get_ytenx_rhymes
-from .util import configure_logging, read_baxter_sagart
+from .data.raw_datasets import get_baxter_sagart, get_ytenx_rhymes
+from .util import configure_logging
 
-BAXTER_SAGART_DATA = read_baxter_sagart()
+BAXTER_SAGART_DATA = get_baxter_sagart()
 YTENX_RHYMES = get_ytenx_rhymes()
 
 log = configure_logging(__name__)
@@ -50,9 +50,9 @@ def component_header(component):
             num_text = f"{i+1}: " if requires_numbers else ""
             output.append(
                 f"""
-                <p class="component-keyword">{num_text}{info['keyword']}</p>
-                <p class="component-pronunciation"><em>Old Chinese:</em> {info['old_chinese']}</p>
-                <p class="component-pronunciation"><em>Middle Chinese:</em> {info['middle_chinese']}</p>
+                <p class="component-keyword">{num_text}{info.gloss}</p>
+                <p class="component-pronunciation"><em>Old Chinese:</em> {info.old_chinese}</p>
+                <p class="component-pronunciation"><em>Middle Chinese:</em> {info.middle_chinese}</p>
             </div>
             """
             )

@@ -1,4 +1,9 @@
-from uniunihan_db.data.raw_datasets import get_ytenx_rhymes, get_ytenx_variants
+from uniunihan_db.data.raw_datasets import (
+    BaxterSagart,
+    get_baxter_sagart,
+    get_ytenx_rhymes,
+    get_ytenx_variants,
+)
 
 
 def test_get_ytenx_rhymes():
@@ -36,3 +41,16 @@ def test_get_ytenx_rhymes():
 def test_get_ytenx_variants():
     data = get_ytenx_variants()
     assert data["鮮"] == {"鱻", "尠", "尟", "鲜"}
+
+
+def test_get_baxter_sagart():
+    char_to_info = get_baxter_sagart()
+    assert "坐" in char_to_info
+    assert len(char_to_info["坐"]) == 3
+    assert char_to_info["坐"][0] == BaxterSagart(
+        char="坐",
+        pinyin="zuò",
+        middle_chinese="dzwaX",
+        old_chinese="*[dz]ˤo[j]ʔ",
+        gloss="sit",
+    )
