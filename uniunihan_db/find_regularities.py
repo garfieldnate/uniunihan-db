@@ -7,12 +7,15 @@ from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
 # allows commenting lines with # or //
 import commentjson as json
 
-from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+from uniunihan_db.constants import (
+    GENERATED_DATA_DIR,
+    HK_ED_CHARS_FILE,
+    INCLUDED_DATA_DIR,
+    KO_ED_CHARS_FILE,
+)
 
 from .component_group import ComponentGroup, PurityType
 from .data.datasets import (
-    HK_ED_CHARS_FILE,
-    KO_ED_CHARS_FILE,
     get_cedict,
     get_ckip_20k,
     get_edict_freq,

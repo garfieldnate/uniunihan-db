@@ -1,5 +1,6 @@
 import csv
 import json
+import tarfile
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
@@ -8,13 +9,27 @@ from typing import Any, Mapping, Sequence, Set
 
 import jaconv
 import requests
+from unihan_etl.process import Packager as unihan_packager
+from unihan_etl.process import export_json
 
-from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+from uniunihan_db.constants import (
+    CEDICT_URL,
+    CEDICT_ZIP,
+    EDICT_FREQ_DIR,
+    EDICT_FREQ_FILE,
+    EDICT_FREQ_TARBALL,
+    EDICT_FREQ_URL,
+    GENERATED_DATA_DIR,
+    INCLUDED_DATA_DIR,
+    JUN_DA_CHAR_FREQ_FILE,
+    JUN_DA_CHAR_FREQ_URL,
+    LIB_HANGUL_DIR,
+    LIB_HANGUL_URL,
+    LIB_HANGUL_ZIP_FILE,
+    SIMPLIFIED_EDICT_FREQ,
+    UNIHAN_FILE,
+)
 from uniunihan_db.util import configure_logging
-
-HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
-KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
-
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
@@ -24,8 +39,238 @@ BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
 
 log = configure_logging(__name__)
 
+#################
+## Downloaders ##
+#################
 
-def __ytenx_download():
+
+def __download_unihan():
+    """Download the famous Unihan database from the Unicode Consortium,
+    and store it has a normalized JSON file"""
+
+    if UNIHAN_FILE.exists() and UNIHAN_FILE.stat().st_size > 0:
+        log.info(f"{UNIHAN_FILE.name} already exists; skipping download")
+        return
+
+    log.info("  Downloading unihan data...")
+    p = unihan_packager.from_cli(["-F", "json", "--destination", str(UNIHAN_FILE)])
+    p.download()
+    # instruct packager to return data instead of writing to file
+    # https://github.com/cihai/unihan-etl/issues/233
+    p.options["format"] = "python"
+    unihan = p.export()
+
+    log.info("  Converting unihan data to dictionary format...")
+    unihan_dict = {entry["char"]: entry for entry in unihan}
+
+    log.info("  Simplifying variant fields...")
+    for d in unihan_dict.values():
+        # TODO: address duplication below
+        if compat_variant := d.get("kCompatibilityVariant"):
+            codepoint = compat_variant[2:]
+            char = chr(int(codepoint, 16))
+            d["kCompatibilityVariant"] = char
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+        ]:
+            if variants := d.get(field_name, []):
+                new_variants = []
+                for v in variants:
+                    # https://github.com/cihai/unihan-etl/issues/80#issuecomment-757470998
+                    codepoint = v.split("<")[0][2:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+                d[field_name] = new_variants
+        # slightly different structure
+        if jinmeiyo := d.get("kJinmeiyoKanji", []):
+            new_variants = []
+            for variant in jinmeiyo:
+                if "U+" in variant:
+                    codepoint = variant[7:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+            d["kJinmeiyoKanji"] = new_variants
+        if joyo := d.get("kJoyoKanji"):
+            new_variants = []
+            for variant in joyo:
+                if "U+" in variant:
+                    codepoint = variant[2:]
+                    char = chr(int(codepoint, 16))
+                    new_variants.append(char)
+            d["kJoyoKanji"] = new_variants
+
+    log.info(f"  Writing unihan to {UNIHAN_FILE}...")
+    export_json(unihan_dict, UNIHAN_FILE)
+    global UNIHAN_DICT
+    UNIHAN_DICT = unihan_dict
+
+
+def __download_edict_freq():
+    """Download and unzip Utsumi Hiroshi's frequency-annotated EDICT"""
+
+    # download
+    if EDICT_FREQ_TARBALL.exists() and EDICT_FREQ_TARBALL.stat().st_size > 0:
+        log.info(f"{EDICT_FREQ_TARBALL.name} already exists; skipping download")
+    else:
+        log.info(
+            f"Downloading frequency-annotated EDICT to {EDICT_FREQ_TARBALL.name}..."
+        )
+        r = requests.get(EDICT_FREQ_URL, stream=True)
+        with open(EDICT_FREQ_TARBALL, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    # unzip
+    if EDICT_FREQ_DIR.exists() and EDICT_FREQ_DIR.is_dir():
+        log.info(f"  {EDICT_FREQ_DIR.name} already exists; skipping decompress")
+    else:
+        tar = tarfile.open(EDICT_FREQ_TARBALL, "r:gz")
+        tar.extractall(GENERATED_DATA_DIR)
+        tar.close()
+
+
+@dataclass
+class EdictEntry:
+    surface: str
+    # hiragana converted to Katakana (for reading comparison purposes)
+    normalized: str
+    freq: int
+    english: str
+    # as appropriate for ruby text, or when you don't know a character, etc.
+    phonetic_spelling: str
+    # same as above, but always katakana
+    pron: str
+
+
+def generate_simplified_edict_freq():
+    """Simplify and re-write EDICT frequency data"""
+
+    if SIMPLIFIED_EDICT_FREQ.exists() and SIMPLIFIED_EDICT_FREQ.stat().st_size > 0:
+        log.info(f"{SIMPLIFIED_EDICT_FREQ.name} already exists; skipping generation")
+        return
+
+    __download_edict_freq()
+
+    log.info(f"Reading EDICT frequency data from {EDICT_FREQ_FILE}...")
+    words = []
+    with open(EDICT_FREQ_FILE) as f:
+        for line in f.readlines()[1:]:
+            word = line.split(" ")[0]
+            word_normalized = jaconv.hira2kata(word)
+            freq = int(line.split("#")[-1][:-2])
+            english = "/".join(line.split("/")[1:-2])
+            if "[" not in line:
+                # line contains no kanji
+                continue
+            pron = line.split("[")[1].split("]")[0]
+            # use Katakana to match other phonetic sources
+            pron_katakana = jaconv.hira2kata(pron)
+            # negative frequency to sort descending
+            words.append((-freq, word, word_normalized, pron_katakana, pron, english))
+
+    output = []
+    for (freq, word, word_normalized, pron_katakana, pron, english) in sorted(words):
+        output.append(
+            EdictEntry(
+                surface=word,
+                normalized=word_normalized,
+                freq=-freq,
+                english=english,
+                phonetic_spelling=pron,
+                pron=pron_katakana,
+            )
+        )
+
+    with open(SIMPLIFIED_EDICT_FREQ, "w") as f:
+        for entry in output:
+            f.write(
+                f"{entry.surface}\t{entry.normalized}\t{entry.freq}\t{entry.english}\t{entry.phonetic_spelling}\t{entry.pron}\n"
+            )
+
+    return output
+
+
+def __download_cedict():
+    """Download and unzip CC-CEDICT"""
+
+    # download
+    if CEDICT_ZIP.exists() and CEDICT_ZIP.stat().st_size > 0:
+        log.info(f"{CEDICT_ZIP.name} already exists; skipping download")
+    else:
+        log.info(f"Downloading CC-CEDICT to {CEDICT_ZIP.name}...")
+        r = requests.get(CEDICT_URL, stream=True)
+        with open(CEDICT_ZIP, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    CEDICT_DIR = CEDICT_ZIP.with_suffix("")
+    # unzip
+    if CEDICT_DIR.exists() and CEDICT_DIR.stat().st_size > 0:
+        log.info(f"  {CEDICT_DIR.name} already exists; skipping decompress")
+    else:
+        log.info(f"  Writing decompressed contents to {CEDICT_DIR.name}")
+        with zipfile.ZipFile(CEDICT_ZIP, "r") as zip_ref:
+            zip_ref.extractall(CEDICT_DIR)
+
+
+def __download_jun_da_char_freq():
+    """Download Jun Da's character frequency list"""
+    # TODO: this thing is super fragile. Would be better to create and distribute
+    # a data package version of the list somewhere.
+
+    if JUN_DA_CHAR_FREQ_FILE.exists() and JUN_DA_CHAR_FREQ_FILE.stat().st_size > 0:
+        log.info(f"{JUN_DA_CHAR_FREQ_FILE.name} already exists; skipping download")
+        return
+
+    log.info(
+        f"Downloading Jun Da's character frequency list from {JUN_DA_CHAR_FREQ_URL}..."
+    )
+    r = requests.get(JUN_DA_CHAR_FREQ_URL)
+    r.encoding = "GBK"
+    for line in r.text.splitlines():
+        if line.startswith("<pre>"):
+            # remove leading <pre>
+            line = line[5:]
+            # remove trailing </pre> and extra content
+            line = line.split("</pre>")[0]
+
+            log.info(
+                f"  Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
+            )
+            with open(JUN_DA_CHAR_FREQ_FILE, "w") as f:
+                f.write(
+                    "Rank\tCharacter\tRaw Frequency\tFrequency Percentile\tPinyin\tEnglish\n"
+                )
+                for entry in line.split("<br>"):
+                    if entry:
+                        f.write(entry)
+                        f.write("\n")
+
+
+def __download_libhangul():
+    """Download and unzip the libhangul hanja word list data."""
+    # download
+    if LIB_HANGUL_ZIP_FILE.exists() and LIB_HANGUL_ZIP_FILE.stat().st_size > 0:
+        log.info(f"{LIB_HANGUL_ZIP_FILE.name} already exists; skipping download")
+    else:
+        log.info(f"Downloading libhangul to {LIB_HANGUL_ZIP_FILE}...")
+        r = requests.get(LIB_HANGUL_URL, stream=True)
+        with open(LIB_HANGUL_ZIP_FILE, "wb") as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+
+    # unzip
+    if LIB_HANGUL_DIR.exists() and LIB_HANGUL_DIR.is_dir():
+        log.info(f"  {LIB_HANGUL_DIR.name} already exists; skipping unzip")
+    else:
+        with zipfile.ZipFile(LIB_HANGUL_ZIP_FILE, "r") as zip_ref:
+            zip_ref.extractall(GENERATED_DATA_DIR)
+
+
+def __download_ytenx():
     """Download and unzip the ytenx rhyming data."""
     # download
     if YTENX_ZIP_FILE.exists() and YTENX_ZIP_FILE.stat().st_size > 0:
@@ -45,9 +290,14 @@ def __ytenx_download():
             zip_ref.extractall(GENERATED_DATA_DIR)
 
 
+###############
+## Accessors ##
+###############
+
+
 @cache
 def get_ytenx_rhymes():
-    __ytenx_download()
+    __download_ytenx()
 
     log.info("  Reading rhymes from ytenx...")
     char_to_component = defaultdict(list)
@@ -100,7 +350,7 @@ def get_baxter_sagart():
 
 @cache
 def get_ytenx_variants():
-    __ytenx_download()
+    __download_ytenx()
 
     log.info("Constructing variants index from Ytenx...")
     char_to_variants = defaultdict(set)
@@ -300,27 +550,42 @@ def get_phonetic_components():
 
 @cache
 def get_edict_freq(aligner):
+    generate_simplified_edict_freq()
+
     log.info("Loading EDICT frequency list...")
     char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
-    with open(GENERATED_DATA_DIR / "edict-freq.tsv") as f:
-        num_words = 0
+    with open(SIMPLIFIED_EDICT_FREQ) as f:
+        num_entries = 0
         for line in f.readlines():
             line = line.strip()
-            surface, surface_normalized, pronunciation, english, frequency = line.split(
-                "\t"
-            )
+            (
+                surface,
+                surface_normalized,
+                frequency,
+                english,
+                phonetic_spelling,
+                pronunciation,
+            ) = line.split("\t")
             alignment = aligner.align(surface_normalized, pronunciation)
             if alignment:
-                word = {
+                entry = {
                     "surface": surface,
                     "pron": pronunciation,
                     "freq": int(frequency),
                     "en": english,
                 }
+                # entry = EdictEntry(
+                #     surface=surface,
+                #     normalized=surface_normalized,
+                #     freq=int(frequency),
+                #     english=english,
+                #     phonetic_spelling=phonetic_spelling,
+                #     pron=pronunciation,
+                # )
                 for c, pron in alignment.items():
-                    char_to_pron_to_words[c][pron].append(word)
-                num_words += 1
-    log.info(f"  Read {num_words} words from EDICT frequency list")
+                    char_to_pron_to_words[c][pron].append(entry)
+                num_entries += 1
+    log.info(f"  Read {num_entries} entries from EDICT frequency list")
     return char_to_pron_to_words
 
 
@@ -344,6 +609,7 @@ def get_historical_on_yomi():
 
 @cache
 def get_unihan(file=GENERATED_DATA_DIR / "unihan.json") -> Mapping[str, Any]:
+    __download_unihan()
     log.info("Loading unihan data...")
     # TODO: read path from constants file
     with open(file) as f:

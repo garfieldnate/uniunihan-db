@@ -4,7 +4,7 @@ Topic: final output
 
 * output language-specific names of components (BS gives pinyin but not Japanese, etc.)
 * Get English keywords for components whose info is taken from ytenx
-* Use character normalization to retrieve more BS data for components: 从->從, etc.
+* Use character normalization to retrieve more BS data for components: 从->從, etc., 瓶
 * Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 
