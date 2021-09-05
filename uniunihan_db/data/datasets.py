@@ -1,15 +1,20 @@
 import csv
+import json
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
 from typing import Any, Mapping, Sequence, Set
 
-import commentjson as json
 import jaconv
 import requests
 
-from uniunihan_db.util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
+from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+from uniunihan_db.util import configure_logging
+
+HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
+KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
+
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
@@ -97,7 +102,7 @@ def get_baxter_sagart():
 def get_ytenx_variants():
     __ytenx_download()
 
-    log.info("  Reading variants from ytenx...")
+    log.info("Constructing variants index from Ytenx...")
     char_to_variants = defaultdict(set)
     with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "JihThex.csv") as f:
         rows = csv.DictReader(f)
@@ -338,11 +343,56 @@ def get_historical_on_yomi():
 
 
 @cache
-def get_unihan() -> Mapping[str, Any]:
+def get_unihan(file=GENERATED_DATA_DIR / "unihan.json") -> Mapping[str, Any]:
     log.info("Loading unihan data...")
     # TODO: read path from constants file
-    with open(GENERATED_DATA_DIR / "unihan.json") as f:
+    with open(file) as f:
         unihan = json.load(f)
     log.info(f"  Read {len(unihan)} characters from Unihan DB")
 
     return unihan
+
+
+@cache
+def get_unihan_variants(file=GENERATED_DATA_DIR / "unihan.json"):
+    unihan = get_unihan(file)
+    log.info("Constructing variants index from Unihan...")
+
+    char_to_variants = defaultdict(set)
+    for char, entry in unihan.items():
+        for field_name in [
+            "kSemanticVariant",
+            "kZVariant",
+            "kSimplifiedVariant",
+            "kTraditionalVariant",
+            "kReverseCompatibilityVariants",
+            "kJinmeiyoKanji",
+            "kJoyoKanji",
+            "kCompatibilityVariant",
+        ]:
+            if variants := entry.get(field_name):
+                if type(variants) != list:
+                    variants = [variants]
+                for v in variants:
+                    char_to_variants[char].add(v)
+
+        # These are asymmetrically noted in Unihan, so we need to reverse the mapping direction
+        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
+            if comp_variant := entry.get(field_name):
+                if type(comp_variant) != list:
+                    comp_variant = [comp_variant]
+                for v in comp_variant:
+                    char_to_variants[v].add(char)
+
+    return char_to_variants
+
+
+@cache
+def get_variants():
+    char_to_variants = defaultdict(set)
+    for char, variants in get_unihan_variants().items():
+        char_to_variants[char].update(variants)
+    for char, variants in get_ytenx_variants().items():
+        char_to_variants[char].update(variants)
+
+    return dict(char_to_variants)

@@ -1,10 +1,12 @@
-from uniunihan_db.data.raw_datasets import (
+from uniunihan_db.constants import TEST_CORPUS_DIR
+from uniunihan_db.data.datasets import (
     BaxterSagart,
     get_baxter_sagart,
     get_cedict,
     get_ckip_20k,
     get_historical_on_yomi,
     get_joyo,
+    get_unihan_variants,
     get_ytenx_rhymes,
     get_ytenx_variants,
 )
@@ -169,3 +171,14 @@ def test_get_historical_on_yomi():
     assert "イ" in char
     old_kana = char["イ"]
     assert old_kana == "ヰ"
+
+
+def test_get_unihan_variants():
+    # test with smaller file because it takes too long to load the full one
+    char_to_variants = get_unihan_variants(TEST_CORPUS_DIR / "unihan_sample.json")
+    assert char_to_variants == {
+        "㑯": {"㑔"},
+        "㖈": {"䎛"},
+        "㗖": {"啖", "啗", "噉"},
+        "㘎": {"㘚"},
+    }

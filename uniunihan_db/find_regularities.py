@@ -7,8 +7,12 @@ from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
 # allows commenting lines with # or //
 import commentjson as json
 
+from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+
 from .component_group import ComponentGroup, PurityType
-from .data.raw_datasets import (
+from .data.datasets import (
+    HK_ED_CHARS_FILE,
+    KO_ED_CHARS_FILE,
     get_cedict,
     get_ckip_20k,
     get_edict_freq,
@@ -19,14 +23,7 @@ from .data.raw_datasets import (
 )
 from .lingua.jp.aligner import Aligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
-from .util import (
-    GENERATED_DATA_DIR,
-    HK_ED_CHARS_FILE,
-    INCLUDED_DATA_DIR,
-    KO_ED_CHARS_FILE,
-    configure_logging,
-    filter_keys,
-)
+from .util import configure_logging, filter_keys
 
 log = configure_logging(__name__)
 

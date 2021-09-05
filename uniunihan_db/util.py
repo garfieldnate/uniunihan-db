@@ -1,21 +1,10 @@
 import logging
 import os
-from pathlib import Path
 from typing import Collection, Mapping, TypeVar
 
-PROJECT_DIR = Path(__file__).parents[1]
-
-DATA_DIR = PROJECT_DIR / "data"
-
-GENERATED_DATA_DIR = DATA_DIR / "generated"
-GENERATED_DATA_DIR.mkdir(exist_ok=True)
-
-INCLUDED_DATA_DIR = DATA_DIR / "included"
+from uniunihan_db.constants import GENERATED_DATA_DIR
 
 LOG_FILE = GENERATED_DATA_DIR / "log.txt"
-
-HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
-KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
 
 
 def configure_logging(name: str) -> logging.Logger:

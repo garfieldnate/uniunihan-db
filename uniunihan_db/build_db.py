@@ -10,15 +10,17 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from .data.raw_datasets import get_unihan, get_ytenx_rhymes, get_ytenx_variants
-from .lingua import japanese, mandarin
-from .util import (
-    GENERATED_DATA_DIR,
+from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+
+from .data.datasets import (
     HK_ED_CHARS_FILE,
-    INCLUDED_DATA_DIR,
     KO_ED_CHARS_FILE,
-    configure_logging,
+    get_unihan,
+    get_variants,
+    get_ytenx_rhymes,
 )
+from .lingua import japanese, mandarin
+from .util import configure_logging
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
 UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
@@ -262,43 +264,6 @@ def jun_da_char_freq_download():
                     if entry:
                         f.write(entry)
                         f.write("\n")
-
-
-def get_variants():
-    unihan = get_unihan()
-    log.info("Constructing variants index...")
-
-    log.info("  Reading variants from unihan...")
-    char_to_variants = defaultdict(set)
-    for char, entry in unihan.items():
-        for field_name in [
-            "kSemanticVariant",
-            "kZVariant",
-            "kSimplifiedVariant",
-            "kTraditionalVariant",
-            "kReverseCompatibilityVariants",
-            "kJinmeiyoKanji",
-            "kJoyoKanji",
-            "kCompatibilityVariant",
-        ]:
-            if variants := entry.get(field_name):
-                if type(variants) != list:
-                    variants = [variants]
-                for v in variants:
-                    char_to_variants[char].add(v)
-
-        # These are asymmetrically noted in Unihan, so we need to reverse the mapping direction
-        for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
-            if comp_variant := entry.get(field_name):
-                if type(comp_variant) != list:
-                    comp_variant = [comp_variant]
-                for v in comp_variant:
-                    char_to_variants[v].add(char)
-
-    for char, variants in get_ytenx_variants().items():
-        char_to_variants[char].update(variants)
-
-    return char_to_variants
 
 
 def expand_unihan():

@@ -6,8 +6,11 @@ from collections import defaultdict
 
 from opencc import OpenCC
 
+from uniunihan_db.constants import GENERATED_DATA_DIR, INCLUDED_DATA_DIR
+from uniunihan_db.data.datasets import get_unihan
+
 from .lingua import japanese, mandarin
-from .util import GENERATED_DATA_DIR, INCLUDED_DATA_DIR, configure_logging
+from .util import configure_logging
 
 log = configure_logging(__name__)
 
@@ -38,14 +41,6 @@ def _read_hsk(max_level):
                 char_set.update(chars)
 
     return word_list, char_set
-
-
-def _read_unihan():
-    log.info("Loading unihan data...")
-    # TODO: read path from constants file
-    with open(GENERATED_DATA_DIR / "unihan.json") as f:
-        unihan = json.load(f)
-    return unihan
 
 
 def _find_joyo(unihan):
@@ -189,7 +184,7 @@ def _format_arff(data):
 def main():
     # TODO: allow choosing character set
     # _, char_set = _read_hsk(6)
-    unihan = _read_unihan()
+    unihan = get_unihan()
     char_set = _find_joyo(unihan)
     ids = _read_ids()
 

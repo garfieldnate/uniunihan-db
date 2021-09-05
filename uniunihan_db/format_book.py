@@ -6,7 +6,7 @@ import jinja2
 from jinja2 import Environment, FileSystemLoader
 
 from .component_group import PurityType
-from .data.raw_datasets import get_baxter_sagart, get_ytenx_rhymes
+from .data.datasets import get_baxter_sagart, get_ytenx_rhymes
 from .util import configure_logging
 
 BAXTER_SAGART_DATA = get_baxter_sagart()

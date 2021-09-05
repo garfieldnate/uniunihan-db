@@ -1,0 +1,277 @@
+{
+  "㑯": {
+    "ucn": "U+346F",
+    "char": "㑯",
+    "kCangjie": "OMBC",
+    "kCantonese": [
+      "seoi1"
+    ],
+    "kDefinition": [
+      "last name, all",
+      "together",
+      "mutually, a low rank officer to take charge of the bandits in ancient time"
+    ],
+    "kHanYu": [
+      {
+        "volume": 1,
+        "page": 188,
+        "character": 5,
+        "virtual": 0
+      }
+    ],
+    "kHanyuPinyin": [
+      {
+        "locations": [
+          {
+            "volume": 1,
+            "page": 188,
+            "character": 5,
+            "virtual": 0
+          }
+        ],
+        "readings": [
+          "xǔ"
+        ]
+      }
+    ],
+    "kIRGHanyuDaZidian": [
+      {
+        "volume": 1,
+        "page": 188,
+        "character": 5,
+        "virtual": 0
+      }
+    ],
+    "kIRGKangXi": [
+      {
+        "page": 111,
+        "character": 13,
+        "virtual": 0
+      }
+    ],
+    "kIRG_GSource": {
+      "source": "GKX",
+      "location": "0111.13"
+    },
+    "kIRG_TSource": {
+      "source": "T3",
+      "location": "343E"
+    },
+    "kMandarin": {
+      "zh-Hans": "xǔ",
+      "zh-Hant": "xǔ"
+    },
+    "kRSUnicode": [
+      {
+        "radical": 9,
+        "strokes": 9,
+        "simplified": false
+      }
+    ],
+    "kSimplifiedVariant": [
+      "㑔"
+    ],
+    "kTotalStrokes": {
+      "zh-Hans": 11,
+      "zh-Hant": 11
+    }
+  },
+  "㖈": {
+    "ucn": "U+3588",
+    "char": "㖈",
+    "kCangjie": "JPR",
+    "kIRGKangXi": [
+      {
+        "page": 189,
+        "character": 27,
+        "virtual": 1
+      }
+    ],
+    "kIRG_KSource": {
+      "source": "K3",
+      "location": "224C"
+    },
+    "kIRG_TSource": {
+      "source": "TF",
+      "location": "295C"
+    },
+    "kRSUnicode": [
+      {
+        "radical": 30,
+        "strokes": 6,
+        "simplified": false
+      }
+    ],
+    "kTotalStrokes": {
+      "zh-Hans": 9,
+      "zh-Hant": 9
+    },
+    "kZVariant": [
+      "䎛"
+    ]
+  },
+  "㗖": {
+    "ucn": "U+35D6",
+    "char": "㗖",
+    "kCangjie": "RBHX",
+    "kCantonese": [
+      "daam6"
+    ],
+    "kDefinition": [
+      "(non-classical form of 啗) to eat",
+      "to chew",
+      "to bite. to entice",
+      "to lure, to contain",
+      "to, comprise"
+    ],
+    "kHKSCS": "A068",
+    "kHanYu": [
+      {
+        "volume": 1,
+        "page": 669,
+        "character": 2,
+        "virtual": 0
+      }
+    ],
+    "kIRGHanyuDaZidian": [
+      {
+        "volume": 1,
+        "page": 669,
+        "character": 2,
+        "virtual": 0
+      }
+    ],
+    "kIRGKangXi": [
+      {
+        "page": 202,
+        "character": 16,
+        "virtual": 0
+      }
+    ],
+    "kIRG_GSource": {
+      "source": "GKX",
+      "location": "0202.16"
+    },
+    "kIRG_HSource": {
+      "source": "H",
+      "location": "A068"
+    },
+    "kIRG_JSource": {
+      "source": "JA",
+      "location": "2173"
+    },
+    "kIRG_KPSource": {
+      "source": "KP1",
+      "location": "3A54"
+    },
+    "kIRG_TSource": {
+      "source": "T3",
+      "location": "404F"
+    },
+    "kIRG_VSource": {
+      "source": "V0",
+      "location": "3231"
+    },
+    "kKPS1": [
+      "3A54"
+    ],
+    "kMandarin": {
+      "zh-Hans": "dàn",
+      "zh-Hant": "dàn"
+    },
+    "kMatthews": [
+      "6052"
+    ],
+    "kRSUnicode": [
+      {
+        "radical": 30,
+        "strokes": 10,
+        "simplified": false
+      }
+    ],
+    "kSemanticVariant": [
+      "啖",
+      "噉",
+      "啗"
+    ],
+    "kTotalStrokes": {
+      "zh-Hans": 13,
+      "zh-Hant": 13
+    },
+    "kVietnamese": [
+      "thào"
+    ]
+  },
+  "㘎": {
+    "ucn": "U+360E",
+    "char": "㘎",
+    "kCangjie": "RLSK",
+    "kCantonese": [
+      "ham3"
+    ],
+    "kDefinition": [
+      "(simplified form) the roars of a tiger"
+    ],
+    "kHanYu": [
+      {
+        "volume": 1,
+        "page": 697,
+        "character": 6,
+        "virtual": 0
+      }
+    ],
+    "kIRGHanyuDaZidian": [
+      {
+        "volume": 1,
+        "page": 697,
+        "character": 6,
+        "virtual": 0
+      }
+    ],
+    "kIRGKangXi": [
+      {
+        "page": 213,
+        "character": 17,
+        "virtual": 1
+      }
+    ],
+    "kIRG_GSource": {
+      "source": "G7",
+      "location": "2249"
+    },
+    "kMandarin": {
+      "zh-Hans": "hǎn",
+      "zh-Hant": "hǎn"
+    },
+    "kRSUnicode": [
+      {
+        "radical": 30,
+        "strokes": 15,
+        "simplified": false
+      }
+    ],
+    "kTGH": [
+      "2013:7936"
+    ],
+    "kTotalStrokes": {
+      "zh-Hans": 18,
+      "zh-Hant": 18
+    },
+    "kTraditionalVariant": [
+      "㘚"
+    ],
+    "kXHC1983": [
+      {
+        "locations": [
+          {
+            "page": 439,
+            "character": 8,
+            "entry": 0,
+            "substituted": false
+          }
+        ],
+        "reading": "hǎn"
+      }
+    ]
+  }
+}
