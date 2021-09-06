@@ -1,5 +1,16 @@
 # TODO
 
+Goal design:
+
+* Pipeline starting from data sources and progressing through processing, indexing, and enrichment steps.
+    - chars + vocab -> char2pron2vocab (index_vocab)
+    - char2pron2vocab + components -> purity groups (find_regularities)
+    - assign IDs (index)
+    - combine langs (cross_ref)
+    - incorporate custom notes (finalize)
+    - write output (format)
+
+
 Topic: final output
 
 * output language-specific names of components (BS gives pinyin but not Japanese, etc.)
