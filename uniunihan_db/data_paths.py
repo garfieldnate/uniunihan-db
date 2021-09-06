@@ -29,6 +29,8 @@ JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
 KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
 
+JP_VOCAB_OVERRIDE = INCLUDED_DATA_DIR / "jp_vocab_override.json"
+
 LIB_HANGUL_URL = "https://github.com/libhangul/libhangul/archive/master.zip"
 LIB_HANGUL_ZIP_FILE = GENERATED_DATA_DIR / "libhangul-master.zip"
 LIB_HANGUL_DIR = LIB_HANGUL_ZIP_FILE.with_suffix("")

@@ -1,5 +1,5 @@
 {
-    "//": "These five characters were collapsed in the sinjitai, and we don't have old spellings for vocab, so these have to be specified directly",
+    // These five characters were collapsed in the sinjitai, and we don't have old spellings for vocab, so these have to be specified directly
     "辯": {
         "ベン": [
             {
@@ -50,7 +50,7 @@
             }
         ]
     },
-    "//": "these two aren't found automatically because of their non-Joyo kanji usage",
+    // these two aren't found automatically because of their non-Joyo kanji usage
     "肘": {
         "チュウ": [
             {
@@ -71,7 +71,7 @@
             }
         ]
     },
-    "//": "This character reading is rare enough not to be in EDICT",
+    // This character reading is rare enough not to be in EDICT
     "栃": {
         "レイ": [
             {
@@ -82,7 +82,7 @@
             }
         ]
     },
-    "//": "These I had to find online somewhere",
+    // These I had to find online somewhere
     "鍋": {
         "カ": [
             {

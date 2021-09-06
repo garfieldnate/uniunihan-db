@@ -1,5 +1,6 @@
 from uniunihan_db.data.datasets import (
     BaxterSagart,
+    ZhWord,
     get_baxter_sagart,
     get_cedict,
     get_ckip_20k,
@@ -89,32 +90,30 @@ def test_get_ckip_20k() -> None:
 
 
 def test_get_cedict() -> None:
-    entries = get_cedict()
+    char_to_pron_to_word = get_cedict()
     # Assuming the size of the dictionary will only grow over time
-    assert len(entries) >= 113420
-    assert entries["分錢"] == [
-        {
-            "en": "cent/penny",
-            "trad": "分錢",
-            "simp": "分钱",
-            "pron": "fen1 qian2",
-        }
-    ]
-    # Ensure pronunciations are lower-cased
-    assert entries["辯機"][0]["pron"] == "bian4 ji1"
-
-    char_to_pron_to_word = get_cedict(index_chars=True)
-    # Assuming the number of characters in the dictionary will only grow over time
     assert len(char_to_pron_to_word) >= 9997
-    assert "qian2" in char_to_pron_to_word["錢"]
-    assert {
-        "en": "cent/penny",
-        "trad": "分錢",
-        "simp": "分钱",
-        "pron": "fen1 qian2",
-    } in char_to_pron_to_word["錢"]["qian2"]
+    assert (
+        sum(
+            len(words)
+            for pron2words in char_to_pron_to_word.values()
+            for words in pron2words.values()
+        )
+        >= 113420
+    )
+    # Ensure pronunciations are lower-cased and variants are ignored
+    assert len(char_to_pron_to_word["辯"]["bian4"]) == 53
 
-    assert "ai2" in char_to_pron_to_word["癌"]
+    assert (
+        ZhWord(
+            surface="一分一毫",
+            pron="yi1 fen1 yi1 hao2",
+            english="a tiny bit (idiom)/an iota",
+            frequency=0,
+            simplified="一分一毫",
+        )
+        in char_to_pron_to_word["分"]["fen1"]
+    )
 
 
 def test_get_joyo() -> None:

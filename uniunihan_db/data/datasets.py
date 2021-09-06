@@ -5,8 +5,17 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
-from typing import Any, Mapping, Sequence, Set
+from typing import (
+    Any,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Optional,
+    Sequence,
+    Set,
+)
 
+import commentjson
 import jaconv
 import requests
 from unihan_etl.process import Packager as unihan_packager
@@ -132,19 +141,6 @@ def __download_edict_freq():
         tar.close()
 
 
-@dataclass
-class EdictEntry:
-    surface: str
-    # hiragana converted to Katakana (for reading comparison purposes)
-    normalized: str
-    freq: int
-    english: str
-    # as appropriate for ruby text, or when you don't know a character, etc.
-    phonetic_spelling: str
-    # same as above, but always katakana
-    pron: str
-
-
 def generate_simplified_edict_freq():
     """Simplify and re-write EDICT frequency data"""
 
@@ -174,20 +170,13 @@ def generate_simplified_edict_freq():
     output = []
     for (freq, word, word_normalized, pron_katakana, pron, english) in sorted(words):
         output.append(
-            EdictEntry(
-                surface=word,
-                normalized=word_normalized,
-                freq=-freq,
-                english=english,
-                phonetic_spelling=pron,
-                pron=pron_katakana,
-            )
+            JpWord(word, pron, english, -freq, word_normalized, pron_katakana)
         )
 
     with open(SIMPLIFIED_EDICT_FREQ, "w") as f:
-        for entry in output:
+        for word in output:
             f.write(
-                f"{entry.surface}\t{entry.normalized}\t{entry.freq}\t{entry.english}\t{entry.phonetic_spelling}\t{entry.pron}\n"
+                f"{word.surface}\t{word.alignable_surface}\t{word.frequency}\t{word.english}\t{word.pron}\t{word.alignable_pron}\n"
             )
 
     return output
@@ -413,17 +402,46 @@ def get_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     return entries
 
 
+@dataclass
+class Word:
+    # the dictionary form of the word using Chinese characters and perhaps other orthographies
+    surface: str
+    # the commonly used phonetic spelling (whatever would go in ruby text, or in place of
+    # Chinese characters when one forgets or wishes to write without them)
+    pron: str
+    # definition in English
+    english: str
+    # unnormalized frequency within some corpus; -1 to indicate missing data
+    frequency: int
+
+
+# character -> {pronunciation-> [words that use that character with that pronunciation]}
+Char2Pron2Words = MutableMapping[str, MutableMapping[str, MutableSequence[Word]]]
+
+
+@dataclass
+class ZhWord(Word):
+    # the surface field contains the traditional form; if the simplified form is different, it will be
+    # stored here
+    simplified: Optional[str]
+
+
+@dataclass
+class JpWord(Word):
+    # these two fields are necessary for alignment; the Aligner implementation requires
+    # the use of katakana over hiragana
+    # same as surface, but with all hiragana converted to katakana
+    alignable_surface: str
+    # phonetic spelling with hiragana converted to katakana
+    alignable_pron: str
+
+
 @cache
-def get_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, Any]:
+def get_cedict(index_chars: bool = False, filter: bool = True) -> Char2Pron2Words:
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
     num_words = 0
-    if index_chars:
-        # char -> pronunciation -> word list
-        entries: Mapping[str, Any] = defaultdict(lambda: defaultdict(list))
-    else:
-        # surface form -> word list
-        entries = defaultdict(list)
+    entries: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
     with open(cedict_file) as f:
         for line in f.readlines():
             # skip comments or empty lines
@@ -451,26 +469,25 @@ def get_cedict(index_chars: bool = False, filter: bool = True) -> Mapping[str, A
                 )
 
             pron = pron.lstrip("[").rstrip("] ").lower()
-            word_dict = {"en": en, "trad": trad, "simp": simp, "pron": pron}
+            # frequency is TODO
+            word = ZhWord(
+                surface=trad, pron=pron, english=en, frequency=0, simplified=simp
+            )
 
             # store word
-            if index_chars:
-                syllables = pron.split(" ")
-                # We can't automatically (simply) align many words, e.g. those with
-                # numbers or letters or multi-syllabic characters like ㍻. So we just
-                # remove these from the index altogether
-                if len(syllables) != len(trad):
-                    continue
-                    # raise ValueError(
-                    #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
-                    # )
-                num_words += 1
-                for c, pron in zip(trad, syllables):
-                    entries[c][pron].append(word_dict)
+            syllables = pron.split(" ")
+            # We can't automatically (simply) align many words, e.g. those with
+            # numbers or letters or multi-syllabic characters like ㍻. So we just
+            # remove these from the index altogether
+            if len(syllables) != len(trad):
+                continue
+                # raise ValueError(
+                #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
+                # )
+            num_words += 1
+            for c, pron in zip(trad, syllables):
+                entries[c][pron].append(word)
 
-            else:
-                num_words += 1
-                entries[trad].append(word_dict)
     log.info(f"  Read {num_words} entries from CEDICT")
     return entries
 
@@ -548,12 +565,16 @@ def get_phonetic_components():
     return comp_to_char
 
 
+# Next: think about how to break this down and test it
+# get_edict_freq: returns list of entry objects
+# jp_index_char_prons: takes list of words and an aligner, returns char_to_pron_to_words
+# same wthout aligner; put in build_db.py
 @cache
-def get_edict_freq(aligner):
+def get_edict_freq(aligner, file=SIMPLIFIED_EDICT_FREQ) -> Char2Pron2Words:
     generate_simplified_edict_freq()
 
     log.info("Loading EDICT frequency list...")
-    char_to_pron_to_words = defaultdict(lambda: defaultdict(list))
+    char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
     with open(SIMPLIFIED_EDICT_FREQ) as f:
         num_entries = 0
         for line in f.readlines():
@@ -568,22 +589,16 @@ def get_edict_freq(aligner):
             ) = line.split("\t")
             alignment = aligner.align(surface_normalized, pronunciation)
             if alignment:
-                entry = {
-                    "surface": surface,
-                    "pron": pronunciation,
-                    "freq": int(frequency),
-                    "en": english,
-                }
-                # entry = EdictEntry(
-                #     surface=surface,
-                #     normalized=surface_normalized,
-                #     freq=int(frequency),
-                #     english=english,
-                #     phonetic_spelling=phonetic_spelling,
-                #     pron=pronunciation,
-                # )
+                word = JpWord(
+                    surface,
+                    phonetic_spelling,
+                    english,
+                    int(frequency),
+                    surface_normalized,
+                    pronunciation,
+                )
                 for c, pron in alignment.items():
-                    char_to_pron_to_words[c][pron].append(entry)
+                    char_to_pron_to_words[c][pron].append(word)
                 num_entries += 1
     log.info(f"  Read {num_entries} entries from EDICT frequency list")
     return char_to_pron_to_words
@@ -605,6 +620,24 @@ def get_historical_on_yomi():
                     char_to_new_to_old_pron[c][modern] = historical
 
     return char_to_new_to_old_pron
+
+
+@cache
+def get_vocab_override(file) -> Char2Pron2Words:
+    data = commentjson.load(file.open())
+    for char, pron2vocab in data.items():
+        for pron, vocab in pron2vocab.items():
+            words = []
+            for v in vocab:
+                word = Word(
+                    surface=v["surface"],
+                    pron=v["pron"],
+                    english=v["en"],
+                    frequency=v["freq"],
+                )
+                words.append(word)
+            pron2vocab[pron] = words
+    return data
 
 
 @cache

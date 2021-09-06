@@ -47,20 +47,19 @@
                             <div class="box vocab">{{
                                 char.prons|
                                 map(attribute='vocab')|
-                                map(attribute='trad')|
+                                map(attribute='surface')|
                                 join('<br />')
                                 }}</div>
                             <div class="box vocab-pron">{{
                                 char.prons|
                                 map(attribute='vocab')|
                                 map(attribute='pron')|
-                                map('kata2hira')|
                                 join('<br />')
                                 }}</div>
                             <div class="box vocab-meaning">{{
                                 char.prons|
                                 map(attribute='vocab')|
-                                map(attribute='en')|
+                                map(attribute='english')|
                                 map('break_slashes')|
                                 join('<br />')
                                 }}</div>

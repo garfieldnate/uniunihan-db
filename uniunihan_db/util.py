@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Collection, Mapping, TypeVar
+from typing import Collection, Mapping, MutableMapping, TypeVar
 
 from uniunihan_db.data_paths import GENERATED_DATA_DIR
 
@@ -27,7 +27,7 @@ T = TypeVar("T")
 U = TypeVar("U")
 
 
-def filter_keys(d: Mapping[T, U], s: Collection[T]) -> Mapping[T, U]:
+def filter_keys(d: Mapping[T, U], s: Collection[T]) -> MutableMapping[T, U]:
     """Filter keys in d to just elements present in s"""
     return {k: v for k, v in d.items() if k in s}
 

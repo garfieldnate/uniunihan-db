@@ -2,7 +2,7 @@ import argparse
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
 from json import JSONEncoder
-from typing import Any, DefaultDict, Dict, List, Mapping, Sequence, Set
+from typing import Any, DefaultDict, Dict, List, Mapping, Optional, Sequence, Set
 
 # allows commenting lines with # or //
 import commentjson as json
@@ -10,12 +10,14 @@ import commentjson as json
 from uniunihan_db.data_paths import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
-    INCLUDED_DATA_DIR,
+    JP_VOCAB_OVERRIDE,
     KO_ED_CHARS_FILE,
 )
 
 from .component_group import ComponentGroup, PurityType
 from .data.datasets import (
+    Char2Pron2Words,
+    Word,
     get_cedict,
     get_ckip_20k,
     get_edict_freq,
@@ -23,6 +25,7 @@ from .data.datasets import (
     get_joyo,
     get_phonetic_components,
     get_unihan,
+    get_vocab_override,
 )
 from .lingua.jp.aligner import Aligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
@@ -42,6 +45,8 @@ class CustomJsonEncoder(JSONEncoder):
             return list(obj)
         elif isinstance(obj, ComponentGroup):
             return vars(obj)
+        elif isinstance(obj, Word):
+            return vars(obj)
 
         return JSONEncoder.default(self, obj)
 
@@ -51,14 +56,11 @@ def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
     for pron_to_words in char_to_pron_to_words.values():
         for words in pron_to_words.values():
             for w in words:
-                if w_with_freq := ckip20k_entries.get(w["trad"]):
+                if w_with_freq := ckip20k_entries.get(w.surface):
                     # use first entry (highest frequency)
-                    w["freq"] = w_with_freq[0]["freq"]
-                else:
-                    # -1 to indicate it's unattested in the CKIP list
-                    w["freq"] = -1
+                    w.frequency = w_with_freq[0]["freq"]
             # sort words descending by frequency and then orthographically
-            words.sort(key=lambda w: (-w["freq"], w["trad"]))
+            words.sort(key=lambda w: (-w.frequency, w.surface))
 
 
 def _zh_supplementary_info(char_list):
@@ -181,7 +183,9 @@ def _print_reports(index: Index, char_to_prons, char_to_pron_to_vocab, out_dir) 
         f.write(_format_json(sorted(list(missing_words))))
 
 
-def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> None:
+def _print_final_output_jp(
+    index, char_to_pron_to_vocab: Char2Pron2Words, char_supplement, out_dir
+) -> None:
     log.info("Constructing final output...")
     purity_2_groups = DefaultDict(list)
     for g in index.groups:
@@ -194,18 +198,17 @@ def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> No
                 c_sup = char_supplement[c]
                 pron_entries = []
                 for pron in c_sup["readings"]:
-                    vocab_list = char_to_words[c].get(pron, [])
+                    vocab_list = char_to_pron_to_vocab[c].get(pron, [])
+                    vocab: Optional[Word] = None
                     if vocab_list:
                         # find a multi-char word if possible
                         try:
                             vocab = next(
-                                filter(lambda v: len(v["surface"]) > 1, vocab_list)
+                                filter(lambda v: len(v.surface) > 1, vocab_list)
                             )
                         except StopIteration:
                             vocab = vocab_list[0]
-                        highest_freq = max(highest_freq, vocab["freq"])
-                    else:
-                        vocab = None
+                        highest_freq = max(highest_freq, vocab.frequency)
                     pron_entry = {
                         "pron": pron,
                         "vocab": vocab,
@@ -251,9 +254,17 @@ def _print_final_output_jp(index, char_to_words, char_supplement, out_dir) -> No
 
 
 def _print_final_output_zh(
-    index, char_to_pron_to_vocab, char_supplement, out_dir
+    index, char_to_pron_to_vocab: Char2Pron2Words, char_supplement, out_dir
 ) -> None:
+
     log.info("Constructing final output...")
+
+    def pron_entry_sort_key(pron_entry):
+        return (-pron_entry["vocab"].frequency, pron_entry["pron"])
+
+    def cluster_sort_key(cluster):
+        return (-cluster[1]["prons"][0]["vocab"].frequency, cluster[0])
+
     purity_2_groups = DefaultDict(list)
     for g in index.groups:
         # keep track of highest frequency vocab used in the group
@@ -267,14 +278,16 @@ def _print_final_output_zh(
                 for pron, vocab_list in char_to_pron_to_vocab[c].items():
                     # find a multi-char word if possible
                     try:
-                        vocab = next(filter(lambda v: len(v["trad"]) > 1, vocab_list))
+                        word = next(filter(lambda w: len(w.surface) > 1, vocab_list))
                     except StopIteration:
-                        vocab = vocab_list[0]
-                    vocab["pron"] = pinyin_numbers_to_tone_marks(vocab["pron"])
-                    highest_freq = max(highest_freq, vocab["freq"])
+                        word = vocab_list[0]
+                    # TODO: convert pronunciation string earlier
+                    pron = pinyin_numbers_to_tone_marks(pron)
+                    word.pron = pinyin_numbers_to_tone_marks(word.pron)
+                    highest_freq = max(highest_freq, word.frequency)
                     pron_entry = {
-                        "pron": pinyin_numbers_to_tone_marks(pron),
-                        "vocab": vocab,
+                        "pron": pron,
+                        "vocab": word,
                     }
                     # TODO: add MC and OC reconstructions
                     # if old_pron := c_sup.get("historical_pron", {}).get(pron):
@@ -282,7 +295,8 @@ def _print_final_output_zh(
                     pron_entries.append(pron_entry)
                 # sort pronunciations by vocab frequency and then alphabetically
                 pron_entries.sort(
-                    key=lambda item: (-item["vocab"]["freq"], item["pron"])
+                    key=pron_entry_sort_key
+                    # key=lambda item: (-item["vocab"].frequency, item["pron"])
                 )
                 c_entry = {"prons": pron_entries}
                 c_entry.update(c_sup)
@@ -293,7 +307,8 @@ def _print_final_output_zh(
             cluster_entry = OrderedDict(
                 sorted(
                     cluster_entry.items(),
-                    key=lambda item: (-item[1]["prons"][0]["vocab"]["freq"], item[0]),
+                    key=cluster_sort_key
+                    # key=lambda item: (-item[1]["prons"][0]["vocab"].frequency, item[0]),
                 )
             )
             cluster_entries.append(cluster_entry)
@@ -357,17 +372,15 @@ def main() -> None:
         # Create aligner to determine which character pronunciations are used in a word
         aligner = Aligner(joyo.new_char_to_prons)
         # Read initial vocab list
-        char_to_pron_to_vocab = get_edict_freq(aligner)
+        char_to_pron_to_vocab: Char2Pron2Words = get_edict_freq(aligner)
         # Add mappings for old character glyphs
-        old_char_to_words = {}
+        old_char_to_words: Char2Pron2Words = {}
         for new_char, words in char_to_pron_to_vocab.items():
             for old_c in joyo.new_to_old(new_char):
                 old_char_to_words[old_c] = words
         char_to_pron_to_vocab.update(old_char_to_words)
         # Some words had to be specified manually instead of extracted from our downloaded dictionary
-        jp_vocab_override = json.load(
-            open(INCLUDED_DATA_DIR / "jp_vocab_override.json")
-        )
+        jp_vocab_override = get_vocab_override(JP_VOCAB_OVERRIDE)
         char_to_pron_to_vocab.update(jp_vocab_override)
 
         # Extract character groups and grade their pronunciation regularities

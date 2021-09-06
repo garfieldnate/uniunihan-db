@@ -7,6 +7,7 @@ Topic: final output
 * Use character normalization to retrieve more BS data for components: 从->從, etc., 瓶
 * Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
+* show weird characters like ㍻ somewhere because it's interesting.
 
 Topic: groupings
 
@@ -16,6 +17,7 @@ Topic: Mandarin support
 * nǎi nai listed twice because it represents two different pronunciations
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation or put in ruby text: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
+* parse out "see": see 羊拐[yang2 guai3]
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
 * source English keywords from somewhere
@@ -46,6 +48,7 @@ Topic: Korean Support
 * Load libhangul data, align to get readings
 * Download ezkorean dictionary
 * Load eumhun and Korean education data from kyoyuk_hanja.csv
+* Short section on gukja, like ones that include hangeul, etc.
 
 Topic: Vietnamese Support
 
@@ -63,6 +66,7 @@ Topic: Vietnamese Support
     - use is explicitly listed as free!
     - will require lots of work to make it usable
 * How to find modern words, though?
+* short intro to chu nom (common words like I, is, you, etc.)
 
 ## Tasks
 
