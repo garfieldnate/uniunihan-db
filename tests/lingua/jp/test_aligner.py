@@ -16,6 +16,7 @@ CHAR_TO_PRONS = {
     "得": ["トク"],
     "今": ["コン"],
     "昔": ["シャク"],
+    "同": ["ドウ"],
 }
 ALIGNER = Aligner(CHAR_TO_PRONS)
 

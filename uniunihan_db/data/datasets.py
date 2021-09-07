@@ -5,15 +5,7 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
-from typing import (
-    Any,
-    Mapping,
-    MutableMapping,
-    MutableSequence,
-    Optional,
-    Sequence,
-    Set,
-)
+from typing import Any, List, Mapping, Sequence, Set
 
 import commentjson
 import jaconv
@@ -21,6 +13,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
+from uniunihan_db.data.types import Char2Pron2Words, JpWord, Word, ZhWord
 from uniunihan_db.data_paths import (
     CEDICT_URL,
     CEDICT_ZIP,
@@ -38,6 +31,7 @@ from uniunihan_db.data_paths import (
     SIMPLIFIED_EDICT_FREQ,
     UNIHAN_FILE,
 )
+from uniunihan_db.lingua.jp.aligner import Aligner
 from uniunihan_db.util import configure_logging
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
@@ -141,11 +135,11 @@ def __download_edict_freq():
         tar.close()
 
 
-def generate_simplified_edict_freq():
+def generate_simplified_edict_freq(out_file=SIMPLIFIED_EDICT_FREQ):
     """Simplify and re-write EDICT frequency data"""
 
-    if SIMPLIFIED_EDICT_FREQ.exists() and SIMPLIFIED_EDICT_FREQ.stat().st_size > 0:
-        log.info(f"{SIMPLIFIED_EDICT_FREQ.name} already exists; skipping generation")
+    if out_file.exists() and out_file.stat().st_size > 0:
+        log.info(f"{out_file.name} already exists; skipping generation")
         return
 
     __download_edict_freq()
@@ -173,7 +167,7 @@ def generate_simplified_edict_freq():
             JpWord(word, pron, english, -freq, word_normalized, pron_katakana)
         )
 
-    with open(SIMPLIFIED_EDICT_FREQ, "w") as f:
+    with open(out_file, "w") as f:
         for word in output:
             f.write(
                 f"{word.surface}\t{word.alignable_surface}\t{word.frequency}\t{word.english}\t{word.pron}\t{word.alignable_pron}\n"
@@ -402,42 +396,10 @@ def get_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     return entries
 
 
-@dataclass
-class Word:
-    # the dictionary form of the word using Chinese characters and perhaps other orthographies
-    surface: str
-    # the commonly used phonetic spelling (whatever would go in ruby text, or in place of
-    # Chinese characters when one forgets or wishes to write without them)
-    pron: str
-    # definition in English
-    english: str
-    # unnormalized frequency within some corpus; -1 to indicate missing data
-    frequency: int
-
-
-# character -> {pronunciation-> [words that use that character with that pronunciation]}
-Char2Pron2Words = MutableMapping[str, MutableMapping[str, MutableSequence[Word]]]
-
-
-@dataclass
-class ZhWord(Word):
-    # the surface field contains the traditional form; if the simplified form is different, it will be
-    # stored here
-    simplified: Optional[str]
-
-
-@dataclass
-class JpWord(Word):
-    # these two fields are necessary for alignment; the Aligner implementation requires
-    # the use of katakana over hiragana
-    # same as surface, but with all hiragana converted to katakana
-    alignable_surface: str
-    # phonetic spelling with hiragana converted to katakana
-    alignable_pron: str
-
-
+# Next: refactor like get_edict
 @cache
 def get_cedict(index_chars: bool = False, filter: bool = True) -> Char2Pron2Words:
+    __download_cedict()
     log.info("Loading CEDICT data...")
     cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
     num_words = 0
@@ -565,17 +527,13 @@ def get_phonetic_components():
     return comp_to_char
 
 
-# Next: think about how to break this down and test it
-# get_edict_freq: returns list of entry objects
-# jp_index_char_prons: takes list of words and an aligner, returns char_to_pron_to_words
-# same wthout aligner; put in build_db.py
 @cache
-def get_edict_freq(aligner, file=SIMPLIFIED_EDICT_FREQ) -> Char2Pron2Words:
-    generate_simplified_edict_freq()
+def get_edict(file=SIMPLIFIED_EDICT_FREQ) -> List[JpWord]:
+    generate_simplified_edict_freq(out_file=file)
 
     log.info("Loading EDICT frequency list...")
-    char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
-    with open(SIMPLIFIED_EDICT_FREQ) as f:
+    words = []
+    with open(file) as f:
         num_entries = 0
         for line in f.readlines():
             line = line.strip()
@@ -587,20 +545,28 @@ def get_edict_freq(aligner, file=SIMPLIFIED_EDICT_FREQ) -> Char2Pron2Words:
                 phonetic_spelling,
                 pronunciation,
             ) = line.split("\t")
-            alignment = aligner.align(surface_normalized, pronunciation)
-            if alignment:
-                word = JpWord(
-                    surface,
-                    phonetic_spelling,
-                    english,
-                    int(frequency),
-                    surface_normalized,
-                    pronunciation,
-                )
-                for c, pron in alignment.items():
-                    char_to_pron_to_words[c][pron].append(word)
-                num_entries += 1
-    log.info(f"  Read {num_entries} entries from EDICT frequency list")
+            word = JpWord(
+                surface,
+                phonetic_spelling,
+                english,
+                int(frequency),
+                surface_normalized,
+                pronunciation,
+            )
+            words.append(word)
+            num_entries += 1
+        log.info(f"  Read {num_entries} entries from EDICT frequency list")
+
+    return words
+
+
+def index_vocab_jp(words: List[JpWord], aligner: Aligner) -> Char2Pron2Words:
+    char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
+    for word in words:
+        alignment = aligner.align(word.alignable_surface, word.alignable_pron)
+        if alignment:
+            for c, pron in alignment.items():
+                char_to_pron_to_words[c][pron].append(word)
     return char_to_pron_to_words
 
 

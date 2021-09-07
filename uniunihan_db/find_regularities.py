@@ -17,15 +17,17 @@ from uniunihan_db.data_paths import (
 from .component_group import ComponentGroup, PurityType
 from .data.datasets import (
     Char2Pron2Words,
+    JpWord,
     Word,
     get_cedict,
     get_ckip_20k,
-    get_edict_freq,
+    get_edict,
     get_historical_on_yomi,
     get_joyo,
     get_phonetic_components,
     get_unihan,
     get_vocab_override,
+    index_vocab_jp,
 )
 from .lingua.jp.aligner import Aligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
@@ -372,7 +374,8 @@ def main() -> None:
         # Create aligner to determine which character pronunciations are used in a word
         aligner = Aligner(joyo.new_char_to_prons)
         # Read initial vocab list
-        char_to_pron_to_vocab: Char2Pron2Words = get_edict_freq(aligner)
+        word_list: List[JpWord] = get_edict()
+        char_to_pron_to_vocab: Char2Pron2Words = index_vocab_jp(word_list, aligner)
         # Add mappings for old character glyphs
         old_char_to_words: Char2Pron2Words = {}
         for new_char, words in char_to_pron_to_vocab.items():

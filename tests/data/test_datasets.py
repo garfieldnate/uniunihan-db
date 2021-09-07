@@ -1,15 +1,18 @@
+from tests.lingua.jp.test_aligner import ALIGNER
 from uniunihan_db.data.datasets import (
     BaxterSagart,
-    ZhWord,
     get_baxter_sagart,
     get_cedict,
     get_ckip_20k,
+    get_edict,
     get_historical_on_yomi,
     get_joyo,
     get_unihan_variants,
     get_ytenx_rhymes,
     get_ytenx_variants,
+    index_vocab_jp,
 )
+from uniunihan_db.data.types import JpWord, ZhWord
 from uniunihan_db.data_paths import TEST_CORPUS_DIR
 
 
@@ -181,3 +184,34 @@ def test_get_unihan_variants():
         "㗖": {"啖", "啗", "噉"},
         "㘎": {"㘚"},
     }
+
+
+def test_get_edict():
+    words = get_edict(TEST_CORPUS_DIR / "edict_freq_sample.tsv")
+    assert words[0] == JpWord(
+        surface="植え替え",
+        pron="うえかえ",
+        english="(n) transplanting/transplantation",
+        frequency=18686,
+        alignable_surface="植エ替エ",
+        alignable_pron="ウエカエ",
+    )
+    assert [w.surface for w in words] == [
+        "植え替え",
+        "心配事",
+        "卒園",
+        "敵対",
+        "保湿",
+    ]
+
+
+def test_index_vocab_jp():
+    words = [
+        JpWord("", "", "", 0, alignable_surface="伴走", alignable_pron="バンソウ"),
+        JpWord("", "", "", 0, alignable_surface="同伴", alignable_pron="ドウハン"),
+        JpWord("", "", "", 0, alignable_surface="漢字", alignable_pron="カンジ"),
+    ]
+    char_to_pron_to_words = index_vocab_jp(words, ALIGNER)
+    assert len(char_to_pron_to_words) == 5
+    assert len(char_to_pron_to_words["伴"]) == 2
+    assert char_to_pron_to_words["伴"]["ハン"][0].alignable_surface == "同伴"

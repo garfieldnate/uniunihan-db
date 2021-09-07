@@ -1,3 +1,6 @@
+from typing import List, Mapping
+
+
 class Aligner:
     """A word/furigana character aligner for Japanese (katakana only)"""
 
@@ -36,7 +39,7 @@ class Aligner:
     KATAKANA_HIGH = int("30ff", 16)
     NO_SOKUON_ALLOWED = set("ンアイウエオ")
 
-    def __init__(self, char_to_prons):
+    def __init__(self, char_to_prons: Mapping[str, List[str]]):
         self.char_to_prons = char_to_prons
         self.sokuon = "ッ"
 
