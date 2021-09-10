@@ -13,6 +13,8 @@ Goal design:
 
 Topic: final output
 
+* Number the chapters/purity groups for easier navigation
+* continuous (but not intrusive) headers for language and purity group
 * output language-specific names of components (BS gives pinyin but not Japanese, etc.)
 * Get English keywords for components whose info is taken from ytenx
 * Use character normalization to retrieve more BS data for components: 从->從, etc., 瓶

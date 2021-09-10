@@ -15,6 +15,7 @@ from unihan_etl.process import export_json
 
 from uniunihan_db.data.types import Char2Pron2Words, JpWord, Word, ZhWord
 from uniunihan_db.data_paths import (
+    CEDICT_FILE,
     CEDICT_URL,
     CEDICT_ZIP,
     EDICT_FREQ_DIR,
@@ -396,15 +397,13 @@ def get_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
     return entries
 
 
-# Next: refactor like get_edict
 @cache
-def get_cedict(index_chars: bool = False, filter: bool = True) -> Char2Pron2Words:
+def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
     __download_cedict()
     log.info("Loading CEDICT data...")
-    cedict_file = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg" / "cedict_ts.u8"
-    num_words = 0
-    entries: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
-    with open(cedict_file) as f:
+
+    words: List[ZhWord] = []
+    with open(file) as f:
         for line in f.readlines():
             # skip comments or empty lines
             line = line.strip()
@@ -433,24 +432,28 @@ def get_cedict(index_chars: bool = False, filter: bool = True) -> Char2Pron2Word
             pron = pron.lstrip("[").rstrip("] ").lower()
             # frequency is TODO
             word = ZhWord(
-                surface=trad, pron=pron, english=en, frequency=0, simplified=simp
+                surface=trad, pron=pron, english=en, frequency=-1, simplified=simp
             )
+            words.append(word)
 
-            # store word
-            syllables = pron.split(" ")
-            # We can't automatically (simply) align many words, e.g. those with
-            # numbers or letters or multi-syllabic characters like ㍻. So we just
-            # remove these from the index altogether
-            if len(syllables) != len(trad):
-                continue
-                # raise ValueError(
-                #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
-                # )
-            num_words += 1
-            for c, pron in zip(trad, syllables):
-                entries[c][pron].append(word)
+    log.info(f"  Read {len(words)} entries from CEDICT")
+    return words
 
-    log.info(f"  Read {num_words} entries from CEDICT")
+
+def index_vocab_zh(words: List[ZhWord]) -> Char2Pron2Words:
+    entries: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
+    for word in words:
+        syllables = word.pron.split(" ")
+        # We can't automatically (simply) align many words, e.g. those with
+        # numbers or letters or multi-syllabic characters like ㍻. So we just
+        # remove these from the index altogether
+        if len(syllables) != len(word.surface):
+            continue
+            # raise ValueError(
+            #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
+            # )
+        for c, pron in zip(word.surface, syllables):
+            entries[c][pron].append(word)
     return entries
 
 

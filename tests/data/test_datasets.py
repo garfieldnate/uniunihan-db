@@ -11,6 +11,7 @@ from uniunihan_db.data.datasets import (
     get_ytenx_rhymes,
     get_ytenx_variants,
     index_vocab_jp,
+    index_vocab_zh,
 )
 from uniunihan_db.data.types import JpWord, ZhWord
 from uniunihan_db.data_paths import TEST_CORPUS_DIR
@@ -90,33 +91,6 @@ def test_get_ckip_20k() -> None:
             },
         ]
     }
-
-
-def test_get_cedict() -> None:
-    char_to_pron_to_word = get_cedict()
-    # Assuming the size of the dictionary will only grow over time
-    assert len(char_to_pron_to_word) >= 9997
-    assert (
-        sum(
-            len(words)
-            for pron2words in char_to_pron_to_word.values()
-            for words in pron2words.values()
-        )
-        >= 113420
-    )
-    # Ensure pronunciations are lower-cased and variants are ignored
-    assert len(char_to_pron_to_word["辯"]["bian4"]) == 53
-
-    assert (
-        ZhWord(
-            surface="一分一毫",
-            pron="yi1 fen1 yi1 hao2",
-            english="a tiny bit (idiom)/an iota",
-            frequency=0,
-            simplified="一分一毫",
-        )
-        in char_to_pron_to_word["分"]["fen1"]
-    )
 
 
 def test_get_joyo() -> None:
@@ -215,3 +189,40 @@ def test_index_vocab_jp():
     assert len(char_to_pron_to_words) == 5
     assert len(char_to_pron_to_words["伴"]) == 2
     assert char_to_pron_to_words["伴"]["ハン"][0].alignable_surface == "同伴"
+
+
+def test_get_cedict():
+    words = get_cedict(TEST_CORPUS_DIR / "cedict_sample.u8", filter=True)
+    assert words[0] == ZhWord(
+        surface="三文魚",
+        # also tests lowercasing
+        pron="san1 wen2 yu2",
+        english="salmon (loanword)",
+        frequency=-1,
+        simplified="三文鱼",
+    )
+    assert [w.surface for w in words] == [
+        "三文魚",
+        "伏虎",
+        "伏臥",
+    ]
+
+
+# TODO: mark as a larger test and only run sometimes
+def test_get_cedict_full() -> None:
+    words = get_cedict()
+    # Assuming the size of the dictionary will only grow over time
+    assert len(words) >= 113420
+
+
+def test_index_vocab_zh():
+    words = [
+        ZhWord("伏虎", "fu2 hu3", "", 0, ""),
+        ZhWord("伏輸", "fu2 shu1", "", 0, ""),
+        ZhWord("自己", "zi4 ji3", "", 0, ""),
+        ZhWord("梯己", "ti1 ji2", "", 0, ""),
+    ]
+    char_to_pron_to_words = index_vocab_zh(words)
+    assert len(char_to_pron_to_words) == 6
+    assert len(char_to_pron_to_words["己"]) == 2
+    assert char_to_pron_to_words["己"]["ji3"][0].surface == "自己"

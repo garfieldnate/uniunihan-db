@@ -14,6 +14,7 @@ TEST_CORPUS_DIR = PROJECT_DIR / "tests" / "corpus"
 CEDICT_URL = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.zip"
 CEDICT_ZIP = GENERATED_DATA_DIR / "cedict_1_0_ts_utf-8_mdbg.zip"
 CEDICT_DIR = CEDICT_ZIP.with_suffix("")
+CEDICT_FILE = CEDICT_DIR / "cedict_ts.u8"
 
 EDICT_FREQ_URL = "http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz"
 EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"

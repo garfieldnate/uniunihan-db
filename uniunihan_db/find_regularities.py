@@ -7,6 +7,7 @@ from typing import Any, DefaultDict, Dict, List, Mapping, Optional, Sequence, Se
 # allows commenting lines with # or //
 import commentjson as json
 
+from uniunihan_db.data.types import ZhWord
 from uniunihan_db.data_paths import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
@@ -28,6 +29,7 @@ from .data.datasets import (
     get_unihan,
     get_vocab_override,
     index_vocab_jp,
+    index_vocab_zh,
 )
 from .lingua.jp.aligner import Aligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
@@ -359,70 +361,82 @@ def main() -> None:
     comp_to_char = get_phonetic_components()
 
     if args.language == "jp":
-        # read initial character data
-        joyo = get_joyo()
-
-        # update character information with historical kana spellings
-        char_to_new_to_old_pron = get_historical_on_yomi()
-        for c, new_to_old_pron in char_to_new_to_old_pron.items():
-            if c_sup := joyo.char_to_supplementary_info.get(c):
-                c_sup["historical_pron"] = new_to_old_pron
-
-        # Compile a dictionary of characters to high frequency words which use them
-        # Old glyphs will be presented to the user in the end, but new glyphs are
-        # required for finding vocab.
-        # Create aligner to determine which character pronunciations are used in a word
-        aligner = Aligner(joyo.new_char_to_prons)
-        # Read initial vocab list
-        word_list: List[JpWord] = get_edict()
-        char_to_pron_to_vocab: Char2Pron2Words = index_vocab_jp(word_list, aligner)
-        # Add mappings for old character glyphs
-        old_char_to_words: Char2Pron2Words = {}
-        for new_char, words in char_to_pron_to_vocab.items():
-            for old_c in joyo.new_to_old(new_char):
-                old_char_to_words[old_c] = words
-        char_to_pron_to_vocab.update(old_char_to_words)
-        # Some words had to be specified manually instead of extracted from our downloaded dictionary
-        jp_vocab_override = get_vocab_override(JP_VOCAB_OVERRIDE)
-        char_to_pron_to_vocab.update(jp_vocab_override)
-
-        # Extract character groups and grade their pronunciation regularities
-        index = _index(joyo.old_char_to_prons, comp_to_char)
-        # 国字 do not have phonetic characters, but can be usefully learned together
-        index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
-
-        _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
-        _print_final_output_jp(
-            index,
-            char_to_pron_to_vocab,
-            joyo.char_to_supplementary_info,
-            out_dir,
-        )
+        main_jp(args, out_dir, comp_to_char)
     elif args.language == "zh-HK":
-        with open(HK_ED_CHARS_FILE) as f:
-            char_list = set(json.load(f))
-        char_to_pron_to_vocab = get_cedict(index_chars=True)
-        char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
-        _incorporate_ckip_freq_data(char_to_pron_to_vocab)
-        # # get chars to prons from unihan where
-        index = _index(char_to_pron_to_vocab, comp_to_char)
-        # char_to_pron_to_vocab = {}  # TODO
-        char_to_supplementary_info = _zh_supplementary_info(char_list)
-        _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
-        # Next: make this work
-
-        _print_final_output_zh(
-            index,
-            char_to_pron_to_vocab,
-            char_to_supplementary_info,
-            out_dir,
-        )
+        main_zh_hk(args, out_dir, comp_to_char)
     elif args.language == "ko":
-        with open(KO_ED_CHARS_FILE) as f:
-            char_list = set(json.load(f))
+        main_ko(args, out_dir, comp_to_char)
     else:
         log.error(f"Cannot handle language {args.language} yet")
         exit()
+
+
+def main_jp(args, out_dir, comp_to_char):
+    # read initial character data
+    joyo = get_joyo()
+
+    # update character information with historical kana spellings
+    char_to_new_to_old_pron = get_historical_on_yomi()
+    for c, new_to_old_pron in char_to_new_to_old_pron.items():
+        if c_sup := joyo.char_to_supplementary_info.get(c):
+            c_sup["historical_pron"] = new_to_old_pron
+
+    # Compile a dictionary of characters to high frequency words which use them
+    # Old glyphs will be presented to the user in the end, but new glyphs are
+    # required for finding vocab.
+    # Create aligner to determine which character pronunciations are used in a word
+    aligner = Aligner(joyo.new_char_to_prons)
+    # Read initial vocab list
+    word_list: List[JpWord] = get_edict()
+    char_to_pron_to_vocab: Char2Pron2Words = index_vocab_jp(word_list, aligner)
+    # Add mappings for old character glyphs
+    old_char_to_words: Char2Pron2Words = {}
+    for new_char, words in char_to_pron_to_vocab.items():
+        for old_c in joyo.new_to_old(new_char):
+            old_char_to_words[old_c] = words
+    char_to_pron_to_vocab.update(old_char_to_words)
+    # Some words had to be specified manually instead of extracted from our downloaded dictionary
+    jp_vocab_override = get_vocab_override(JP_VOCAB_OVERRIDE)
+    char_to_pron_to_vocab.update(jp_vocab_override)
+
+    # Extract character groups and grade their pronunciation regularities
+    index = _index(joyo.old_char_to_prons, comp_to_char)
+    # 国字 do not have phonetic characters, but can be usefully learned together
+    index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
+
+    _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
+    _print_final_output_jp(
+        index,
+        char_to_pron_to_vocab,
+        joyo.char_to_supplementary_info,
+        out_dir,
+    )
+
+
+def main_zh_hk(args, out_dir, comp_to_char):
+    with open(HK_ED_CHARS_FILE) as f:
+        char_list = set(json.load(f))
+    word_list: List[ZhWord] = get_cedict()
+    char_to_pron_to_vocab = index_vocab_zh(word_list)
+    char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
+    _incorporate_ckip_freq_data(char_to_pron_to_vocab)
+    # # get chars to prons from unihan where TODO
+    index = _index(char_to_pron_to_vocab, comp_to_char)
+    char_to_supplementary_info = _zh_supplementary_info(char_list)
+    _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
+
+    _print_final_output_zh(
+        index,
+        char_to_pron_to_vocab,
+        char_to_supplementary_info,
+        out_dir,
+    )
+
+
+def main_ko(args, out_dir, comp_to_char):
+    with open(KO_ED_CHARS_FILE) as f:
+        char_list = set(json.load(f))
+        print(char_list)
 
 
 if __name__ == "__main__":
