@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import MutableMapping, MutableSequence, Optional
+from typing import Collection, Mapping, MutableMapping, MutableSequence, Optional
 
 
 @dataclass
@@ -25,3 +25,5 @@ class ZhWord(Word):
 
 # character -> {pronunciation-> [words that use that character with that pronunciation]}
 Char2Pron2Words = MutableMapping[str, MutableMapping[str, MutableSequence[Word]]]
+
+StringToStrings = Mapping[str, Collection[str]]

@@ -1,7 +1,9 @@
 import abc
-from typing import Iterable, Mapping, Set, Tuple
+from typing import Set, Tuple
 
 import jaconv
+
+from uniunihan_db.data.types import StringToStrings
 
 
 class Aligner(metaclass=abc.ABCMeta):
@@ -68,7 +70,7 @@ class JpAligner(Aligner):
     KATAKANA_HIGH = int("30ff", 16)
     NO_SOKUON_ALLOWED = set("ンアイウエオ")
 
-    def __init__(self, char_to_prons: Mapping[str, Iterable[str]]):
+    def __init__(self, char_to_prons: StringToStrings):
         self.char_to_prons = char_to_prons
         self.sokuon = "ッ"
 

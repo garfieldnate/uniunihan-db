@@ -1,7 +1,9 @@
 import copy
 from collections import defaultdict
 from enum import IntEnum
-from typing import Collection, Iterable, Mapping, Sequence, Tuple
+from typing import Collection, Sequence, Tuple
+
+from uniunihan_db.data.datasets import StringToStrings
 
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
@@ -63,7 +65,7 @@ class PurityType(IntEnum):
     SINGLETON = (
         8,
         "loner",
-        "These groups each contain only one character. It is still of use to know the phonetic component, since it may be of use in learning new characters not treated here, or in relating pronunciations to those found in other languages.",
+        "These groups each contain only one character. It is still good to know the phonetic component, since it may be of use in learning new characters not treated here, in the same or other languages.",
     )
     # No pronunciations are available to judge the group's purity
     NO_PRONUNCIATIONS = (
@@ -74,7 +76,7 @@ class PurityType(IntEnum):
 
 
 class ComponentGroup:
-    def __init__(self, component: str, char_to_prons: Mapping[str, Iterable[str]]):
+    def __init__(self, component: str, char_to_prons: StringToStrings):
         """component: phonetic component common to all characters in the group
         char_to_prons: dict[char -> [pronunciations]] for all characters in the group"""
         self.component = component

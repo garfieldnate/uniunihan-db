@@ -1,6 +1,8 @@
+import json
 import logging
 import os
-from typing import Collection, Mapping, MutableMapping, TypeVar
+from json.encoder import JSONEncoder
+from typing import Any, Collection, Mapping, MutableMapping, TypeVar
 
 from uniunihan_db.data_paths import GENERATED_DATA_DIR
 
@@ -32,6 +34,30 @@ def filter_keys(d: Mapping[T, U], s: Collection[T]) -> MutableMapping[T, U]:
     return {k: v for k, v in d.items() if k in s}
 
 
+class ExtendedJsonEncoder(JSONEncoder):
+    """Serializes sets as sorted lists, and any other objects not handled by
+    the default JSON decoder as dictionaries with their fields as the keys."""
+
+    def default(self, obj: Any) -> object:
+        try:
+            return JSONEncoder.default(self, obj)
+        except TypeError:
+            if isinstance(obj, set):
+                return sorted(list(obj))
+            else:
+                return vars(obj)
+
+
+def format_json(data: object) -> str:
+    return json.dumps(
+        data,
+        cls=ExtendedJsonEncoder,
+        ensure_ascii=False,
+        indent=2,
+    )
+
+
+# TODO: move to datasets file?
 def get_mandarin_pronunciation(unihan_entry):
     # check all of the available fields in order of usefulness/accuracy
     if pron := unihan_entry.get("kHanyuPinlu"):

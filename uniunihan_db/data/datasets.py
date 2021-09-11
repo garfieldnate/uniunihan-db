@@ -5,7 +5,7 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
-from typing import Any, List, Mapping, Sequence, Set
+from typing import AbstractSet, Any, List, Mapping, MutableSet, TypeVar
 
 import commentjson
 import jaconv
@@ -13,7 +13,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
+from uniunihan_db.data.types import Char2Pron2Words, StringToStrings, Word, ZhWord
 from uniunihan_db.data_paths import (
     CEDICT_FILE,
     CEDICT_URL,
@@ -342,16 +342,12 @@ def get_ytenx_variants():
 
 
 @cache
-def get_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
+def get_ckip_20k() -> Mapping[str, Any]:
     ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
     log.info(f"Loading {ckip_path}")
 
-    if index_chars:
-        # char -> pronunciation -> word list
-        entries: Mapping[str, Any] = defaultdict(lambda: defaultdict(list))
-    else:
-        # surface form -> word list
-        entries = defaultdict(list)
+    # surface form -> word list
+    entries = defaultdict(list)
     with open(ckip_path) as f:
         num_words = 0
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
@@ -366,16 +362,7 @@ def get_ckip_20k(index_chars: bool = False) -> Mapping[str, Any]:
                 "en": r["meaning"],
             }
             num_words += 1
-            if index_chars:
-                syllables = pronunciation.split(" ")
-                if len(syllables) != len(word):
-                    raise ValueError(
-                        f"Number of pinyin syllables does not match number of characters: {word}/{pronunciation}"
-                    )
-                for c, pron in zip(word, syllables):
-                    entries[c][pron].append(word_dict)
-            else:
-                entries[word].append(word_dict)
+            entries[word].append(word_dict)
 
     log.info(f"  Read {num_words} words from CKIP frequency list")
     return entries
@@ -426,18 +413,18 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
 
 @dataclass
 class Joyo:
-    old_char_to_prons: Mapping[str, Sequence[str]]
-    new_char_to_prons: Mapping[str, Sequence[str]]
+    old_char_to_prons: StringToStrings
+    new_char_to_prons: StringToStrings
     char_to_supplementary_info: Mapping[str, Mapping[str, Any]]
 
     def __post_init__(self) -> None:
-        self._new_to_old: Mapping[str, Set[str]] = defaultdict(set)
+        self._new_to_old: Mapping[str, MutableSet[str]] = defaultdict(set)
         for c_sup in self.char_to_supplementary_info.values():
             new_c = c_sup["new"]
             old_c = c_sup["old"] or c_sup["new"]
             self._new_to_old[new_c].add(old_c)
 
-    def new_to_old(self, new_char: str) -> Set[str]:
+    def new_to_old(self, new_char: str) -> AbstractSet[str]:
         return self._new_to_old[new_char]
 
 
@@ -451,7 +438,7 @@ def get_joyo():
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
         for r in rows:
-            kun_yomi = [yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi]
+            kun_yomi = {yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi}
             supplementary_info = {
                 "keyword": r["English_meaning"],
                 "kun_yomi": kun_yomi,
@@ -461,13 +448,13 @@ def get_joyo():
                 "old": None,
             }
             # remove empty readings
-            readings = [yomi for yomi in r["on-yomi"].split("|") if yomi]
+            readings = {yomi for yomi in r["on-yomi"].split("|") if yomi}
             # note the non-Joyo readings and strip the indicator asterisk
-            supplementary_info["non_joyo"] = [
+            supplementary_info["non_joyo"] = {
                 yomi[:-1] for yomi in readings if yomi[-1] == "*"
-            ]
-            readings = [yomi.rstrip("*") for yomi in readings if yomi]
-            supplementary_info["readings"] = sorted(readings)
+            }
+            readings = {yomi.rstrip("*") for yomi in readings if yomi}
+            supplementary_info["readings"] = readings
 
             new_c = r["new"]
             new_char_to_prons[new_c] = readings
@@ -484,7 +471,7 @@ def get_joyo():
 
 
 @cache
-def get_phonetic_components():
+def get_phonetic_components() -> StringToStrings:
     log.info("Loading phonetic components...")
     comp_to_char = {}
     with open(GENERATED_DATA_DIR / "components_to_chars.tsv") as f:
@@ -497,7 +484,10 @@ def get_phonetic_components():
     return comp_to_char
 
 
-def index_vocab(words: List[Word], aligner: Aligner) -> Char2Pron2Words:
+W = TypeVar("W", bound=Word)
+
+
+def index_vocab(words: List[W], aligner: Aligner) -> Char2Pron2Words:
     char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
     for word in words:
         alignment = aligner.align(word.surface, word.pron)

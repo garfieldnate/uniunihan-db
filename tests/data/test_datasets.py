@@ -78,19 +78,6 @@ def test_get_ckip_20k() -> None:
         },
     ]
 
-    ckip_20k = get_ckip_20k(index_chars=True)
-    assert len(ckip_20k) == 3499
-    assert ckip_20k["黴"] == {
-        "mei2": [
-            {
-                "en": "family_Aspergillaceae",
-                "freq": 11,
-                "pron": "mei2 jun4",
-                "surface": "黴菌",
-            },
-        ]
-    }
-
 
 def test_get_joyo() -> None:
     joyo = get_joyo()
@@ -102,23 +89,23 @@ def test_get_joyo() -> None:
 
     assert joyo.char_to_supplementary_info["辯"] == {
         "keyword": "articulate",
-        "kun_yomi": [],
+        "kun_yomi": set(),
         "grade": "5",
         "strokes": "5",
         "new": "弁",
-        "non_joyo": [],
-        "readings": ["ベン"],
+        "non_joyo": set(),
+        "readings": {"ベン"},
         "old": "辯",
     }
     # make sure these are properly recognized as separate characters
     assert joyo.char_to_supplementary_info["辮"]["old"] == "辮"
-    assert joyo.char_to_supplementary_info["和"]["non_joyo"] == ["オ"]
+    assert joyo.char_to_supplementary_info["和"]["non_joyo"] == {"オ"}
 
-    assert joyo.new_char_to_prons["労"] == ["ロウ"]
+    assert joyo.new_char_to_prons["労"] == {"ロウ"}
 
-    assert joyo.old_char_to_prons["勞"] == ["ロウ"]
+    assert joyo.old_char_to_prons["勞"] == {"ロウ"}
     # new glyph is used if old one not available
-    assert joyo.old_char_to_prons["老"] == ["ロウ"]
+    assert joyo.old_char_to_prons["老"] == {"ロウ"}
 
     # 1-to-many new-to-old mappings should be listed in a separate row for each variant
     assert all(
@@ -136,7 +123,7 @@ def test_get_joyo() -> None:
 
     assert set("辨瓣辯辦辮") == joyo.new_to_old("弁")
 
-    assert joyo.char_to_supplementary_info["抱"]["kun_yomi"] == ["だ-く", "いだ-く", "かか-える"]
+    assert joyo.char_to_supplementary_info["抱"]["kun_yomi"] == {"だ-く", "いだ-く", "かか-える"}
 
 
 def test_get_historical_on_yomi():

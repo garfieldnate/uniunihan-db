@@ -1,13 +1,13 @@
 import argparse
 from collections import OrderedDict, defaultdict
-from dataclasses import dataclass
-from json import JSONEncoder
-from typing import Any, DefaultDict, Dict, List, Mapping, Optional, Sequence, Set
+from typing import DefaultDict, List
 
 # allows commenting lines with # or //
 import commentjson as json
 
-from uniunihan_db.data.types import ZhWord
+from uniunihan_db.component.group import ComponentGroup
+from uniunihan_db.component.index import ComponentGroupIndex, find_component_groups
+from uniunihan_db.data.types import Char2Pron2Words, ZhWord
 from uniunihan_db.data_paths import (
     GENERATED_DATA_DIR,
     HK_ED_CHARS_FILE,
@@ -15,9 +15,8 @@ from uniunihan_db.data_paths import (
     KO_ED_CHARS_FILE,
 )
 
-from .component_group import ComponentGroup, PurityType
 from .data.datasets import (
-    Char2Pron2Words,
+    StringToStrings,
     Word,
     get_cedict,
     get_ckip_20k,
@@ -31,158 +30,30 @@ from .data.datasets import (
 )
 from .lingua.aligner import JpAligner, SpaceAligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
-from .util import configure_logging, filter_keys
+from .util import configure_logging, filter_keys, format_json
 
 log = configure_logging(__name__)
 
 OUTPUT_DIR = GENERATED_DATA_DIR / "regularities"
 
 
-class CustomJsonEncoder(JSONEncoder):
-    """Handles structures that the default encoder cannot,
-    then delegates everything else to the default encoder"""
+def _report_missing_words(
+    index: ComponentGroupIndex, char_to_prons, char_to_pron_to_vocab, out_dir
+):
 
-    def default(self, obj: Any) -> object:
-        if isinstance(obj, set):
-            return list(obj)
-        elif isinstance(obj, ComponentGroup):
-            return vars(obj)
-        elif isinstance(obj, Word):
-            return vars(obj)
-
-        return JSONEncoder.default(self, obj)
-
-
-def _incorporate_ckip_freq_data(char_to_pron_to_words) -> None:
-    ckip20k_entries = get_ckip_20k()
-    for pron_to_words in char_to_pron_to_words.values():
-        for words in pron_to_words.values():
-            for w in words:
-                if w_with_freq := ckip20k_entries.get(w.surface):
-                    # use first entry (highest frequency)
-                    w.frequency = w_with_freq[0]["freq"]
-            # sort words descending by frequency and then orthographically
-            words.sort(key=lambda w: (-w.frequency, w.surface))
-
-
-def _zh_supplementary_info(char_list):
-    unihan = get_unihan()
-    sup_info = defaultdict(dict)
-    for char in char_list:
-        sup_info[char]["trad"] = char
-        if simplified := unihan[char].get("kSimplifiedVariant", []):
-            sup_info[char]["simp"] = simplified
-
-    return sup_info
-
-
-@dataclass
-class Index:
-    groups: List[ComponentGroup]
-    # char -> pronuncitions
-    char_to_prons: Mapping[str, Sequence[str]]
-    # unique pronunciations and their corresponding character
-    unique_pron_to_char: Mapping[str, str]
-    # characters without any pronunciations
-    no_pron_chars: Set[str]
-    # characters with no pronunciation components
-    no_comp_chars: Set[str]
-
-
-def _index(char_to_prons, comp_to_char) -> Index:
-    # Group and classify characters by component
-    chars_assigned_to_a_group = set()
-    groups = []
-    for component, chars in comp_to_char.items():
-        # comp_to_char likely contains way more characters than we need
-        chars = {c for c in chars if c in char_to_prons}
-        if not chars:
-            continue
-        c2p = {c: prons for c, prons in char_to_prons.items() if c in chars}
-        group = ComponentGroup(
-            component,
-            c2p,
-        )
-        groups.append(group)
-        chars_assigned_to_a_group.update(chars)
-
-    # find characters with no assigned group
-    all_chars = set(char_to_prons.keys())
-    chars_with_no_group = all_chars - chars_assigned_to_a_group
-
-    # Find characters with no listed pronunciations
-    no_pron_chars = set()
-    for char, prons in char_to_prons.items():
-        if not prons:
-            no_pron_chars.add(char)
-    no_pron_chars -= chars_with_no_group
-
-    # get unique character readings
-    pron_to_chars = defaultdict(set)
-    for char, char_prons in char_to_prons.items():
-        for char_pron in char_prons:
-            pron_to_chars[char_pron].add(char)
-    unique_readings = {
-        pron: next(iter(chars))
-        for pron, chars in pron_to_chars.items()
-        if len(chars) == 1
-    }
-
-    return Index(
-        groups,
-        char_to_prons,
-        unique_readings,
-        no_pron_chars,
-        chars_with_no_group,
-    )
-
-
-def _format_json(data: object) -> str:
-    return json.dumps(
-        data,
-        cls=CustomJsonEncoder,
-        ensure_ascii=False,
-        indent=2,
-    )
-
-
-def _print_reports(index: Index, char_to_prons, char_to_pron_to_vocab, out_dir) -> None:
-    purity_to_chars = defaultdict(set)
-    purity_to_groups: Dict[PurityType, int] = defaultdict(int)
     missing_words = set()
     for g in index.groups:
-        purity_to_chars[g.purity_type].update(g.chars)
-        purity_to_groups[g.purity_type] += 1
         for c in g.chars:
             missing = set(char_to_prons[c]) - set(char_to_pron_to_vocab[c].keys())
             for p in missing:
                 missing_words.add(f"{c}/{p}")
 
-    if index.no_comp_chars:
-        log.warn(
-            f"{len(index.no_comp_chars)} characters with no phonetic component: {index.no_comp_chars}"
-        )
-    if index.no_pron_chars:
-        log.warn(
-            f"{len(index.no_pron_chars)} characters with no pronunciations: {index.no_pron_chars}"
-        )
     if missing_words:
         log.warn(f"Missing vocab for {len(missing_words)} char/pron pairs")
-    log.info(f"{len(index.unique_pron_to_char)} characters with unique readings")
 
-    log.info(f"{len(index.groups)} total groups:")
-    for purity_type in PurityType:
-        log.info(
-            f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
-        )
-
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "unique_readings.json", "w") as f:
-        # Characters with unique on'yomi (for the joyo data)
-        f.write(_format_json(index.unique_pron_to_char))
     with open(out_dir / "missing_words.json", "w") as f:
         # Character/pronunciation pairs for which no vocab examples could be found
-        f.write(_format_json(sorted(list(missing_words))))
+        f.write(format_json(sorted(list(missing_words))))
 
 
 def _print_final_output_jp(
@@ -201,7 +72,7 @@ def _print_final_output_jp(
                 pron_entries = []
                 for pron in c_sup["readings"]:
                     vocab_list = char_to_pron_to_vocab[c].get(pron, [])
-                    vocab: Optional[Word] = None
+                    vocab: Word
                     if vocab_list:
                         # find a multi-char word if possible
                         try:
@@ -252,7 +123,7 @@ def _print_final_output_jp(
     final = OrderedDict(sorted(purity_2_groups.items(), key=lambda kv: kv[0]))
 
     with open(out_dir / "final_output.json", "w") as f:
-        f.write(_format_json(final))
+        f.write(format_json(final))
 
 
 def _print_final_output_zh(
@@ -296,10 +167,7 @@ def _print_final_output_zh(
                     #     pron_entry["historical"] = old_pron
                     pron_entries.append(pron_entry)
                 # sort pronunciations by vocab frequency and then alphabetically
-                pron_entries.sort(
-                    key=pron_entry_sort_key
-                    # key=lambda item: (-item["vocab"].frequency, item["pron"])
-                )
+                pron_entries.sort(key=pron_entry_sort_key)
                 c_entry = {"prons": pron_entries}
                 c_entry.update(c_sup)
                 # already added this in pronunciation entries
@@ -339,7 +207,7 @@ def _print_final_output_zh(
     final = OrderedDict(sorted(purity_2_groups.items(), key=lambda kv: kv[0]))
 
     with open(out_dir / "final_output.json", "w") as f:
-        f.write(_format_json(final))
+        f.write(format_json(final))
 
 
 def main() -> None:
@@ -369,7 +237,7 @@ def main() -> None:
         exit()
 
 
-def main_jp(args, out_dir, comp_to_char):
+def main_jp(args, out_dir, comp_to_char: StringToStrings):
     # read initial character data
     joyo = get_joyo()
 
@@ -388,11 +256,10 @@ def main_jp(args, out_dir, comp_to_char):
 
     # Read initial vocab list
     word_list: List[Word] = get_edict_freq()
-
     char_to_pron_to_vocab: Char2Pron2Words = index_vocab(word_list, aligner)
 
     # Add mappings for old character glyphs
-    old_char_to_words: Char2Pron2Words = {}
+    old_char_to_words = {}
     for new_char, words in char_to_pron_to_vocab.items():
         for old_c in joyo.new_to_old(new_char):
             old_char_to_words[old_c] = words
@@ -403,11 +270,12 @@ def main_jp(args, out_dir, comp_to_char):
     char_to_pron_to_vocab.update(jp_vocab_override)
 
     # Extract character groups and grade their pronunciation regularities
-    index = _index(joyo.old_char_to_prons, comp_to_char)
+    index = find_component_groups(joyo.old_char_to_prons, comp_to_char)
     # 国字 do not have phonetic characters, but can be usefully learned together
     index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
+    index.log_diagnostics(log, out_dir)
+    _report_missing_words(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
 
-    _print_reports(index, joyo.old_char_to_prons, char_to_pron_to_vocab, out_dir)
     _print_final_output_jp(
         index,
         char_to_pron_to_vocab,
@@ -416,17 +284,40 @@ def main_jp(args, out_dir, comp_to_char):
     )
 
 
-def main_zh_hk(args, out_dir, comp_to_char):
+def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
+    ckip20k_entries = get_ckip_20k()
+    for w in words:
+        if w_with_freq := ckip20k_entries.get(w.surface):
+            # use first entry (highest frequency)
+            w.frequency = w_with_freq[0]["freq"]
+    # sort words descending by frequency and then orthographically
+    words.sort(key=lambda w: (-w.frequency, w.surface))
+
+
+def _zh_supplementary_info(char_list):
+    unihan = get_unihan()
+    sup_info = defaultdict(dict)
+    for char in char_list:
+        sup_info[char]["trad"] = char
+        if simplified := unihan[char].get("kSimplifiedVariant", []):
+            sup_info[char]["simp"] = simplified
+
+    return sup_info
+
+
+def main_zh_hk(args, out_dir, comp_to_char: StringToStrings):
     with open(HK_ED_CHARS_FILE) as f:
         char_list = set(json.load(f))
     word_list: List[ZhWord] = get_cedict()
+    _incorporate_ckip_freq_data(word_list)
     char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
     char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
-    _incorporate_ckip_freq_data(char_to_pron_to_vocab)
-    # # get chars to prons from unihan where TODO
-    index = _index(char_to_pron_to_vocab, comp_to_char)
+    # get chars to prons from unihan where TODO
+    index = find_component_groups(char_to_pron_to_vocab, comp_to_char)
+    index.log_diagnostics(log, out_dir)
+    _report_missing_words(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
+
     char_to_supplementary_info = _zh_supplementary_info(char_list)
-    _print_reports(index, char_to_pron_to_vocab, char_to_pron_to_vocab, out_dir)
 
     _print_final_output_zh(
         index,
