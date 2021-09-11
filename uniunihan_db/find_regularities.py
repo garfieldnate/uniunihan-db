@@ -31,7 +31,7 @@ from .data.datasets import (
     index_vocab_jp,
     index_vocab_zh,
 )
-from .lingua.jp.aligner import Aligner
+from .lingua.aligner import JpAligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
 from .util import configure_logging, filter_keys
 
@@ -385,7 +385,7 @@ def main_jp(args, out_dir, comp_to_char):
     # Old glyphs will be presented to the user in the end, but new glyphs are
     # required for finding vocab.
     # Create aligner to determine which character pronunciations are used in a word
-    aligner = Aligner(joyo.new_char_to_prons)
+    aligner = JpAligner(joyo.new_char_to_prons)
     # Read initial vocab list
     word_list: List[JpWord] = get_edict()
     char_to_pron_to_vocab: Char2Pron2Words = index_vocab_jp(word_list, aligner)

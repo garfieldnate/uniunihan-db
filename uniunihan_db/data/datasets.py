@@ -32,7 +32,9 @@ from uniunihan_db.data_paths import (
     SIMPLIFIED_EDICT_FREQ,
     UNIHAN_FILE,
 )
-from uniunihan_db.lingua.jp.aligner import Aligner
+
+# TODO: move out of jp package
+from uniunihan_db.lingua.aligner import Aligner, SpaceAligner
 from uniunihan_db.util import configure_logging
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
@@ -442,17 +444,9 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
 
 def index_vocab_zh(words: List[ZhWord]) -> Char2Pron2Words:
     entries: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
+    aligner = SpaceAligner()
     for word in words:
-        syllables = word.pron.split(" ")
-        # We can't automatically (simply) align many words, e.g. those with
-        # numbers or letters or multi-syllabic characters like ㍻. So we just
-        # remove these from the index altogether
-        if len(syllables) != len(word.surface):
-            continue
-            # raise ValueError(
-            #     f"Number of pinyin syllables does not match number of characters: {len(trad)} ({trad}) != {len(pron)} ({pron})"
-            # )
-        for c, pron in zip(word.surface, syllables):
+        for c, pron in aligner.align(word.surface, word.pron):
             entries[c][pron].append(word)
     return entries
 
@@ -563,13 +557,13 @@ def get_edict(file=SIMPLIFIED_EDICT_FREQ) -> List[JpWord]:
     return words
 
 
+# TODO: combine with index_vocab_zh; generalize aligner into ABC/interface
 def index_vocab_jp(words: List[JpWord], aligner: Aligner) -> Char2Pron2Words:
     char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
     for word in words:
         alignment = aligner.align(word.alignable_surface, word.alignable_pron)
-        if alignment:
-            for c, pron in alignment.items():
-                char_to_pron_to_words[c][pron].append(word)
+        for c, pron in alignment:
+            char_to_pron_to_words[c][pron].append(word)
     return char_to_pron_to_words
 
 

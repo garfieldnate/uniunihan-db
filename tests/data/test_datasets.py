@@ -1,4 +1,4 @@
-from tests.lingua.jp.test_aligner import ALIGNER
+from tests.lingua.test_aligner import TestJpAligner
 from uniunihan_db.data.datasets import (
     BaxterSagart,
     get_baxter_sagart,
@@ -185,7 +185,7 @@ def test_index_vocab_jp():
         JpWord("", "", "", 0, alignable_surface="同伴", alignable_pron="ドウハン"),
         JpWord("", "", "", 0, alignable_surface="漢字", alignable_pron="カンジ"),
     ]
-    char_to_pron_to_words = index_vocab_jp(words, ALIGNER)
+    char_to_pron_to_words = index_vocab_jp(words, TestJpAligner.ALIGNER)
     assert len(char_to_pron_to_words) == 5
     assert len(char_to_pron_to_words["伴"]) == 2
     assert char_to_pron_to_words["伴"]["ハン"][0].alignable_surface == "同伴"
