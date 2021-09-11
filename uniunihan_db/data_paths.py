@@ -20,7 +20,6 @@ EDICT_FREQ_URL = "http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.g
 EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"
 EDICT_FREQ_DIR = EDICT_FREQ_TARBALL.with_suffix("").with_suffix("")
 EDICT_FREQ_FILE = EDICT_FREQ_DIR / "edict-freq-20081002"
-SIMPLIFIED_EDICT_FREQ = GENERATED_DATA_DIR / "edict-freq.tsv"
 
 JUN_DA_CHAR_FREQ_URL = (
     "https://lingua.mtsu.edu/chinese-computing/statistics/char/list.php"

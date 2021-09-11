@@ -18,20 +18,18 @@ from uniunihan_db.data_paths import (
 from .component_group import ComponentGroup, PurityType
 from .data.datasets import (
     Char2Pron2Words,
-    JpWord,
     Word,
     get_cedict,
     get_ckip_20k,
-    get_edict,
+    get_edict_freq,
     get_historical_on_yomi,
     get_joyo,
     get_phonetic_components,
     get_unihan,
     get_vocab_override,
-    index_vocab_jp,
-    index_vocab_zh,
+    index_vocab,
 )
-from .lingua.aligner import JpAligner
+from .lingua.aligner import JpAligner, SpaceAligner
 from .lingua.mandarin import pinyin_numbers_to_tone_marks
 from .util import configure_logging, filter_keys
 
@@ -285,7 +283,7 @@ def _print_final_output_zh(
                         word = next(filter(lambda w: len(w.surface) > 1, vocab_list))
                     except StopIteration:
                         word = vocab_list[0]
-                    # TODO: convert pronunciation string earlier
+                    # TODO: convert pronunciation string later
                     pron = pinyin_numbers_to_tone_marks(pron)
                     word.pron = pinyin_numbers_to_tone_marks(word.pron)
                     highest_freq = max(highest_freq, word.frequency)
@@ -384,18 +382,23 @@ def main_jp(args, out_dir, comp_to_char):
     # Compile a dictionary of characters to high frequency words which use them
     # Old glyphs will be presented to the user in the end, but new glyphs are
     # required for finding vocab.
+
     # Create aligner to determine which character pronunciations are used in a word
     aligner = JpAligner(joyo.new_char_to_prons)
+
     # Read initial vocab list
-    word_list: List[JpWord] = get_edict()
-    char_to_pron_to_vocab: Char2Pron2Words = index_vocab_jp(word_list, aligner)
+    word_list: List[Word] = get_edict_freq()
+
+    char_to_pron_to_vocab: Char2Pron2Words = index_vocab(word_list, aligner)
+
     # Add mappings for old character glyphs
     old_char_to_words: Char2Pron2Words = {}
     for new_char, words in char_to_pron_to_vocab.items():
         for old_c in joyo.new_to_old(new_char):
             old_char_to_words[old_c] = words
     char_to_pron_to_vocab.update(old_char_to_words)
-    # Some words had to be specified manually instead of extracted from our downloaded dictionary
+
+    # Some words have to be specified manually instead of extracted from our downloaded dictionary
     jp_vocab_override = get_vocab_override(JP_VOCAB_OVERRIDE)
     char_to_pron_to_vocab.update(jp_vocab_override)
 
@@ -417,7 +420,7 @@ def main_zh_hk(args, out_dir, comp_to_char):
     with open(HK_ED_CHARS_FILE) as f:
         char_list = set(json.load(f))
     word_list: List[ZhWord] = get_cedict()
-    char_to_pron_to_vocab = index_vocab_zh(word_list)
+    char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
     char_to_pron_to_vocab = filter_keys(char_to_pron_to_vocab, char_list)
     _incorporate_ckip_freq_data(char_to_pron_to_vocab)
     # # get chars to prons from unihan where TODO

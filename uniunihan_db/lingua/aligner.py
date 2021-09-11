@@ -1,6 +1,8 @@
 import abc
 from typing import Iterable, Mapping, Set, Tuple
 
+import jaconv
+
 
 class Aligner(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -29,7 +31,7 @@ class SpaceAligner(Aligner):
 
 
 class JpAligner(Aligner):
-    """A word/furigana character aligner for Japanese (katakana only)"""
+    """A word/furigana character aligner for Japanese"""
 
     RENDAKU = {
         "カ": "ガ",
@@ -72,8 +74,19 @@ class JpAligner(Aligner):
 
     def align(self, surface: str, phonetic_spelling: str) -> Set[Tuple[str, str]]:
         """Recursively construct a set of (char, pronunciation) mappings for the
-        characters in surface and the pronunciation in phonetic_spelling.
-        This implementation is very specific to the project's current needs, and is limited."""
+        characters in surface and the pronunciation in phonetic_spelling. All returned
+        pronunciations are in katakana."""
+
+        # Convert all hiragana to katakana for matching purposes
+        alignable_surface = jaconv.hira2kata(surface)
+        alignable_pron = jaconv.hira2kata(phonetic_spelling)
+
+        return self.__align(
+            alignable_surface,
+            alignable_pron,
+        )
+
+    def __align(self, surface, word_pron):
         if surface:
             char = surface[0]
             # if surface char is katakana, align with identical katakana in pronunciation;
@@ -91,37 +104,33 @@ class JpAligner(Aligner):
                 matching_kana = False
             for pron in prons:
                 matched_pron = None
-                if phonetic_spelling.startswith(pron):
+                if word_pron.startswith(pron):
                     matched_pron = pron
                 # test for sokuon, e.g. little っ
                 elif (
-                    phonetic_spelling.startswith(pron[:-1] + self.sokuon)
+                    word_pron.startswith(pron[:-1] + self.sokuon)
                     and pron[-1] not in JpAligner.NO_SOKUON_ALLOWED
                 ):
                     matched_pron = pron[:-1] + self.sokuon
                 # test for rendaku, e.g. added tenten
-                elif pron[
-                    0
-                ] in JpAligner.RENDAKU.keys() and phonetic_spelling.startswith(
+                elif pron[0] in JpAligner.RENDAKU.keys() and word_pron.startswith(
                     JpAligner.RENDAKU[pron[0]] + pron[1:]
                 ):
                     matched_pron = JpAligner.RENDAKU[pron[0]] + pron[1:]
                 # test for renpandaku, e.g. added maru (I made that word up)
-                elif pron[
-                    0
-                ] in JpAligner.RENPANDAKU.keys() and phonetic_spelling.startswith(
+                elif pron[0] in JpAligner.RENPANDAKU.keys() and word_pron.startswith(
                     JpAligner.RENPANDAKU[pron[0]] + pron[1:]
                 ):
                     matched_pron = JpAligner.RENPANDAKU[pron[0]] + pron[1:]
                 if matched_pron:
                     # base case: this character must map to this pronunciation
-                    if len(phonetic_spelling) == len(matched_pron):
+                    if len(word_pron) == len(matched_pron):
                         if matching_kana:
                             return set()
                         return {(char, pron)}
                     # recurse to see if this pronunciation gives a viable alignment
-                    if alignment := self.align(
-                        surface[1:], phonetic_spelling.removeprefix(matched_pron)
+                    if alignment := self.__align(
+                        surface[1:], word_pron.removeprefix(matched_pron)
                     ):
                         # if successful and match is a kanji, add this char->pron mapping to the alignment and return it
                         if not matching_kana:

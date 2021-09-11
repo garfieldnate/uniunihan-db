@@ -13,7 +13,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from uniunihan_db.data.types import Char2Pron2Words, JpWord, Word, ZhWord
+from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
 from uniunihan_db.data_paths import (
     CEDICT_FILE,
     CEDICT_URL,
@@ -29,12 +29,9 @@ from uniunihan_db.data_paths import (
     LIB_HANGUL_DIR,
     LIB_HANGUL_URL,
     LIB_HANGUL_ZIP_FILE,
-    SIMPLIFIED_EDICT_FREQ,
     UNIHAN_FILE,
 )
-
-# TODO: move out of jp package
-from uniunihan_db.lingua.aligner import Aligner, SpaceAligner
+from uniunihan_db.lingua.aligner import Aligner
 from uniunihan_db.util import configure_logging
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
@@ -138,43 +135,28 @@ def __download_edict_freq():
         tar.close()
 
 
-def generate_simplified_edict_freq(out_file=SIMPLIFIED_EDICT_FREQ):
-    """Simplify and re-write EDICT frequency data"""
-
-    if out_file.exists() and out_file.stat().st_size > 0:
-        log.info(f"{out_file.name} already exists; skipping generation")
-        return
+def get_edict_freq(file=EDICT_FREQ_FILE):
+    """Retrieve Utsumi Hiroshi's frequency-annotated EDICT data"""
 
     __download_edict_freq()
 
-    log.info(f"Reading EDICT frequency data from {EDICT_FREQ_FILE}...")
+    log.info(f"Reading EDICT frequency data from {file}...")
     words = []
-    with open(EDICT_FREQ_FILE) as f:
+    with open(file) as f:
         for line in f.readlines()[1:]:
             word = line.split(" ")[0]
-            word_normalized = jaconv.hira2kata(word)
             freq = int(line.split("#")[-1][:-2])
             english = "/".join(line.split("/")[1:-2])
             if "[" not in line:
                 # line contains no kanji
                 continue
             pron = line.split("[")[1].split("]")[0]
-            # use Katakana to match other phonetic sources
-            pron_katakana = jaconv.hira2kata(pron)
             # negative frequency to sort descending
-            words.append((-freq, word, word_normalized, pron_katakana, pron, english))
+            words.append((-freq, word, pron, english))
 
     output = []
-    for (freq, word, word_normalized, pron_katakana, pron, english) in sorted(words):
-        output.append(
-            JpWord(word, pron, english, -freq, word_normalized, pron_katakana)
-        )
-
-    with open(out_file, "w") as f:
-        for word in output:
-            f.write(
-                f"{word.surface}\t{word.alignable_surface}\t{word.frequency}\t{word.english}\t{word.pron}\t{word.alignable_pron}\n"
-            )
+    for (freq, word, pron, english) in sorted(words):
+        output.append(Word(word, pron, english, -freq))
 
     return output
 
@@ -442,15 +424,6 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
     return words
 
 
-def index_vocab_zh(words: List[ZhWord]) -> Char2Pron2Words:
-    entries: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
-    aligner = SpaceAligner()
-    for word in words:
-        for c, pron in aligner.align(word.surface, word.pron):
-            entries[c][pron].append(word)
-    return entries
-
-
 @dataclass
 class Joyo:
     old_char_to_prons: Mapping[str, Sequence[str]]
@@ -524,44 +497,10 @@ def get_phonetic_components():
     return comp_to_char
 
 
-@cache
-def get_edict(file=SIMPLIFIED_EDICT_FREQ) -> List[JpWord]:
-    generate_simplified_edict_freq(out_file=file)
-
-    log.info("Loading EDICT frequency list...")
-    words = []
-    with open(file) as f:
-        num_entries = 0
-        for line in f.readlines():
-            line = line.strip()
-            (
-                surface,
-                surface_normalized,
-                frequency,
-                english,
-                phonetic_spelling,
-                pronunciation,
-            ) = line.split("\t")
-            word = JpWord(
-                surface,
-                phonetic_spelling,
-                english,
-                int(frequency),
-                surface_normalized,
-                pronunciation,
-            )
-            words.append(word)
-            num_entries += 1
-        log.info(f"  Read {num_entries} entries from EDICT frequency list")
-
-    return words
-
-
-# TODO: combine with index_vocab_zh; generalize aligner into ABC/interface
-def index_vocab_jp(words: List[JpWord], aligner: Aligner) -> Char2Pron2Words:
+def index_vocab(words: List[Word], aligner: Aligner) -> Char2Pron2Words:
     char_to_pron_to_words: Char2Pron2Words = defaultdict(lambda: defaultdict(list))
     for word in words:
-        alignment = aligner.align(word.alignable_surface, word.alignable_pron)
+        alignment = aligner.align(word.surface, word.pron)
         for c, pron in alignment:
             char_to_pron_to_words[c][pron].append(word)
     return char_to_pron_to_words

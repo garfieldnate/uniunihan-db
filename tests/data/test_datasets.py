@@ -1,20 +1,19 @@
-from tests.lingua.test_aligner import TestJpAligner
 from uniunihan_db.data.datasets import (
     BaxterSagart,
     get_baxter_sagart,
     get_cedict,
     get_ckip_20k,
-    get_edict,
+    get_edict_freq,
     get_historical_on_yomi,
     get_joyo,
     get_unihan_variants,
     get_ytenx_rhymes,
     get_ytenx_variants,
-    index_vocab_jp,
-    index_vocab_zh,
+    index_vocab,
 )
-from uniunihan_db.data.types import JpWord, ZhWord
+from uniunihan_db.data.types import Word, ZhWord
 from uniunihan_db.data_paths import TEST_CORPUS_DIR
+from uniunihan_db.lingua.aligner import SpaceAligner
 
 
 def test_get_ytenx_rhymes():
@@ -160,15 +159,13 @@ def test_get_unihan_variants():
     }
 
 
-def test_get_edict():
-    words = get_edict(TEST_CORPUS_DIR / "edict_freq_sample.tsv")
-    assert words[0] == JpWord(
+def test_get_edict_freq():
+    words = get_edict_freq(TEST_CORPUS_DIR / "edict_freq_sample.txt")
+    assert words[0] == Word(
         surface="植え替え",
         pron="うえかえ",
         english="(n) transplanting/transplantation",
         frequency=18686,
-        alignable_surface="植エ替エ",
-        alignable_pron="ウエカエ",
     )
     assert [w.surface for w in words] == [
         "植え替え",
@@ -179,16 +176,17 @@ def test_get_edict():
     ]
 
 
-def test_index_vocab_jp():
+def test_index_vocab():
     words = [
-        JpWord("", "", "", 0, alignable_surface="伴走", alignable_pron="バンソウ"),
-        JpWord("", "", "", 0, alignable_surface="同伴", alignable_pron="ドウハン"),
-        JpWord("", "", "", 0, alignable_surface="漢字", alignable_pron="カンジ"),
+        Word("伴走", "ban sou", "", 0),
+        Word("同伴", "dou han", "", 0),
+        Word("漢字", "kan ji", "", 0),
     ]
-    char_to_pron_to_words = index_vocab_jp(words, TestJpAligner.ALIGNER)
+    char_to_pron_to_words = index_vocab(words, SpaceAligner())
+    print(char_to_pron_to_words)
     assert len(char_to_pron_to_words) == 5
     assert len(char_to_pron_to_words["伴"]) == 2
-    assert char_to_pron_to_words["伴"]["ハン"][0].alignable_surface == "同伴"
+    assert char_to_pron_to_words["伴"]["han"][0].surface == "同伴"
 
 
 def test_get_cedict():
@@ -213,16 +211,3 @@ def test_get_cedict_full() -> None:
     words = get_cedict()
     # Assuming the size of the dictionary will only grow over time
     assert len(words) >= 113420
-
-
-def test_index_vocab_zh():
-    words = [
-        ZhWord("伏虎", "fu2 hu3", "", 0, ""),
-        ZhWord("伏輸", "fu2 shu1", "", 0, ""),
-        ZhWord("自己", "zi4 ji3", "", 0, ""),
-        ZhWord("梯己", "ti1 ji2", "", 0, ""),
-    ]
-    char_to_pron_to_words = index_vocab_zh(words)
-    assert len(char_to_pron_to_words) == 6
-    assert len(char_to_pron_to_words["己"]) == 2
-    assert char_to_pron_to_words["己"]["ji3"][0].surface == "自己"

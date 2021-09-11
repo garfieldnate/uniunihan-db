@@ -11,6 +11,7 @@ class Word:
     pron: str
     # definition in English
     english: str
+    # TODO: generalize to sort key of parameterized type
     # unnormalized frequency within some corpus; -1 to indicate missing data
     frequency: int
 
@@ -20,16 +21,6 @@ class ZhWord(Word):
     # the surface field contains the traditional form; if the simplified form is different, it will be
     # stored here
     simplified: Optional[str]
-
-
-@dataclass
-class JpWord(Word):
-    # these two fields are necessary for alignment; the Aligner implementation requires
-    # the use of katakana over hiragana
-    # same as surface, but with all hiragana converted to katakana
-    alignable_surface: str
-    # phonetic spelling with hiragana converted to katakana
-    alignable_pron: str
 
 
 # character -> {pronunciation-> [words that use that character with that pronunciation]}
