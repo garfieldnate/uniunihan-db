@@ -5,7 +5,7 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
-from typing import AbstractSet, Any, List, Mapping, MutableSet, TypeVar
+from typing import AbstractSet, Any, List, Mapping, MutableMapping, MutableSet, TypeVar
 
 import commentjson
 import jaconv
@@ -415,7 +415,7 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
 class Joyo:
     old_char_to_prons: StringToStrings
     new_char_to_prons: StringToStrings
-    char_to_supplementary_info: Mapping[str, Mapping[str, Any]]
+    char_to_supplementary_info: MutableMapping[str, MutableMapping[str, Any]]
 
     def __post_init__(self) -> None:
         self._new_to_old: Mapping[str, MutableSet[str]] = defaultdict(set)
@@ -429,11 +429,11 @@ class Joyo:
 
 
 @cache
-def get_joyo():
+def get_joyo() -> Joyo:
     log.info("Loading joyo data...")
     new_char_to_prons = {}
     old_char_to_prons = {}
-    char_info = {}
+    char_info: MutableMapping[str, MutableMapping[str, Any]] = {}
     with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
         # filter comments
         rows = csv.DictReader(filter(lambda row: row[0] != "#", f))

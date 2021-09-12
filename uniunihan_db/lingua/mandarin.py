@@ -139,6 +139,7 @@ def parse_syllable(s: str) -> Optional[Syllable]:
 
 
 def pinyin_tone_marks_to_numbers(s: str) -> str:
+    """Converts shén to shen2, etc."""
     words = s.split()
     new_words = []
     for w in words:
@@ -178,6 +179,7 @@ def __convertPinyinCallback(m: re.Match[str]) -> str:
 
 
 def pinyin_numbers_to_tone_marks(s: str) -> str:
+    """Converts shen2 to shén, etc."""
     return re.sub(
         r"([aeiouüvÜ]{1,3})(n?g?r?)([012345])",
         __convertPinyinCallback,

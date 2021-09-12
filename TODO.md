@@ -3,8 +3,9 @@
 Goal design:
 
 * Pipeline starting from data sources and progressing through processing, indexing, and enrichment steps.
-    - chars + vocab -> char2pron2vocab (index_vocab)
-    - char2pron2vocab + components -> purity groups (find_regularities)
+    - chars + prons (from vocab or standards like Joyo) -> char2prons (get_char_prons)
+    - char2prons + components -> purity groups (find_regularities)
+    - add vocab, final sorting -> final language output (add_vocab? finalize)
     - assign IDs (index)
     - combine langs (cross_ref)
     - incorporate custom notes (finalize)

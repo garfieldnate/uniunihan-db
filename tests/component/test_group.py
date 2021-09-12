@@ -100,7 +100,7 @@ class TestComponentGroup:
             "z": ["d", "a"],
         }
         group = ComponentGroup("x", char_to_prons)
-        char_clusters = group.get_char_presentation()
+        char_clusters = group.get_ordered_clusters()
         assert char_clusters == [["x", "y", "z"], ["u", "w"], ["t"], ["v"]]
 
     @staticmethod
@@ -109,4 +109,4 @@ class TestComponentGroup:
         assert group.chars == {"a", "b", "c"}
         assert group.purity_type == PurityType.NO_PRONUNCIATIONS
         assert group.pron_to_chars == {"": ["a", "b", "c"]}
-        assert group.get_char_presentation() == [["a", "b", "c"]]
+        assert group.get_ordered_clusters() == [["a", "b", "c"]]

@@ -5,7 +5,9 @@ import jaconv
 import jinja2
 from jinja2 import Environment, FileSystemLoader
 
-from .component_group import PurityType
+from uniunihan_db.lingua.mandarin import pinyin_numbers_to_tone_marks
+
+from .component.group import PurityType
 from .data.datasets import get_baxter_sagart, get_ytenx_rhymes
 from .util import configure_logging
 
@@ -150,6 +152,7 @@ def get_jinja_env():
     jinja_env.filters["kata2hira"] = kata2hira
     jinja_env.filters["break_slashes"] = break_slashes
     jinja_env.globals["purity_group_header"] = purity_group_header
+    jinja_env.filters["num2diacritic"] = pinyin_numbers_to_tone_marks
 
     return jinja_env
 

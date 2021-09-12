@@ -132,9 +132,11 @@ class ComponentGroup:
         elif len(self.exceptions) != num_prons:
             self.purity_type = PurityType.MIXED_D
 
-    def get_char_presentation(self) -> Sequence[Sequence[str]]:
-        """Returns a list of lists of characters which share a pronunciation.
-        The lists are sorted by their size and then by the pronunciation which they share."""
+    def get_ordered_clusters(self) -> Sequence[Sequence[str]]:
+        """Returns a list of lists of characters (clusters) which share a pronunciation.
+        The lists are sorted by their size and then by the pronunciation which they share.
+        This ordering is meant to allow the learner to memorize pronunciations as rules
+        with exceptions."""
         # sort by number of characters descending and then orthographically by pronunciation
         def sorter(item: Tuple[str, Collection[str]]) -> Tuple[int, str]:
             return (-len(item[1]), item[0])

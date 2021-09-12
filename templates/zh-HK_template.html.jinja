@@ -28,15 +28,12 @@
                                 for c in char.simp %}{{ comma() }}{{
                                 c}}{%
                                 endfor %}</div>
-                            <div class="box pron">{%-
-                                set comma = joiner("、") %}{%-
-                                for p in char.prons %}{{ comma() }}{{
-                                p['pron']}}{%
-                                if 'historical' in p %}（{{
-                                p['historical']}}）{%
-                                endif %}{%
-                                endfor %}
-                            </div>
+                            <div class="box pron">{{
+                                char.prons|
+                                map(attribute='pron')|
+                                map('num2diacritic')|
+                                join('、')
+                                }}</div>
                             <div class="box kun-yomi">{%-
                                 set comma = joiner("、") %}{%-
                                 for p in char.kun_yomi %}{{ comma() }}{{
@@ -54,6 +51,7 @@
                                 char.prons|
                                 map(attribute='vocab')|
                                 map(attribute='pron')|
+                                map('num2diacritic')|
                                 join('<br />')
                                 }}</div>
                             <div class="box vocab-meaning">{{
