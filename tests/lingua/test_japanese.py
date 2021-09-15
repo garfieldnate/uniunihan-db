@@ -1,10 +1,10 @@
-import csv
 from pathlib import Path
 from typing import Any, Collection, Tuple, Union
 
 import pytest
 
 from uniunihan_db.lingua import japanese
+from uniunihan_db.util import read_csv
 
 CODE_DIR = Path(__file__).parents[0]
 
@@ -26,7 +26,7 @@ def pytest_generate_tests(metafunc: Any) -> None:
 
 
 def read_hepburn_test_data() -> Collection[Tuple[str, str]]:
-    data_csv = Path(CODE_DIR, "romaji_kanaization.csv")
+    data_csv = CODE_DIR / "romaji_kanaization.csv"
     data = []
 
     reader = read_csv(data_csv)
@@ -36,19 +36,13 @@ def read_hepburn_test_data() -> Collection[Tuple[str, str]]:
 
 
 def read_ime_test_data() -> Collection[Tuple[str, str]]:
-    data_csv = Path(CODE_DIR, "kana_romanization.csv")
+    data_csv = CODE_DIR / "kana_romanization.csv"
     data = []
 
     reader = read_csv(data_csv)
     for row in reader:
         data.append((row["hiragana"], row["IME"]))
     return data
-
-
-def read_csv(path: Path) -> csv.DictReader:
-    csvfile = open(path, newline="")
-    # skip comments
-    return csv.DictReader(filter(lambda row: row[0] != "#", csvfile))
 
 
 ###### Tests ######

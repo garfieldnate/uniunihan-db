@@ -80,14 +80,12 @@ def test_get_ckip_20k() -> None:
 
 
 def test_get_joyo() -> None:
-    joyo = get_joyo()
+    char_info = get_joyo()
 
-    # There should be 2136 joyo characters
-    assert len(joyo.new_char_to_prons) == 2136
-    # When using kyuujitai, the number is higher because 弁=辨瓣辯辦辮
-    assert len(joyo.old_char_to_prons) == 2140
+    # There should be 2140 joyo characters
+    assert len(char_info) == 2140
 
-    assert joyo.char_to_supplementary_info["辯"] == {
+    assert char_info["辯"] == {
         "keyword": "articulate",
         "kun_yomi": set(),
         "grade": "5",
@@ -98,32 +96,14 @@ def test_get_joyo() -> None:
         "old": "辯",
     }
     # make sure these are properly recognized as separate characters
-    assert joyo.char_to_supplementary_info["辮"]["old"] == "辮"
-    assert joyo.char_to_supplementary_info["和"]["non_joyo"] == {"オ"}
-
-    assert joyo.new_char_to_prons["労"] == {"ロウ"}
-
-    assert joyo.old_char_to_prons["勞"] == {"ロウ"}
-    # new glyph is used if old one not available
-    assert joyo.old_char_to_prons["老"] == {"ロウ"}
+    assert char_info["辮"]["old"] == "辮"
+    assert char_info["和"]["non_joyo"] == {"オ"}
 
     # 1-to-many new-to-old mappings should be listed in a separate row for each variant
-    assert all(
-        [
-            len(joyo.char_to_supplementary_info[c]["old"] or "") <= 1
-            for c in joyo.char_to_supplementary_info
-        ]
-    )
-    assert all(
-        [
-            len(joyo.char_to_supplementary_info[c]["new"]) == 1
-            for c in joyo.char_to_supplementary_info
-        ]
-    )
+    assert all([len(char_info[c]["old"] or "") <= 1 for c in char_info])
+    assert all([len(char_info[c]["new"]) == 1 for c in char_info])
 
-    assert set("辨瓣辯辦辮") == joyo.new_to_old("弁")
-
-    assert joyo.char_to_supplementary_info["抱"]["kun_yomi"] == {"だ-く", "いだ-く", "かか-える"}
+    assert char_info["抱"]["kun_yomi"] == {"だ-く", "いだ-く", "かか-える"}
 
 
 def test_get_historical_on_yomi():

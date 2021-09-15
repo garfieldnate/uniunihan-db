@@ -429,10 +429,8 @@ class Joyo:
 
 
 @cache
-def get_joyo() -> Joyo:
+def get_joyo():
     log.info("Loading joyo data...")
-    new_char_to_prons = {}
-    old_char_to_prons = {}
     char_info: MutableMapping[str, MutableMapping[str, Any]] = {}
     with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
         # filter comments
@@ -457,17 +455,14 @@ def get_joyo() -> Joyo:
             supplementary_info["readings"] = readings
 
             new_c = r["new"]
-            new_char_to_prons[new_c] = readings
-            char_info[new_c] = supplementary_info
-
             # old glyph same as new glyph when missing
             old_c = r["old"] or new_c
-            old_char_to_prons[old_c] = readings
             char_info[old_c] = supplementary_info
+
             if old_c != new_c:
                 supplementary_info["old"] = old_c
 
-    return Joyo(old_char_to_prons, new_char_to_prons, char_info)
+    return char_info
 
 
 @cache

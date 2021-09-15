@@ -11,7 +11,6 @@ from uniunihan_db.component.index import ComponentGroupIndex, find_component_gro
 from uniunihan_db.data.types import Char2Pron2Words, ZhWord
 from uniunihan_db.data_paths import (
     GENERATED_DATA_DIR,
-    HK_ED_CHARS_FILE,
     JP_VOCAB_OVERRIDE,
     KO_ED_CHARS_FILE,
 )
@@ -131,19 +130,6 @@ def _load_jp_char_pron_vocab(joyo: Joyo):
     return char_to_pron_to_vocab
 
 
-def _find_jp_component_groups(
-    char_to_prons,
-    comp_to_char,
-    out_dir,
-) -> ComponentGroupIndex:
-    index = find_component_groups(char_to_prons, comp_to_char)
-    # 国字 do not have phonetic characters, but can be usefully learned together
-    index.groups.append(ComponentGroup("国字", {c: [] for c in index.no_comp_chars}))
-    index.log_diagnostics(log, out_dir)
-
-    return index
-
-
 def _compile_final_output_jp(
     index: ComponentGroupIndex,
     char_to_pron_to_vocab: Char2Pron2Words,
@@ -175,7 +161,7 @@ def _compile_final_output_jp(
 
 
 def main_zh_hk(args, out_dir, comp_to_char: StringToStrings):
-    with open(HK_ED_CHARS_FILE) as f:
+    with open("TODO") as f:
         char_list = set(json.load(f))
     char_to_supplementary_info = _zh_supplementary_info(char_list)
 

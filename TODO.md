@@ -1,9 +1,13 @@
 # TODO
 
+Then: write and test get_char_prons.py
+
+
 Goal design:
 
 * Pipeline starting from data sources and progressing through processing, indexing, and enrichment steps.
-    - chars + prons (from vocab or standards like Joyo) -> char2prons (get_char_prons)
+    - char data (gather_char_data.py)
+    - pronunciations (from vocab or standards like Joyo) -> char2prons (get_char_prons)
     - char2prons + components -> purity groups (find_regularities)
     - add vocab, final sorting -> final language output (add_vocab? finalize)
     - assign IDs (index)
@@ -34,7 +38,6 @@ Topic: Mandarin support
 * parse out "see": see 羊拐[yang2 guai3]
 * Get rough frequencies from baidu
 * Differentiate baidu and wendu
-* source English keywords from somewhere
 * Get 三体 word list
     - simp to trad conversion
     - how to present? show chapter 1 vocab with rest of book as backup?
@@ -59,9 +62,9 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
+* Source keywords
 * Load libhangul data, align to get readings
 * Download ezkorean dictionary
-* Load eumhun and Korean education data from kyoyuk_hanja.csv
 * Short section on gukja, like ones that include hangeul, etc.
 
 Topic: Vietnamese Support
@@ -156,6 +159,9 @@ Prediction experiments:
 * Unihan: missing relationship between 顏顔, 匂匈, 倶俱 (from ytenx JihThex),
 * python json: ignore '//' key everywhere
 * comment on Wikipedia about missing syllables and umlauts in pronunciations for CKIP frequency data
+* Unihan: kKoreanName messed up hangeul browser display (인명용 한자)
+* Unihan: kGradeLevel only goes through grade 6, but characters are also learned in middle school, so the data is incomplete (missing like 2700 characters)
+* Unihan: Wikipedia says 常用字字形表 should have 4762 characters, kHKGlyph only has 4759 (data is 20 years old)
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together

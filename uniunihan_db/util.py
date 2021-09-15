@@ -1,7 +1,9 @@
+import csv
 import json
 import logging
 import os
 from json.encoder import JSONEncoder
+from pathlib import Path
 from typing import Any, Collection, Mapping, MutableMapping, TypeVar
 
 from uniunihan_db.data_paths import GENERATED_DATA_DIR
@@ -55,6 +57,14 @@ def format_json(data: object) -> str:
         ensure_ascii=False,
         indent=2,
     )
+
+
+def read_csv(path: Path) -> csv.DictReader:
+    """Return a csv.DictReader, removing commented lines
+    (which start with a #)."""
+    csvfile = open(path, newline="")
+    # skip comments
+    return csv.DictReader(filter(lambda row: row[0] != "#", csvfile))
 
 
 # TODO: move to datasets file?

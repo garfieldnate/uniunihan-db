@@ -5,20 +5,13 @@ from collections import defaultdict
 import commentjson as json
 from unihan_etl.process import export_json
 
+from uniunihan_db.data.datasets import get_unihan, get_variants, get_ytenx_rhymes
 from uniunihan_db.data_paths import (
-    HK_ED_CHARS_FILE,
     INCLUDED_DATA_DIR,
-    KO_ED_CHARS_FILE,
     PHONETIC_COMPONENTS_FILE,
     UNIHAN_AUGMENTATION_FILE,
 )
 
-from .data.datasets import (
-    generate_simplified_edict_freq,
-    get_unihan,
-    get_variants,
-    get_ytenx_rhymes,
-)
 from .lingua import japanese, mandarin
 from .util import configure_logging
 
@@ -132,45 +125,9 @@ def expand_unihan():
     export_json(new_data, UNIHAN_AUGMENTATION_FILE)
 
 
-def write_hk_ed_chars():
-    if HK_ED_CHARS_FILE.exists() and HK_ED_CHARS_FILE.stat().st_size > 0:
-        log.info(f"{HK_ED_CHARS_FILE.name} already exists; skipping unihan scan")
-        return
-    log.info("Scanning Unihan for Hong Kong educational character list...")
-
-    unihan = get_unihan()
-    chars = []
-    for char, info in unihan.items():
-        if "kGradeLevel" in info:
-            chars.append(char)
-
-    export_json(chars, HK_ED_CHARS_FILE)
-    log.info(f"  Wrote {len(chars)} characters to {HK_ED_CHARS_FILE.name}")
-
-
-def write_ko_ed_chars():
-    if KO_ED_CHARS_FILE.exists() and KO_ED_CHARS_FILE.stat().st_size > 0:
-        log.info(f"{KO_ED_CHARS_FILE.name} already exists; skipping unihan scan")
-        return
-    log.info("Scanning Unihan for Korea educational character list...")
-
-    unihan = get_unihan()
-    chars = []
-    for char, info in unihan.items():
-        if "kKoreanEducationHanja" in info:
-            chars.append(char)
-
-    export_json(chars, KO_ED_CHARS_FILE)
-    log.info(f"  Wrote {len(chars)} characters to {KO_ED_CHARS_FILE.name}")
-
-
 def main():
     write_phonetic_components()
-
-    generate_simplified_edict_freq()
     # expand_unihan()
-    write_hk_ed_chars()
-    write_ko_ed_chars()
 
 
 if __name__ == "__main__":

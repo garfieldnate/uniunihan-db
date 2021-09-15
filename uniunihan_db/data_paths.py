@@ -5,7 +5,8 @@ PROJECT_DIR = Path(__file__).parents[1]
 DATA_DIR = PROJECT_DIR / "data"
 
 GENERATED_DATA_DIR = DATA_DIR / "generated"
-GENERATED_DATA_DIR.mkdir(exist_ok=True)
+PIPELINE_OUTPUT_DIR = GENERATED_DATA_DIR / "pipeline"
+PIPELINE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 INCLUDED_DATA_DIR = DATA_DIR / "included"
 
@@ -26,8 +27,7 @@ JUN_DA_CHAR_FREQ_URL = (
 )
 JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 
-HK_ED_CHARS_FILE = GENERATED_DATA_DIR / "hk_ed_chars.json"
-KO_ED_CHARS_FILE = GENERATED_DATA_DIR / "ko_ed_chars.json"
+KO_ED_CHARS_FILE = INCLUDED_DATA_DIR / "kyoyuk_hanja.csv"
 
 JP_VOCAB_OVERRIDE = INCLUDED_DATA_DIR / "jp_vocab_override.json"
 
