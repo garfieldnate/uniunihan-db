@@ -1,6 +1,6 @@
 # TODO
 
-Then: write and test get_char_prons.py
+Next: find_regularities
 
 
 Goal design:
@@ -62,6 +62,7 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
+* kyoyuk hanja doesn't have yo for 樂 or 현 for 見
 * Source keywords
 * Load libhangul data, align to get readings
 * Download ezkorean dictionary

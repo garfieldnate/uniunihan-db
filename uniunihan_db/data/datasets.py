@@ -438,7 +438,7 @@ def get_joyo():
         for r in rows:
             kun_yomi = {yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi}
             supplementary_info = {
-                "keyword": r["English_meaning"],
+                "keyword": r["English_meaning"].split("|"),
                 "kun_yomi": kun_yomi,
                 "grade": r["grade"],
                 "strokes": r["strokes"],

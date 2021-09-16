@@ -34,8 +34,7 @@ build-backend = "poetry.core.masonry.api"
 testpaths = ["tests"]
 
 [tool.poetry.scripts]
-gather-chars = "uniunihan_db.pipeline.gather_char_data:main"
-build-db = "uniunihan_db.build_db:main"
+pipeline = "uniunihan_db.pipeline.pipeline:main"
 find-regularities = "uniunihan_db.find_regularities:main"
 format-book = "uniunihan_db.format_book:main"
 # test = "pre-commit run --all-files"

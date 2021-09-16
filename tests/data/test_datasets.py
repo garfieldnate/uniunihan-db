@@ -86,7 +86,7 @@ def test_get_joyo() -> None:
     assert len(char_info) == 2140
 
     assert char_info["辯"] == {
-        "keyword": "articulate",
+        "keyword": ["articulate"],
         "kun_yomi": set(),
         "grade": "5",
         "strokes": "5",
