@@ -1,6 +1,6 @@
 # TODO
 
-Next: find_regularities
+Next: integrate vocab
 
 
 Goal design:
@@ -67,6 +67,7 @@ Topic: Korean Support
 * Load libhangul data, align to get readings
 * Download ezkorean dictionary
 * Short section on gukja, like ones that include hangeul, etc.
+    - https://en.wiktionary.org/wiki/Category:Korean-only_CJKV_Characters
 
 Topic: Vietnamese Support
 
@@ -153,16 +154,18 @@ Prediction experiments:
 * Unihan does not indicate where okurigana in a kun'yomi begin
 * Would be great if unihan-etl (or better yet, Unihan itself!) structurized the (traditional variant of X), (non-classical variant of X), (same as X), etc. in the `kDefinition` field.
     - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
+* Unihan-etl doesn't provide the new kStrange field?
 * Unihan entries 彙彚𢑥 do not mention each other as variants
 * Really wish unihan had kyuujitai/sinjitai links; 綠 links to 緑 only in the jinmeiyo kanji field.
 * Unihan: relationship between 駄 and 馱 not given; between 瓶 and 甁, too (sinjitai/kyuujitai)
 * Unihan: relationship between 栃𣜜櫔 not given
 * Unihan: missing relationship between 顏顔, 匂匈, 倶俱 (from ytenx JihThex),
-* python json: ignore '//' key everywhere
 * comment on Wikipedia about missing syllables and umlauts in pronunciations for CKIP frequency data
 * Unihan: kKoreanName messed up hangeul browser display (인명용 한자)
 * Unihan: kGradeLevel only goes through grade 6, but characters are also learned in middle school, so the data is incomplete (missing like 2700 characters)
-* Unihan: Wikipedia says 常用字字形表 should have 4762 characters, kHKGlyph only has 4759 (data is 20 years old)
+* Unihan: Wikipedia says 常用字字形表 should have 4762 characters, kHKGlyph has 4824. Could be an issue with variants being included, but really only one glyph should be marked.
+* Unihan: the data I gathered could be integrated usefully. The okurigana info in Joyo, old spellings, recently relicensed Baxter-Sagart reconstructions, phonetic components, etc.
+* Unihan: would be nice to list kokuji/gukja/chu nom
 
 ## Dev Tools
 * integrate darglint and/or pydocstyle to help keep documentation together

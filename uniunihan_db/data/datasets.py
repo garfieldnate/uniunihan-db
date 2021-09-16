@@ -29,6 +29,7 @@ from uniunihan_db.data_paths import (
     LIB_HANGUL_DIR,
     LIB_HANGUL_URL,
     LIB_HANGUL_ZIP_FILE,
+    PHONETIC_COMPONENTS_FILE,
     UNIHAN_FILE,
 )
 from uniunihan_db.lingua.aligner import Aligner
@@ -469,7 +470,7 @@ def get_joyo():
 def get_phonetic_components() -> StringToStrings:
     log.info("Loading phonetic components...")
     comp_to_char = {}
-    with open(GENERATED_DATA_DIR / "components_to_chars.tsv") as f:
+    with open(PHONETIC_COMPONENTS_FILE) as f:
         rows = csv.DictReader(f, delimiter="\t")
         for r in rows:
             component = r["component"]

@@ -65,21 +65,3 @@ def read_csv(path: Path) -> csv.DictReader:
     csvfile = open(path, newline="")
     # skip comments
     return csv.DictReader(filter(lambda row: row[0] != "#", csvfile))
-
-
-# TODO: move to datasets file?
-def get_mandarin_pronunciation(unihan_entry):
-    # check all of the available fields in order of usefulness/accuracy
-    if pron := unihan_entry.get("kHanyuPinlu"):
-        #             print('returning pinlu')
-        return [p["phonetic"] for p in pron]
-    elif pron := unihan_entry.get("kXHC1983"):
-        #             print('returning 1983')
-        return [p["reading"] for p in pron]
-    elif pron := unihan_entry.get("kHanyuPinyin"):
-        #             print('returning pinyin!')
-        return [r for p in pron for r in p["readings"]]
-    elif pron := unihan_entry.get("kMandarin"):
-        # print("returning mandarin!")
-        return pron["zh-Hans"]
-    return []

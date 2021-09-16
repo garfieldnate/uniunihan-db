@@ -106,10 +106,10 @@ class ComponentGroup:
 
         if "" in self.pron_to_chars:
             if len(self.pron_to_chars) != 1:
-                # 国字 characters are the only ones without pronunciations, and they should never be assigned to a phonetic
-                # component group with characters that actually have Chinese readings
+                # If a group contains only 国字, then it won't have any Chinese readings;
+                # otherwise, all characters should have them.
                 raise ValueError(
-                    "Characters both with and without pronunciations were provided to group {self.component}"
+                    f"Characters both with and without pronunciations were provided to group {self.component}; {self.pron_to_chars}"
                 )
             self.purity_type = PurityType.NO_PRONUNCIATIONS
             return

@@ -21,7 +21,6 @@ def load_char_data_jp():
 
 
 def load_char_data_zh_hk():
-    # TODO: returns 4825 characters; expected 4759
     unihan = get_unihan()
     char_data = {}
     for char, info in unihan.items():
