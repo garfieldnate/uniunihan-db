@@ -23,9 +23,6 @@ isort = "^5.6.4"
 pre-commit = "^2.7.1"
 unihan-etl = "^0.11.0"
 requests = "^2.24.0"
-opencc-python-reimplemented = "^0.1.6"
-scikit-learn = "^0.24.0"
-matplotlib = "^3.3.3"
 jaconv = "^0.2.4"
 
 [build-system]
