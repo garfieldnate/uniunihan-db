@@ -19,10 +19,13 @@ def load_prons_jp(char_data):
         c_data["prons"] = prons = {}
         for pron in c_data["readings"]:
             prons[pron] = pron_data = {}
+            pron_data["joyo"] = pron not in c_data["non_joyo"]
             if old_pron := c_data.get("historical_pron", {}).get(pron):
                 pron_data["historical"] = old_pron
                 del c_data["historical_pron"][pron]
+        # delete copied keys
         del c_data["readings"]
+        del c_data["non_joyo"]
         try:
             del c_data["historical_pron"]
         except KeyError:
