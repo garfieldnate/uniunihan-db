@@ -1,6 +1,6 @@
 # TODO
 
-Next: integrate vocab
+Next: sort and assign IDs to components, chars, and words
 
 
 Goal design:
@@ -32,11 +32,11 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* Next: integrate baidu frequencies
 * nǎi nai listed twice because it represents two different pronunciations
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation or put in ruby text: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
 * parse out "see": see 羊拐[yang2 guai3]
-* Get rough frequencies from baidu
 * Differentiate baidu and wendu
 * Get 三体 word list
     - simp to trad conversion
@@ -48,6 +48,7 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* Next: investigate char/prons with missing example words
 * JpAligner not aligning 板塀 (itabei) because it uses kun'yomi or 煉瓦塀 (rengabei) because it uses non-joyo chars.
     - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation
@@ -65,10 +66,10 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
+* Next: ezcorean vocab integration
 * kyoyuk hanja doesn't have yo for 樂 or 현 for 見
 * Source keywords
 * Load libhangul data, align to get readings
-* Download ezcorean dictionary
 * Short section on gukja, like ones that include hangeul, etc.
     - https://en.wiktionary.org/wiki/Category:Korean-only_CJKV_Characters
 
