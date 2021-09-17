@@ -45,5 +45,7 @@
     // Unihan missed 櫔 variant
     "栃": "萬",
     // Override wrong semantic variant from both Unihan and ytenx (礮); TODO: can we automate this fix using the pronunciation?
-    "砲": "勹"
+    "砲": "勹",
+    // Scholars assume that the Sino-Korean pronunciation of this 國字 was borrowed from a similar-looking character
+    "畓": "沓"
 }

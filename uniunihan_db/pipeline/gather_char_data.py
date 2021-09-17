@@ -41,6 +41,10 @@ def load_char_data_ko():
     for row in reader:
         char = row["char"]
         del row["char"]
+        # remove fields that are blank strings
+        for key in ["variant", "note"]:
+            if not row[key]:
+                del row[key]
         char_data[char] = row
 
     return char_data

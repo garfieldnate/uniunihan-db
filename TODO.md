@@ -2,6 +2,7 @@
 
 Next: sort and assign IDs to components, chars, and words
 
+Sometime soon: Unit tests for pipeline steps
 
 Goal design:
 
@@ -49,6 +50,7 @@ Topic: Mandarin support
 Topic: Japanese Support
 
 * Next: investigate char/prons with missing example words
+* Should not use both 無沙汰 and ご無沙汰
 * JpAligner not aligning 板塀 (itabei) because it uses kun'yomi or 煉瓦塀 (rengabei) because it uses non-joyo chars.
     - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation
@@ -72,6 +74,7 @@ Topic: Korean Support
 * Load libhangul data, align to get readings
 * Short section on gukja, like ones that include hangeul, etc.
     - https://en.wiktionary.org/wiki/Category:Korean-only_CJKV_Characters
+* Note somewhere: interesting that hundok for some characters like 畜 and 安 contain the eumdok
 
 Topic: Vietnamese Support
 
@@ -170,8 +173,10 @@ Prediction experiments:
 * Unihan: Wikipedia says 常用字字形表 should have 4762 characters, kHKGlyph has 4824. Could be an issue with variants being included, but really only one glyph should be marked.
 * Unihan: the data I gathered could be integrated usefully. The okurigana info in Joyo, old spellings, recently relicensed Baxter-Sagart reconstructions, phonetic components, etc.
 * Unihan: would be nice to list kokuji/gukja/chu nom
+* Unihan/Ytenx: semantic variant for 砲 is not 礮
 
 ## Dev Tools
+* Consider integrating doit to manage the processing pipeline
 * integrate darglint and/or pydocstyle to help keep documentation together
 * mypy doesn't check that types are used in signatures, nor that methods are used correctly 😡 Maybe try pyre, pyright, or pytype
 * Try rope for refactoring
