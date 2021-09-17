@@ -20,14 +20,13 @@ log = configure_logging(__name__)
 MAX_EXAMPLE_VOCAB = 2
 
 
-def select_vocab_jp(purity_groups, out_dir):
+def select_vocab_jp(data, out_dir):
+    char_data = data["char_data"]
     # construct data necessary for char/pronunciation alignment
     new_char_to_prons = {}
-    for pg in purity_groups.values():
-        for comp_data in pg.values():
-            for old_c, char_data in comp_data["char_data"].items():
-                new_c = char_data["new"]
-                new_char_to_prons[new_c] = char_data["prons"]
+    for c_data in char_data.values():
+        new_c = c_data["new"]
+        new_char_to_prons[new_c] = c_data["prons"]
 
     word_list: List[Word] = get_edict_freq()
     aligner = JpAligner(new_char_to_prons)
@@ -35,28 +34,24 @@ def select_vocab_jp(purity_groups, out_dir):
     # Some words have to be specified manually instead of extracted from our downloaded dictionary
     vocab_override: Char2Pron2Words = get_vocab_override(JP_VOCAB_OVERRIDE)
 
-    for pg in purity_groups.values():
-        for comp_data in pg.values():
-            for old_c, char_data in comp_data["char_data"].items():
-                # Vocab override uses old forms, edict vocab data uses new forms
-                if pron_to_words := vocab_override.get(old_c):
-                    for pron, words in pron_to_words.items():
-                        char_data["prons"].get(pron, {})["vocab"] = words
-                else:
-                    new_c = char_data["new"]
-                    for pron, pron_data in char_data["prons"].items():
-                        words = char_to_pron_to_vocab.get(new_c, {}).get(pron, [])
-                        pron_data["vocab"] = __filter_vocab(words)
+    for old_c, c_data in char_data.items():
+        # Vocab override uses old forms, edict vocab data uses new forms
+        if pron_to_words := vocab_override.get(old_c):
+            for pron, words in pron_to_words.items():
+                c_data["prons"].get(pron, {})["vocab"] = words
+        else:
+            new_c = c_data["new"]
+            for pron, pron_data in c_data["prons"].items():
+                words = char_to_pron_to_vocab.get(new_c, {}).get(pron, [])
+                pron_data["vocab"] = __filter_vocab(words)
 
     def char_data_iter():
-        for pg in purity_groups.values():
-            for comp_data in pg.values():
-                for char_data in comp_data["char_data"].values():
-                    yield char_data["new"], char_data
+        for c_data in char_data.values():
+            yield c_data["new"], c_data
 
     _report_missing_words(char_data_iter(), out_dir)
 
-    return purity_groups
+    return data
 
 
 def __filter_vocab(words):
@@ -64,28 +59,24 @@ def __filter_vocab(words):
     return list(filter(lambda w: len(w.surface) > 1, words))[:MAX_EXAMPLE_VOCAB]
 
 
-def select_vocab_zh_hk(purity_groups, out_dir):
-
+def select_vocab_zh_hk(data, out_dir):
+    char_data = data["char_data"]
     word_list: List[ZhWord] = get_cedict()
     _incorporate_ckip_freq_data(word_list)
     char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
 
-    for pg in purity_groups.values():
-        for comp_data in pg.values():
-            for c, char_data in comp_data["char_data"].items():
-                for pron, pron_data in char_data["prons"].items():
-                    words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-                    pron_data["vocab"] = __filter_vocab(words)
+    for c, c_data in char_data.items():
+        for pron, pron_data in c_data["prons"].items():
+            words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
+            pron_data["vocab"] = __filter_vocab(words)
 
     def char_data_iter():
-        for pg in purity_groups.values():
-            for comp_data in pg.values():
-                for c, char_data in comp_data["char_data"].items():
-                    yield c, char_data
+        for c, c_data in char_data.items():
+            yield c, c_data
 
     _report_missing_words(char_data_iter(), out_dir)
 
-    return purity_groups
+    return data
 
 
 def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
@@ -98,8 +89,9 @@ def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
     words.sort(key=lambda w: (-w.frequency, w.surface))
 
 
-def select_vocab_ko(purity_groups, out_dir):
-    return purity_groups
+def select_vocab_ko(data, out_dir):
+    # TODO: need Korean vocab data
+    return data
 
 
 def _report_missing_words(char_data_iter, out_dir):

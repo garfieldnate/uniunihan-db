@@ -1,8 +1,6 @@
 # Step 3: Group characters based on their phonetic components,
 # and assign the resulting groups to larger groups based
 # on their pronunciation regularity.
-from collections import defaultdict
-
 from uniunihan_db.component.group import ComponentGroup
 from uniunihan_db.component.index import find_component_groups
 from uniunihan_db.data.datasets import get_phonetic_components
@@ -24,7 +22,7 @@ def group_chars_jp(char_data, out_dir):
     index.no_comp_chars.difference_update(KOKUJI)
     index.log_diagnostics(log, out_dir)
 
-    return __restructure_char_data(char_data, index)
+    return {"char_data": char_data, "group_index": index}
 
 
 def group_chars(char_data, out_dir):
@@ -34,19 +32,7 @@ def group_chars(char_data, out_dir):
     index = find_component_groups(char_to_prons, comp_to_char)
     index.log_diagnostics(log, out_dir)
 
-    return __restructure_char_data(char_data, index)
-
-
-def __restructure_char_data(char_data, index):
-    output = defaultdict(dict)
-    for g in index.groups:
-        purity_groups = output[g.purity_type]
-        purity_groups[g.component] = component_group = {"char_data": {}}
-        for c in g.chars:
-            component_group["char_data"][c] = char_data[c]
-            component_group["num_exceptions"] = len(g.exceptions)
-
-    return output
+    return {"char_data": char_data, "group_index": index}
 
 
 GROUP_CHARS = {"jp": group_chars_jp, "ko": group_chars, "zh-HK": group_chars}
