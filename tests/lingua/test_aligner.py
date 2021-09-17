@@ -19,6 +19,8 @@ class TestJpAligner:
         "今": ["コン"],
         "昔": ["シャク"],
         "同": ["ドウ"],
+        "土": ["ド"],
+        "塀": ["ヘイ"],
     }
     ALIGNER = JpAligner(CHAR_TO_PRONS)
 
@@ -41,6 +43,9 @@ class TestJpAligner:
     def test_rendaku_alignment() -> None:
         alignment = TestJpAligner.ALIGNER.align("賭博", "トバク")
         assert alignment == {("賭", "ト"), ("博", "ハク")}
+
+        alignment = TestJpAligner.ALIGNER.align("土塀", "ドベイ")
+        assert alignment == {("土", "ド"), ("塀", "ヘイ")}
 
         alignment = TestJpAligner.ALIGNER.align("今昔", "コンシャク")
         assert alignment == {("今", "コン"), ("昔", "シャク")}
