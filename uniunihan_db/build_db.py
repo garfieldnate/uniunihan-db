@@ -7,7 +7,7 @@ from unihan_etl.process import export_json
 
 from uniunihan_db.data.datasets import get_unihan, get_variants, get_ytenx_rhymes
 from uniunihan_db.data_paths import (
-    INCLUDED_DATA_DIR,
+    COMPONENT_OVERRIDE_FILE,
     PHONETIC_COMPONENTS_FILE,
     UNIHAN_AUGMENTATION_FILE,
 )
@@ -33,7 +33,7 @@ def write_phonetic_components():
     ytenx_rhyme_data = get_ytenx_rhymes()
     char_to_component = {char: info[0]["聲符"] for char, info in ytenx_rhyme_data.items()}
 
-    with open(INCLUDED_DATA_DIR / "manual_components.json") as f:
+    with COMPONENT_OVERRIDE_FILE.open() as f:
         extra_char_to_components = json.load(f)
         char_to_component.update(extra_char_to_components)
 

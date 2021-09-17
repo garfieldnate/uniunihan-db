@@ -1,5 +1,5 @@
 {
-    "//": "These characters are simply missing from ytenx",
+    // These characters are simply missing from ytenx
     "鈍": "屯",
     "礁": "焦",
     "侮": "母",
@@ -20,7 +20,7 @@
     "狠": "艮",
     "碰": "並",
     "螞": "馬",
-    "//": "This one is itself a component but isn't marked as having itself as a component. TODO: easy fix?",
+    // This one is itself a component but isn't marked as having itself as a component. TODO: easy fix?
     "閒": "閒",
     "灒": "贊",
     "瞧": "焦",
@@ -34,16 +34,16 @@
     "藹": "謁",
     "垃": "立",
     "丟": "丟",
-    "//": "ytenx should contain the compatibility char 塀",
+    // ytenx should contain the compatibility char 塀
     "塀": "并",
-    "//": "I bet this one is a historical mess up of 陟",
+    // I bet this one is a historical mess up of 陟
     "捗": "步",
-    "//": "This one doesn't have a phonetic piece, but we'll include it anyway",
+    // This one doesn't have a phonetic piece, but we'll include it anyway
     "奪": "奪",
-    "//": "on'yomi made up in Japan",
+    // on'yomi made up in Japan
     "働": "動",
-    "//": "Unihan missed 櫔 variant",
+    // Unihan missed 櫔 variant
     "栃": "萬",
-    "//": "Override wrong semantic variant from both Unihan and ytenx (礮); TODO: can we automate this fix using the pronunciation?",
+    // Override wrong semantic variant from both Unihan and ytenx (礮); TODO: can we automate this fix using the pronunciation?
     "砲": "勹"
 }

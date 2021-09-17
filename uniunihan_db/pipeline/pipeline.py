@@ -24,14 +24,15 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    out_dir = OUTPUT_DIR / args.language
 
     char_data = LOAD_CHAR_DATA[args.language]()
     log.info(f"Loaded data for {len(char_data)} characters")
     char_data = ADD_PRONUNCIATIONS[args.language](char_data)
-    purity_groups = GROUP_CHARS[args.language](char_data, OUTPUT_DIR)
-    all_data = SELECT_VOCAB[args.language](purity_groups, OUTPUT_DIR)
+    purity_groups = GROUP_CHARS[args.language](char_data, out_dir)
+    all_data = SELECT_VOCAB[args.language](purity_groups, out_dir)
 
-    out_file = OUTPUT_DIR / f"{args.language}.json"
-    with open(out_file, "w") as f:
+    final_out_file = out_dir / "all_data.json"
+    with open(final_out_file, "w") as f:
         f.write(format_json(all_data))
-    log.info(f"Wrote output to {out_file}")
+    log.info(f"Wrote output to {final_out_file}")

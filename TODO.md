@@ -48,7 +48,10 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* JpAligner not aligning 板塀 (itabei) because it uses kun'yomi or 煉瓦塀 (rengabei) because it uses non-joyo chars.
+    - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation
+    - same with 日本語 にっぽんご
 * Char notes: kokuji section, 動 is also kokuji but has a phonetic component
 * track down unfound Baxter/Sagart data for 125 components
 * Would be nice to have Japanese names for components
@@ -65,7 +68,7 @@ Topic: Korean Support
 * kyoyuk hanja doesn't have yo for 樂 or 현 for 見
 * Source keywords
 * Load libhangul data, align to get readings
-* Download ezkorean dictionary
+* Download ezcorean dictionary
 * Short section on gukja, like ones that include hangeul, etc.
     - https://en.wiktionary.org/wiki/Category:Korean-only_CJKV_Characters
 
