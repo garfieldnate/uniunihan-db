@@ -6,8 +6,7 @@ from uniunihan_db.util import configure_logging, format_json
 from .add_char_prons import ADD_PRONUNCIATIONS
 from .gather_char_data import LOAD_CHAR_DATA
 from .group_chars import GROUP_CHARS
-
-# from .order import ORDER_DATA
+from .organize import ORGANIZE_DATA
 from .select_vocab import SELECT_VOCAB
 
 log = configure_logging(__name__)
@@ -34,7 +33,7 @@ def main() -> None:
     char_data = ADD_PRONUNCIATIONS[args.language](char_data)
     all_data = GROUP_CHARS[args.language](char_data, out_dir)
     all_data = SELECT_VOCAB[args.language](all_data, out_dir)
-    # all_data = ORDER_DATA[args.language](all_data)
+    all_data = ORGANIZE_DATA[args.language](all_data)
 
     final_out_file = out_dir / "all_data.json"
     with open(final_out_file, "w") as f:

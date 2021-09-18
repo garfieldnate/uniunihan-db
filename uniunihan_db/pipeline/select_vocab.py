@@ -90,7 +90,11 @@ def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
 
 
 def select_vocab_ko(data, out_dir):
-    # TODO: need Korean vocab data
+    char_data = data["char_data"]
+    for c, c_data in char_data.items():
+        for pron, pron_data in c_data["prons"].items():
+            # TODO: need Korean vocab data
+            pron_data["vocab"] = []
     return data
 
 
