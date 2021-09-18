@@ -1,7 +1,7 @@
 import copy
 from collections import defaultdict
 from enum import IntEnum
-from typing import Collection, Sequence, Tuple
+from typing import Any, Collection, MutableMapping, Sequence, Tuple
 
 from uniunihan_db.data.datasets import StringToStrings
 
@@ -80,6 +80,7 @@ class ComponentGroup:
         """component: phonetic component common to all characters in the group
         char_to_prons: dict[char -> [pronunciations]] for all characters in the group"""
         self.component = component
+        self.sup_info: MutableMapping[Any, Any] = {}
 
         self.chars = set()
         # reverse the char/pron mapping to determine pronunciation regularities

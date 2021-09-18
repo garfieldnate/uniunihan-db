@@ -264,6 +264,14 @@ def __download_ytenx():
 ###############
 
 
+@dataclass
+class YtenxRhyme:
+    char: str
+    old_chinese: List[str]
+    middle_chinese: str
+    late_middle_chinese: str
+
+
 @cache
 def get_ytenx_rhymes():
     __download_ytenx()
@@ -280,9 +288,9 @@ def get_ytenx_rhymes():
             if pron_2 := r["擬音2"]:
                 r["擬音"].append(pron_2)
             del r["擬音2"]
-            # keep all keys with non-empty values
-            char_info = {k: v for k, v in r.items() if v}
-            char_to_component[char].append(char_info)
+            char_to_component[char].append(
+                YtenxRhyme(char, r["擬音"], r["擬音（後世）"] or None, r["擬音（更後世）"] or None)
+            )
 
     return char_to_component
 

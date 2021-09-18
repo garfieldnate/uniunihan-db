@@ -57,6 +57,8 @@ def __create_group_data(g, char_data):
         "num_chars": len(g.chars),
         "clusters": [],
     }
+    for k, v in g.sup_info.items():
+        data[k] = v
 
     max_frequency = -1
     for chars in g.get_ordered_clusters():

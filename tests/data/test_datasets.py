@@ -1,5 +1,6 @@
 from uniunihan_db.data.datasets import (
     BaxterSagart,
+    YtenxRhyme,
     get_baxter_sagart,
     get_cedict,
     get_ckip_20k,
@@ -19,32 +20,8 @@ from uniunihan_db.lingua.aligner import SpaceAligner
 def test_get_ytenx_rhymes():
     data = get_ytenx_rhymes()
     assert data["搋"] == [
-        {
-            "廣韻聲": "徹",
-            "廣韻韻": "皆",
-            "聲調": "平",
-            "等": "2",
-            "開合": "開",
-            "上字": "丑",
-            "下字": "皆",
-            "聲符": "虒",
-            "韻部": "支",
-            "擬音": ["hr'eː"],
-            "註釋": "見通俗文",
-        },
-        {
-            "廣韻聲": "徹",
-            "廣韻韻": "佳",
-            "聲調": "平",
-            "等": "2",
-            "開合": "開",
-            "上字": "丑",
-            "下字": "佳",
-            "聲符": "虒",
-            "韻部": "支",
-            "擬音": ["hr'eː", "shreːl"],
-            "註釋": "扠字注或體",
-        },
+        YtenxRhyme("搋", ["hr'eː"], None, None),
+        YtenxRhyme("搋", ["hr'eː", "shreːl"], None, None),
     ]
 
 
