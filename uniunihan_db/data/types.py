@@ -6,6 +6,8 @@ from typing import Collection, Mapping, MutableMapping, MutableSequence, Optiona
 class Word:
     # the dictionary form of the word using Chinese characters and perhaps other orthographies
     surface: str
+    # Unique identifier
+    id: str
     # the commonly used phonetic spelling (whatever would go in ruby text, or in place of
     # Chinese characters when one forgets or wishes to write without them)
     pron: str

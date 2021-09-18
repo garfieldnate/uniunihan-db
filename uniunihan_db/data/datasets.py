@@ -144,7 +144,8 @@ def get_edict_freq(file=EDICT_FREQ_FILE):
     log.info(f"Reading EDICT frequency data from {file}...")
     words = []
     with open(file) as f:
-        for line in f.readlines()[1:]:
+        # skip header
+        for i, line in enumerate(f.readlines()[1:]):
             word = line.split(" ")[0]
             freq = int(line.split("#")[-1][:-2])
             english = "/".join(line.split("/")[1:-2])
@@ -153,11 +154,11 @@ def get_edict_freq(file=EDICT_FREQ_FILE):
                 continue
             pron = line.split("[")[1].split("]")[0]
             # negative frequency to sort descending
-            words.append((-freq, word, pron, english))
+            words.append((-freq, word, pron, english, i))
 
     output = []
-    for (freq, word, pron, english) in sorted(words):
-        output.append(Word(word, pron, english, -freq))
+    for (freq, word, pron, english, i) in sorted(words):
+        output.append(Word(word, f"edict-{i+1}", pron, english, -freq))
 
     return output
 
@@ -384,7 +385,7 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
 
     words: List[ZhWord] = []
     with open(file) as f:
-        for line in f.readlines():
+        for i, line in enumerate(f.readlines()):
             # skip comments or empty lines
             line = line.strip()
             if not line or line.startswith("#"):
@@ -412,7 +413,12 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
             pron = pron.lstrip("[").rstrip("] ").lower()
             # frequency is TODO
             word = ZhWord(
-                surface=trad, pron=pron, english=en, frequency=-1, simplified=simp
+                surface=trad,
+                id=f"cedict-{i+1}",
+                pron=pron,
+                english=en,
+                frequency=-1,
+                simplified=simp,
             )
             words.append(word)
 
@@ -521,17 +527,20 @@ def get_historical_on_yomi():
 @cache
 def get_vocab_override(file) -> Char2Pron2Words:
     data = commentjson.load(file.open())
+    counter = 1
     for char, pron2vocab in data.items():
         for pron, vocab in pron2vocab.items():
             words = []
             for v in vocab:
                 word = Word(
                     surface=v["surface"],
+                    id=f"override-{counter}",
                     pron=v["pron"],
                     english=v["en"],
                     frequency=v["freq"],
                 )
                 words.append(word)
+                counter += 1
             pron2vocab[pron] = words
     return data
 

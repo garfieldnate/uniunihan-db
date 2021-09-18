@@ -107,6 +107,7 @@ def test_get_edict_freq():
     words = get_edict_freq(TEST_CORPUS_DIR / "edict_freq_sample.txt")
     assert words[0] == Word(
         surface="植え替え",
+        id="edict-1",
         pron="うえかえ",
         english="(n) transplanting/transplantation",
         frequency=18686,
@@ -122,9 +123,9 @@ def test_get_edict_freq():
 
 def test_index_vocab():
     words = [
-        Word("伴走", "ban sou", "", 0),
-        Word("同伴", "dou han", "", 0),
-        Word("漢字", "kan ji", "", 0),
+        Word("伴走", "", "ban sou", "", 0),
+        Word("同伴", "", "dou han", "", 0),
+        Word("漢字", "", "kan ji", "", 0),
     ]
     char_to_pron_to_words = index_vocab(words, SpaceAligner())
     print(char_to_pron_to_words)
@@ -137,6 +138,7 @@ def test_get_cedict():
     words = get_cedict(TEST_CORPUS_DIR / "cedict_sample.u8", filter=True)
     assert words[0] == ZhWord(
         surface="三文魚",
+        id="cedict-1",
         # also tests lowercasing
         pron="san1 wen2 yu2",
         english="salmon (loanword)",
