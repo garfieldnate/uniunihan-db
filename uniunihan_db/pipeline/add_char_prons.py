@@ -7,12 +7,12 @@ from uniunihan_db.data.datasets import get_cedict, get_unihan, index_vocab
 from uniunihan_db.data.types import ZhWord
 from uniunihan_db.lingua.aligner import SpaceAligner
 from uniunihan_db.lingua.mandarin import pinyin_tone_marks_to_numbers
-from uniunihan_db.util import configure_logging
+from uniunihan_db.util import configure_logging, format_json
 
 log = configure_logging(__name__)
 
 
-def load_prons_jp(char_data):
+def load_prons_jp(char_data, out_dir):
     # Use pronunciations from Joyo specification.
     # This only requires restructuring; no new data loading.
     for _, c_data in char_data.items():
@@ -34,7 +34,7 @@ def load_prons_jp(char_data):
     return char_data
 
 
-def load_prons_zh_hk(char_data):
+def load_prons_zh_hk(char_data, out_dir):
     # Get pronunciations that are used in modern words present in CEDICT. This allows
     # us to guarantee that we have examples for most pronunciations, and avoids super
     # obscure pronunciations that increase the grouping complexity significantly.
@@ -67,8 +67,10 @@ def load_prons_zh_hk(char_data):
 
     if fallback_chars:
         log.warn(
-            f"Fell back to using Mandarin readings from Unihan for {len(fallback_chars)} characters: {fallback_chars}"
+            f"Fell back to using Mandarin readings from Unihan for {len(fallback_chars)} characters"
         )
+        with open(out_dir / "mandarin_reading_fallback_chars.json", "w") as f:
+            f.write(format_json(fallback_chars))
     if no_pron_chars:
         log.warn(
             f"No pronunciations found for {len(no_pron_chars)} characters: {no_pron_chars}"
@@ -95,7 +97,7 @@ def __get_mandarin_pronunciations(unihan_entry):
     return {}
 
 
-def load_prons_ko(char_data):
+def load_prons_ko(char_data, out_dir):
     # no new data loading; only requires restructuring
     for _, c_data in char_data.items():
         c_data["prons"] = prons = {}

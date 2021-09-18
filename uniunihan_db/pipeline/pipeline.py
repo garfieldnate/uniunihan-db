@@ -13,7 +13,6 @@ from .select_vocab import SELECT_VOCAB
 log = configure_logging(__name__)
 
 OUTPUT_DIR = PIPELINE_OUTPUT_DIR
-OUTPUT_DIR.mkdir(exist_ok=True)
 
 
 def main() -> None:
@@ -28,10 +27,11 @@ def main() -> None:
 
     args = parser.parse_args()
     out_dir = OUTPUT_DIR / args.language
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     char_data = LOAD_CHAR_DATA[args.language]()
     log.info(f"Loaded data for {len(char_data)} characters")
-    char_data = ADD_PRONUNCIATIONS[args.language](char_data)
+    char_data = ADD_PRONUNCIATIONS[args.language](char_data, out_dir)
     all_data = GROUP_CHARS[args.language](char_data, out_dir)
     all_data = OC_MC[args.language](all_data, out_dir)
     all_data = SELECT_VOCAB[args.language](all_data, out_dir)

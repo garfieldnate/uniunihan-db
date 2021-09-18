@@ -24,6 +24,7 @@ class ComponentGroupIndex:
     def log_diagnostics(self, log: Logger, out_dir: Path):
         """Write a diagnostic summary to log and more details where necessary to
         files in out_dir."""
+
         purity_to_chars = defaultdict(set)
         purity_to_groups: MutableMapping[PurityType, int] = defaultdict(int)
         for g in self.groups:
@@ -31,24 +32,23 @@ class ComponentGroupIndex:
             purity_to_groups[g.purity_type] += 1
 
         if self.no_comp_chars:
-            log.warn(
-                f"{len(self.no_comp_chars)} characters with no phonetic component: {self.no_comp_chars}"
-            )
+            log.warn(f"{len(self.no_comp_chars)} characters with no phonetic component")
+            with open(out_dir / "no_component_chars.json", "w") as f:
+                f.write(format_json(self.no_comp_chars))
         if self.missing_pron_chars:
             log.warn(
                 f"{len(self.missing_pron_chars)} characters with no pronunciations: {self.missing_pron_chars}"
             )
+
         log.info(f"{len(self.unique_pron_to_char)} characters with unique readings")
+        with open(out_dir / "unique_readings.json", "w") as f:
+            f.write(format_json(self.unique_pron_to_char))
 
         log.info(f"{len(self.groups)} total groups:")
         for purity_type in PurityType:
             log.info(
                 f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
             )
-
-        out_dir.mkdir(parents=True, exist_ok=True)
-        with open(out_dir / "unique_readings.json", "w") as f:
-            f.write(format_json(self.unique_pron_to_char))
 
 
 def find_component_groups(

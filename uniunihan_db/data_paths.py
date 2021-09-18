@@ -6,7 +6,6 @@ DATA_DIR = PROJECT_DIR / "data"
 
 GENERATED_DATA_DIR = DATA_DIR / "generated"
 PIPELINE_OUTPUT_DIR = GENERATED_DATA_DIR / "pipeline"
-PIPELINE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 INCLUDED_DATA_DIR = DATA_DIR / "included"
 
