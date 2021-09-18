@@ -20,8 +20,6 @@ def organize_data(data):
         p: {"groups": __organize_groups(char_data, index, p)} for p in PurityType
     }
 
-    __assign_ids(final_output)
-
     return final_output
 
 
@@ -71,22 +69,8 @@ def __create_group_data(g, char_data):
     return data
 
 
-def __assign_ids(data):
-    """Add ID values for groups and characters"""
-    group_id = 1
-    char_id = 1
-    for purity_group in data.values():
-        for group in purity_group["groups"].values():
-            group["ID"] = group_id
-            group_id += 1
-            for cluster in group["clusters"]:
-                for char_data in cluster.values():
-                    char_data["ID"] = char_id
-                    char_id += 1
-
-
 ORGANIZE_DATA = {
     "jp": organize_data,
-    "zh-HK": organize_data,
+    "zh": organize_data,
     "ko": organize_data,
 }

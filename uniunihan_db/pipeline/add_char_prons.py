@@ -110,6 +110,6 @@ def load_prons_ko(char_data, out_dir):
 
 ADD_PRONUNCIATIONS = {
     "jp": load_prons_jp,
-    "zh-HK": load_prons_zh_hk,
+    "zh": load_prons_zh_hk,
     "ko": load_prons_ko,
 }

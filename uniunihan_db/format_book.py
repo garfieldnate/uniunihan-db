@@ -86,7 +86,7 @@ def component_header(component):
 
 GENERATED_DIR = Path(__file__).parent.parent / "data" / "generated"
 JP_DATA_FILE = GENERATED_DIR / "regularities" / "jp" / "final_output.json"
-ZH_HK_DATA_FILE = GENERATED_DIR / "regularities" / "zh-HK" / "final_output.json"
+ZH_HK_DATA_FILE = GENERATED_DIR / "regularities" / "zh" / "final_output.json"
 # OUTPUT_FILE = GENERATED_DIR / "book.html"
 
 
@@ -140,7 +140,7 @@ def index(jp_data, zh_data):
 
     if zh_missing_jp_chars:
         log.warn(
-            f"{len(zh_missing_jp_chars)} zh-HK chars missing JP indices: {zh_missing_jp_chars}"
+            f"{len(zh_missing_jp_chars)} zh chars missing JP indices: {zh_missing_jp_chars}"
         )
 
 

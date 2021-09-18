@@ -115,6 +115,6 @@ def _report_missing_words(char_data_iter, out_dir):
 
 SELECT_VOCAB = {
     "jp": select_vocab_jp,
-    "zh-HK": select_vocab_zh_hk,
+    "zh": select_vocab_zh_hk,
     "ko": select_vocab_ko,
 }

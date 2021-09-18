@@ -15,7 +15,7 @@ Goal design:
     - enrich groups with OC/MC data (enrich_groups)
     - assign IDs (index)
     - combine langs (cross_ref)
-    - incorporate custom notes (finalize)
+    - incorporate custom notes (prose)
     - write output (format)
 
 
@@ -29,6 +29,7 @@ Topic: final output
 * Re-do structure: vocab surface, pron, meaning need to be in single divs together so that height changes in sync and make selection easier
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 * show weird characters like ㍻ somewhere because it's interesting.
+* Where to put 略字 such as 门, 㐧, 才, 圕, 广K, 木キ, etc.?
 
 Topic: groupings
 
@@ -176,6 +177,7 @@ Prediction experiments:
 * Unihan: the data I gathered could be integrated usefully. The okurigana info in Joyo, old spellings, recently relicensed Baxter-Sagart reconstructions, phonetic components, etc.
 * Unihan: would be nice to list kokuji/gukja/chu nom
 * Unihan/Ytenx: semantic variant for 砲 is not 礮
+* Unihan: many characters (曲帶挾, etc.) are set to simplified variant of themselves
 
 ## Dev Tools
 * Consider integrating doit to manage the processing pipeline

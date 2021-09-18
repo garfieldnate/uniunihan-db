@@ -17,6 +17,7 @@ def load_char_data_jp():
         if c_data := char_data.get(c):
             c_data["historical_pron"] = new_to_old_pron
 
+    log.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 
@@ -28,9 +29,13 @@ def load_char_data_zh_hk():
             char_data[char] = {"trad": char}
             if c_def := info.get("kDefinition"):
                 char_data[char]["english"] = c_def
-            if simplified := unihan[char].get("kSimplifiedVariant", []):
-                char_data[char]["simp"] = simplified
 
+            simp = unihan[char].get("kSimplifiedVariant", [])
+            # Remove char from its own list of simplified variants. Pretty sure this is an issue with Unihan data.
+            simp = list(filter(lambda x: x != char, simp))
+            char_data[char]["simp"] = simp
+
+    log.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 
@@ -41,17 +46,18 @@ def load_char_data_ko():
     for row in reader:
         char = row["char"]
         del row["char"]
-        # remove fields that are blank strings
+        # set blannk fields to None
         for key in ["variant", "note"]:
             if not row[key]:
-                del row[key]
+                row[key] = None
         char_data[char] = row
 
+    log.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 
 LOAD_CHAR_DATA = {
     "jp": load_char_data_jp,
-    "zh-HK": load_char_data_zh_hk,
+    "zh": load_char_data_zh_hk,
     "ko": load_char_data_ko,
 }

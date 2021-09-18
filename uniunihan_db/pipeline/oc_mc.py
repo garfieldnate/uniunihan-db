@@ -62,5 +62,5 @@ def integrate_historical_chinese(all_data, out_dir):
 OC_MC = {
     "jp": integrate_historical_chinese,
     "ko": integrate_historical_chinese,
-    "zh-HK": integrate_historical_chinese,
+    "zh": integrate_historical_chinese,
 }
