@@ -34,7 +34,7 @@ def load_prons_jp(char_data, out_dir):
     return char_data
 
 
-def load_prons_zh_hk(char_data, out_dir):
+def load_prons_zh(char_data, out_dir):
     # Get pronunciations that are used in modern words present in CEDICT. This allows
     # us to guarantee that we have examples for most pronunciations, and avoids super
     # obscure pronunciations that increase the grouping complexity significantly.
@@ -110,6 +110,6 @@ def load_prons_ko(char_data, out_dir):
 
 ADD_PRONUNCIATIONS = {
     "jp": load_prons_jp,
-    "zh": load_prons_zh_hk,
+    "zh": load_prons_zh,
     "ko": load_prons_ko,
 }

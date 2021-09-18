@@ -78,6 +78,8 @@ def collate():
     with open(OUTPUT_DIR / "final.json", "w") as f:
         f.write(format_json(all_data))
 
+    return all_data
+
 
 def __cross_reference(all_indices):
     for lang1 in all_indices.keys():

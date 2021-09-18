@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="jp-style.css" />
-    <link rel="stylesheet" href="zh-style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+        integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% for lang in all_data.keys() %}
+    <link rel="stylesheet" href="{{ lang }}-style.css" />
+    {% endfor %}
     <title>Uniunihan Dictionary</title>
 </head>
+
 <body>
-    {% include 'jp_template.html.jinja' %}
-    {% include 'zh_template.html.jinja' %}
+    {% for lang, data in all_data.items() %}
+    {% with part_num = loop.index %}
+    {% include 'part.html.jinja' %}
+    {% endwith %}
+    {% endfor %}
 </body>
+
 </html>

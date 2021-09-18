@@ -47,13 +47,13 @@ class PurityType(IntEnum):
     MIXED_C = (
         5,
         "mixed-C",
-        "These groups have at least 4 characters and share at least 1 pronunciation.",
+        "These groups have at least 4 characters and share at least 1 pronunciation among all the contained characters.",
     )
     # At least one shared pronunciation
     MIXED_D = (
         6,
         "mixed-D",
-        "These groups have less than 4 characters and share at least 1 pronunciation.",
+        "These groups have less than 4 characters but still share at least 1 pronunciation among all the contained characters.",
     )
     # Multiple characters, no pattern found
     NO_PATTERN = (

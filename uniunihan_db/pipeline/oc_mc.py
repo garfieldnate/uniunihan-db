@@ -5,26 +5,26 @@ from uniunihan_db.util import configure_logging, format_json
 
 log = configure_logging(__name__)
 
-BAXTER_SAGART_DATA = get_baxter_sagart()
-YTENX_RHYMES = get_ytenx_rhymes()
-
 
 def integrate_historical_chinese(all_data, out_dir):
-    # For now, we just add the historical data to the components to illustrate the original
-    # pronunciations they signalled
+    """For now, we just add the historical data to the components to
+    illustrate the original pronunciations they signalled"""
+
+    baxter_sagart_data = get_baxter_sagart()
+    ytenx_rhymes = get_ytenx_rhymes()
     missing_data_components = []
     for g in all_data["group_index"].groups:
+        historical_data = []
+        g.sup_info["historical"] = historical_data
+
         component = g.component
         # Filter out groups that aren't based off of real components
         if component in ["国字", "國字"]:
             continue
 
-        bs_infos = BAXTER_SAGART_DATA[component]
-        ytenx_infos = YTENX_RHYMES[component]
-
-        historical_data = []
-        g.sup_info["historical"] = historical_data
-        if bs_infos := BAXTER_SAGART_DATA[component]:
+        bs_infos = baxter_sagart_data[component]
+        ytenx_infos = ytenx_rhymes[component]
+        if bs_infos := baxter_sagart_data[component]:
             for bs in bs_infos:
                 historical_data.append(
                     {
@@ -35,7 +35,7 @@ def integrate_historical_chinese(all_data, out_dir):
                         "LMC": None,
                     }
                 )
-        elif ytenx_infos := YTENX_RHYMES[component]:
+        elif ytenx_infos := ytenx_rhymes[component]:
             for yt in ytenx_infos:
                 historical_data.append(
                     {

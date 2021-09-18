@@ -1,7 +1,7 @@
-{% block zh_hk_content %}
-<div id="zh_hk_content">
-    {{ zh_hk_intro }}
-    {% for purity_type, groups in zh_hk_data.items() %}
+{% block zh_content %}
+<div id="zh_content">
+    {{ zh_intro }}
+    {% for purity_type, groups in zh_data.items() %}
     <div class="purity-group" id="中-purity-group-{{ purity_type }}">
         <div class="purity-group-header">
             {{ purity_group_header(purity_type) }}

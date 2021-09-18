@@ -65,7 +65,7 @@ def __filter_vocab(words, used):
     ]
 
 
-def select_vocab_zh_hk(data, out_dir):
+def select_vocab_zh(data, out_dir):
     char_data = data["char_data"]
     word_list: List[ZhWord] = get_cedict()
     _incorporate_ckip_freq_data(word_list)
@@ -123,6 +123,6 @@ def _report_missing_words(char_data_iter, out_dir):
 
 SELECT_VOCAB = {
     "jp": select_vocab_jp,
-    "zh": select_vocab_zh_hk,
+    "zh": select_vocab_zh,
     "ko": select_vocab_ko,
 }

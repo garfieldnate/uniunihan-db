@@ -21,6 +21,8 @@ Goal design:
 
 Topic: final output
 
+* 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
+* 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
 * Number the chapters/purity groups for easier navigation
 * continuous (but not intrusive) headers for language and purity group
 * output language-specific names of components (BS gives pinyin but not Japanese, etc.)
@@ -30,6 +32,7 @@ Topic: final output
 * Pastel color-coding for languages on edge of pages; kanji for language printed on side (by printing black strips on each page that combine into a character?)
 * show weird characters like ㍻ somewhere because it's interesting.
 * Where to put 略字 such as 门, 㐧, 才, 圕, 广K, 木キ, etc.?
+* List country characters somewhere
 
 Topic: groupings
 
@@ -53,7 +56,6 @@ Topic: Mandarin support
 Topic: Japanese Support
 
 * Next: investigate char/prons with missing example words
-* Should not use both 無沙汰 and ご無沙汰
 * JpAligner not aligning 板塀 (itabei) because it uses kun'yomi or 煉瓦塀 (rengabei) because it uses non-joyo chars.
     - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation
@@ -65,7 +67,6 @@ Topic: Japanese Support
 * Would be nice to be able to sort キョウダイ before ケイテイ (need frequency of readings to do this)
 * move POS into separate field in vocab (is currently part of definition).
 * What is "/(P)" in definition field?
-* non-joyo field should always be list, never `False`
 * possibly output kun'yomi definitions
 * possibly get Japanese glyph alternatives for components
 

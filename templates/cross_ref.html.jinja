@@ -1,0 +1,6 @@
+<div class="box cross-ref border">
+    <div>{% set separator = joiner("<br />")
+        %}{% for l, id in char_info.cross_ref.items() %}{{ separator()}}
+        <a href="#{{ id }}">{{ l|lang_to_han }}：{{ id|format_id }}</a>{% endfor %}
+    </div>
+</div>

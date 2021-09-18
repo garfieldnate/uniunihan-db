@@ -13,7 +13,7 @@ from .select_vocab import SELECT_VOCAB
 
 log = configure_logging(__name__)
 
-LANGUAGES = ["jp", "ko", "zh"]
+LANGUAGES = ["zh", "jp", "ko"]
 
 
 def main() -> None:

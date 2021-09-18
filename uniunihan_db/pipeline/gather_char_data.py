@@ -21,7 +21,7 @@ def load_char_data_jp():
     return char_data
 
 
-def load_char_data_zh_hk():
+def load_char_data_zh():
     unihan = get_unihan()
     char_data = {}
     for char, info in unihan.items():
@@ -57,6 +57,6 @@ def load_char_data_ko():
 
 LOAD_CHAR_DATA = {
     "jp": load_char_data_jp,
-    "zh": load_char_data_zh_hk,
+    "zh": load_char_data_zh,
     "ko": load_char_data_ko,
 }

@@ -36,7 +36,7 @@ testpaths = ["tests"]
 [tool.poetry.scripts]
 pipeline = "uniunihan_db.pipeline.runner:main"
 collate = "uniunihan_db.collate:collate"
-format-book = "uniunihan_db.format_book:main"
+build-book = "uniunihan_db.build_book:build_book"
 # test = "pre-commit run --all-files"
 
 [tool.isort]
