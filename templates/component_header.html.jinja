@@ -5,7 +5,7 @@
     <div class="component-etymology-section">
         <p class="component-keyword">{{loop.index if needs_num else ''}}{{hist_info.gloss}}</p>
         {% if hist_info.OC %}
-        <p class="component-pronunciation"><em>Old Chinese:</em> {{hist_info.OC}}</p>
+        <p class="component-pronunciation"><em>Old Chinese:</em> {{ hist_info.OC|join(',')}}</p>
         {% endif %}
         {% if hist_info.MC %}
         <p class="component-pronunciation"><em>Middle Chinese:</em> {{hist_info.MC}}</p>

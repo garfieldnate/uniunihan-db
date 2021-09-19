@@ -19,7 +19,7 @@
         <div class="box kun-yomi">
             TODO: Cantonese?
         </div>
-        <div class="box keywords">{{ char_info.english }}</div>
+        <div class="box keywords">{{ char_info.english|join('; ') }}</div>
         <div class="box vocab">{{
             char_info.prons.values()|
             sum(attribute='vocab', start=[])|

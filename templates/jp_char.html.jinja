@@ -5,11 +5,6 @@
 <div class="box right-column border">
     <div class="char-data">
         <div class="box old-form">{{ char_info.old or '' }}</div>
-        <div class="box pron">{{
-            char_info.prons.keys()|
-            map('num2diacritic')|
-            join('、')
-            }}</div>
         <div class="box pron">{%-
             set comma = joiner("、") %}{%-
             for pron, pron_info in char_info.prons.items() %}{{ comma() }}{{
@@ -25,7 +20,7 @@
             pron }}{%
             endfor %}
         </div>
-        <div class="box keywords">{{ char_info.keyword }}</div>
+        <div class="box keywords">{{ char_info.keyword|join('; ') }}</div>
         <div class="box vocab">{{
             char_info.prons.values()|
             sum(attribute='vocab', start=[])|

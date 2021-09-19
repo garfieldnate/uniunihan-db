@@ -110,11 +110,6 @@ body {
     grid-row: 2;
 }
 
-.kun-yomi {
-    grid-column: 4;
-    text-align: right;
-}
-
 .cross-ref {
     grid-column: 3;
     display: flex;
