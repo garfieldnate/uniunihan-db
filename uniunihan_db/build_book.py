@@ -94,3 +94,5 @@ def build_book():
     out_dir = OUTPUT_FILE.parent
     for css_file in list(TEMPLATES_DIR.glob("*.css")):
         copy2(css_file, out_dir)
+    for css_file in list((Path(__file__).parent.parent / "vendor").glob("*.css")):
+        copy2(css_file, out_dir)
