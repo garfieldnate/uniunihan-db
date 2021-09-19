@@ -76,6 +76,7 @@ def build_book():
 
     jinja_env = get_jinja_env()
     template = jinja_env.get_template("base.html.jinja")
+    log.info("Rendering template...")
     result = template.render(
         all_data=all_data,
         intros={

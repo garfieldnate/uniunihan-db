@@ -80,11 +80,6 @@ body {
     grid-template-columns: 1fr 1fr 1fr;
 }
 
-.old-form {
-    grid-column: 1;
-    grid-row: 1;
-}
-
 .pron {
     grid-column: 2;
     grid-row: 1;
@@ -120,7 +115,7 @@ body {
     margin-left: -1px;
 }
 
-.comment {
+.char-note {
     grid-column: 1 / span 4;
     grid-row: 2;
 }

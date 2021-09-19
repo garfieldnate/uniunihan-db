@@ -1,0 +1,38 @@
+<div class="box left-column border">
+    <div class="box character">{{ char }}</div>
+    <div class="box id">{{ char_info.ID|format_id }}</div>
+</div>
+<div class="box right-column border">
+    <div class="char-data">
+        <div class="box variant">{{ char_info.variant or '' }}</div>
+        <div class="box pron">{{
+            char_info.prons.keys()|
+            join('、')
+            }}</div>
+        <div class="box hundok">{{ char_info.hun }}</div>
+        <div class="box keywords">TODO: keyword</div>
+        <div class="box vocab">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='surface')|
+            join('<br />')
+            }}</div>
+        <div class="box vocab-pron">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='pron')|
+            join('<br />')
+            }}</div>
+        <div class="box vocab-meaning">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='english')|
+            map('break_slashes')|
+            join('<br />')
+            }}</div>
+    </div>
+    {% if 'note' in char
+    %}<div class="char-note">{{ char.note }}</div>{%
+    endif %}
+</div>
+{% include 'cross_ref.html.jinja' %}
