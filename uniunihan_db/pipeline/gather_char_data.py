@@ -27,8 +27,7 @@ def load_char_data_zh_hk():
     for char, info in unihan.items():
         if "kHKGlyph" in info:
             char_data[char] = {"trad": char}
-            if c_def := info.get("kDefinition"):
-                char_data[char]["english"] = c_def
+            char_data[char]["english"] = info.get("kDefinition", [])
 
             simp = unihan[char].get("kSimplifiedVariant", [])
             # Remove char from its own list of simplified variants. Pretty sure this is an issue with Unihan data.
