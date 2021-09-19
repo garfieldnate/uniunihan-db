@@ -34,16 +34,19 @@ def select_vocab_jp(data, out_dir):
     # Some words have to be specified manually instead of extracted from our downloaded dictionary
     vocab_override: Char2Pron2Words = get_vocab_override(JP_VOCAB_OVERRIDE)
 
+    used_vocab = set()
     for old_c, c_data in char_data.items():
         # Vocab override uses old forms, edict vocab data uses new forms
         if pron_to_words := vocab_override.get(old_c):
             for pron, words in pron_to_words.items():
                 c_data["prons"].get(pron, {})["vocab"] = words
+                used_vocab.update({v.surface for v in c_data["prons"][pron]["vocab"]})
         else:
             new_c = c_data["new"]
             for pron, pron_data in c_data["prons"].items():
                 words = char_to_pron_to_vocab.get(new_c, {}).get(pron, [])
-                pron_data["vocab"] = __filter_vocab(words)
+                pron_data["vocab"] = __filter_vocab(words, used_vocab)
+                used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
         for c_data in char_data.values():
@@ -54,9 +57,12 @@ def select_vocab_jp(data, out_dir):
     return data
 
 
-def __filter_vocab(words):
-    """Take the top MAX_EXAMPLE_VOCAB which contain 2 or more characters (words should be pre-sorted by frequency)"""
-    return list(filter(lambda w: len(w.surface) > 1, words))[:MAX_EXAMPLE_VOCAB]
+def __filter_vocab(words, used):
+    """Take the top MAX_EXAMPLE_VOCAB unused vocab which contain 2 or more characters
+    (words should be pre-sorted by frequency)"""
+    return list(filter(lambda w: len(w.surface) > 1 and w.surface not in used, words))[
+        :MAX_EXAMPLE_VOCAB
+    ]
 
 
 def select_vocab_zh_hk(data, out_dir):
@@ -65,10 +71,12 @@ def select_vocab_zh_hk(data, out_dir):
     _incorporate_ckip_freq_data(word_list)
     char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
 
+    used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-            pron_data["vocab"] = __filter_vocab(words)
+            pron_data["vocab"] = __filter_vocab(words, used_vocab)
+            used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
         for c, c_data in char_data.items():
