@@ -25,7 +25,9 @@ body {
 
 .cell {
     display: grid;
-    grid-template-columns: 10% 80% 10%;
+    /* Technically we need 2ic + 4ch in the third colum,
+    but ic is experimental */
+    grid-template-columns: 10% 80% 11ch;
     background-color: #fff;
     color: #444;
     line-height: 1.5em;

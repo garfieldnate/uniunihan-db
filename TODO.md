@@ -55,7 +55,9 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
-* Next: investigate char/prons with missing example words
+* investigate char/prons with missing example words
+* Consider getting rid of (obsc) and (arch) words (貞治 is in output!)
+    - generally, meaning fields probably need to be parsed better
 * JpAligner not aligning 板塀 (itabei) because it uses kun'yomi or 煉瓦塀 (rengabei) because it uses non-joyo chars.
     - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation

@@ -1,0 +1,53 @@
+<div class="box left-column border">
+    <div class="box character">{{ char_info.new }}</div>
+    <div class="box id">{{ char_info.ID|format_id }}</div>
+</div>
+<div class="box right-column border">
+    <div class="char-data">
+        <div class="box old-form">{{ char_info.old or '' }}</div>
+        <div class="box pron">{{
+            char_info.prons.keys()|
+            map('num2diacritic')|
+            join('、')
+            }}</div>
+        <div class="box pron">{%-
+            set comma = joiner("、") %}{%-
+            for pron, pron_info in char_info.prons.items() %}{{ comma() }}{{
+            pron}}{%
+            if pron_info.historical %}（{{
+            pron_info.historical}}）{%
+            endif %}{%
+            endfor %}
+        </div>
+        <div class="box kun-yomi">{%-
+            set comma = joiner("、") %}{%-
+            for pron in char_info.kun_yomi %}{{ comma() }}{{
+            pron }}{%
+            endfor %}
+        </div>
+        <div class="box keywords">{{ char_info.keyword }}</div>
+        <div class="box vocab">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='surface')|
+            join('<br />')
+            }}</div>
+        <div class="box vocab-pron">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='pron')|
+            join('<br />')
+            }}</div>
+        <div class="box vocab-meaning">{{
+            char_info.prons.values()|
+            sum(attribute='vocab', start=[])|
+            map(attribute='english')|
+            map('break_slashes')|
+            join('<br />')
+            }}</div>
+    </div>
+    {% if 'comment' in char
+    %}<div class="comment">{{ char.comment }}</div>{%
+    endif %}
+</div>
+{% include 'cross_ref.html.jinja' %}

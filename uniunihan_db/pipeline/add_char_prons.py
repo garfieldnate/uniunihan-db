@@ -23,6 +23,8 @@ def load_prons_jp(char_data, out_dir):
             if old_pron := c_data.get("historical_pron", {}).get(pron):
                 pron_data["historical"] = old_pron
                 del c_data["historical_pron"][pron]
+            else:
+                pron_data["historical"] = None
         # delete copied keys
         del c_data["readings"]
         del c_data["non_joyo"]
