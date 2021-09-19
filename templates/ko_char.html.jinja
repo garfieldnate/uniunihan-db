@@ -31,8 +31,7 @@
             join('<br />')
             }}</div>
     </div>
-    {% if 'note' in char
-    %}<div class="char-note">{{ char.note }}</div>{%
+    {% if char_info.note %}<div class="char-note">{{ char_info.note }}</div>{%
     endif %}
 </div>
 {% include 'cross_ref.html.jinja' %}

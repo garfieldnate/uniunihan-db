@@ -20,8 +20,8 @@ from uniunihan_db.lingua.aligner import SpaceAligner
 def test_get_ytenx_rhymes():
     data = get_ytenx_rhymes()
     assert data["搋"] == [
-        YtenxRhyme("搋", ["hr'eː"], None, None),
-        YtenxRhyme("搋", ["hr'eː", "shreːl"], None, None),
+        YtenxRhyme("搋", "虒", ["hr'eː"], None, None),
+        YtenxRhyme("搋", "虒", ["hr'eː", "shreːl"], None, None),
     ]
 
 

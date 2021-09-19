@@ -18,6 +18,7 @@ from uniunihan_db.data_paths import (
     CEDICT_FILE,
     CEDICT_URL,
     CEDICT_ZIP,
+    COMPONENT_OVERRIDE_FILE,
     EDICT_FREQ_DIR,
     EDICT_FREQ_FILE,
     EDICT_FREQ_TARBALL,
@@ -29,7 +30,6 @@ from uniunihan_db.data_paths import (
     LIB_HANGUL_DIR,
     LIB_HANGUL_URL,
     LIB_HANGUL_ZIP_FILE,
-    PHONETIC_COMPONENTS_FILE,
     UNIHAN_FILE,
 )
 from uniunihan_db.lingua.aligner import Aligner
@@ -268,6 +268,7 @@ def __download_ytenx():
 @dataclass
 class YtenxRhyme:
     char: str
+    phonetic_component: str
     old_chinese: List[str]
     middle_chinese: str
     late_middle_chinese: str
@@ -290,7 +291,9 @@ def get_ytenx_rhymes():
                 r["擬音"].append(pron_2)
             del r["擬音2"]
             char_to_component[char].append(
-                YtenxRhyme(char, r["擬音"], r["擬音（後世）"] or None, r["擬音（更後世）"] or None)
+                YtenxRhyme(
+                    char, r["聲符"], r["擬音"], r["擬音（後世）"] or None, r["擬音（更後世）"] or None
+                )
             )
 
     return char_to_component
@@ -480,18 +483,37 @@ def get_joyo():
     return char_info
 
 
+# TODO: unit test
 @cache
-def get_phonetic_components() -> StringToStrings:
-    log.info("Loading phonetic components...")
-    comp_to_char = {}
-    with open(PHONETIC_COMPONENTS_FILE) as f:
-        rows = csv.DictReader(f, delimiter="\t")
-        for r in rows:
-            component = r["component"]
-            chars = r["characters"]
-            comp_to_char[component] = set(chars)
+def get_phonetic_components():
+    """Extract and augment the phonetic component data in ytenx"""
 
-    return comp_to_char
+    log.info("Determining phonetic components...")
+
+    ytenx_rhyme_data = get_ytenx_rhymes()
+    char_to_component = {
+        char: info[0].phonetic_component for char, info in ytenx_rhyme_data.items()
+    }
+
+    with COMPONENT_OVERRIDE_FILE.open() as f:
+        extra_char_to_components = commentjson.load(f)
+        char_to_component.update(extra_char_to_components)
+
+    variants = get_variants()
+    log.info("  Addding phonetic components for variants...")
+    variant_to_component = {}
+    for char in char_to_component:
+        for c in variants.get(char, []):
+            if c not in char_to_component:
+                variant_to_component[c] = char_to_component[char]
+    char_to_component.update(variant_to_component)
+
+    # group by component to make it easier to use
+    component_to_chars = defaultdict(list)
+    for char, component in sorted(char_to_component.items()):
+        component_to_chars[component].append(char)
+
+    return component_to_chars
 
 
 W = TypeVar("W", bound=Word)

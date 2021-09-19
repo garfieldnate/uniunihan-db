@@ -39,4 +39,3 @@ LIB_HANGUL_DIR = LIB_HANGUL_ZIP_FILE.with_suffix("")
 PHONETIC_COMPONENTS_FILE = GENERATED_DATA_DIR / "components_to_chars.tsv"
 
 UNIHAN_FILE = GENERATED_DATA_DIR / "unihan.json"
-UNIHAN_AUGMENTATION_FILE = GENERATED_DATA_DIR / "unihan_augmentation.json"
