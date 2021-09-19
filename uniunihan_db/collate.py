@@ -1,4 +1,4 @@
-from uniunihan_db.data_paths import GENERATED_DATA_DIR
+from uniunihan_db.data.paths import GENERATED_DATA_DIR
 from uniunihan_db.util import configure_logging, format_json
 
 from .pipeline.runner import LANGUAGES, run_pipeline

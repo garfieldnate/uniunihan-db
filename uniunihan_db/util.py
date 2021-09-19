@@ -6,7 +6,7 @@ from json.encoder import JSONEncoder
 from pathlib import Path
 from typing import Any, Collection, Mapping, MutableMapping, TypeVar
 
-from uniunihan_db.data_paths import GENERATED_DATA_DIR
+from uniunihan_db.data.paths import GENERATED_DATA_DIR
 
 LOG_FILE = GENERATED_DATA_DIR / "log.txt"
 

@@ -2,7 +2,7 @@
 # Final structure: {char -> {char data}}
 
 from uniunihan_db.data.datasets import get_historical_on_yomi, get_joyo, get_unihan
-from uniunihan_db.data_paths import KO_ED_CHARS_FILE
+from uniunihan_db.data.paths import KO_ED_CHARS_FILE
 from uniunihan_db.util import configure_logging, read_csv
 
 log = configure_logging(__name__)

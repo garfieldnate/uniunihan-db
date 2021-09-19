@@ -12,8 +12,8 @@ from uniunihan_db.data.datasets import (
     get_ytenx_variants,
     index_vocab,
 )
+from uniunihan_db.data.paths import TEST_CORPUS_DIR
 from uniunihan_db.data.types import Word, ZhWord
-from uniunihan_db.data_paths import TEST_CORPUS_DIR
 from uniunihan_db.lingua.aligner import SpaceAligner
 
 

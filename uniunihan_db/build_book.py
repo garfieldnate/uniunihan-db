@@ -9,7 +9,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from uniunihan_db.collate import collate
 from uniunihan_db.component.group import PurityType
-from uniunihan_db.data_paths import GENERATED_DATA_DIR
+from uniunihan_db.data.paths import GENERATED_DATA_DIR
 from uniunihan_db.lingua.mandarin import pinyin_numbers_to_tone_marks
 from uniunihan_db.util import configure_logging
 

@@ -10,8 +10,8 @@ from uniunihan_db.data.datasets import (
     get_vocab_override,
     index_vocab,
 )
+from uniunihan_db.data.paths import JP_VOCAB_OVERRIDE
 from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
-from uniunihan_db.data_paths import JP_VOCAB_OVERRIDE
 from uniunihan_db.lingua.aligner import JpAligner, SpaceAligner
 from uniunihan_db.util import configure_logging, format_json
 

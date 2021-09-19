@@ -1,6 +1,6 @@
 import argparse
 
-from uniunihan_db.data_paths import PIPELINE_OUTPUT_DIR
+from uniunihan_db.data.paths import PIPELINE_OUTPUT_DIR
 from uniunihan_db.util import configure_logging, format_json
 
 from .add_char_prons import ADD_PRONUNCIATIONS

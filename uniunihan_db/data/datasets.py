@@ -13,8 +13,7 @@ import requests
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
-from uniunihan_db.data.types import Char2Pron2Words, StringToStrings, Word, ZhWord
-from uniunihan_db.data_paths import (
+from uniunihan_db.data.paths import (
     CEDICT_FILE,
     CEDICT_URL,
     CEDICT_ZIP,
@@ -32,6 +31,7 @@ from uniunihan_db.data_paths import (
     LIB_HANGUL_ZIP_FILE,
     UNIHAN_FILE,
 )
+from uniunihan_db.data.types import Char2Pron2Words, StringToStrings, Word, ZhWord
 from uniunihan_db.lingua.aligner import Aligner
 from uniunihan_db.util import configure_logging
 
