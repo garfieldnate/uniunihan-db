@@ -28,6 +28,10 @@ JUN_DA_CHAR_FREQ_URL = (
 )
 JUN_DA_CHAR_FREQ_FILE = GENERATED_DATA_DIR / "jun_da_char.tsv"
 
+KENGDIC_DATA_PACKAGE_URL = (
+    "https://raw.githubusercontent.com/garfieldnate/kengdic/master/datapackage.json"
+)
+
 KO_ED_CHARS_FILE = INCLUDED_DATA_DIR / "kyoyuk_hanja.csv"
 
 JP_VOCAB_OVERRIDE = INCLUDED_DATA_DIR / "jp_vocab_override.json"

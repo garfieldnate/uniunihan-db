@@ -10,6 +10,7 @@ from typing import AbstractSet, Any, List, Mapping, MutableMapping, MutableSet, 
 import commentjson
 import jaconv
 import requests
+from datapackage import Package
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
@@ -26,6 +27,7 @@ from uniunihan_db.data.paths import (
     INCLUDED_DATA_DIR,
     JUN_DA_CHAR_FREQ_FILE,
     JUN_DA_CHAR_FREQ_URL,
+    KENGDIC_DATA_PACKAGE_URL,
     LIB_HANGUL_DIR,
     LIB_HANGUL_URL,
     LIB_HANGUL_ZIP_FILE,
@@ -621,3 +623,35 @@ def get_variants():
         char_to_variants[char].update(variants)
 
     return dict(char_to_variants)
+
+
+@cache
+def get_kengdic():
+    # TODO: add separate download step
+    log.info("Loading kengdic data...")
+    package = Package(KENGDIC_DATA_PACKAGE_URL)
+    resource = package.get_resource("kengdic")
+    data = resource.read(keyed=True)
+
+    # No frequency data available, so we'll translate the level data to fake
+    # frequencies to help
+    level_to_frequency = {"A": 500, "B": 400, "C": 300, "D": 200}
+    words = []
+    for d in data:
+        if d["hanja"] and d["gloss"]:
+            if level := d["level"]:
+                frequency = level_to_frequency[level]
+            else:
+                frequency = -1
+
+            w = Word(
+                d["hanja"],
+                "kengdic-{id}".format(**d),
+                d["surface"],
+                d["gloss"],
+                frequency,
+            )
+            words.append(w)
+
+    log.info(f"Loaded {len(words)} usable words from Kengdic")
+    return sorted(words, key=lambda w: -w.frequency)

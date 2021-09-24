@@ -7,6 +7,7 @@ from uniunihan_db.data.datasets import (
     get_cedict,
     get_ckip_20k,
     get_edict_freq,
+    get_kengdic,
     get_vocab_override,
     index_vocab,
 )
@@ -97,12 +98,31 @@ def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
     words.sort(key=lambda w: (-w.frequency, w.surface))
 
 
+def __filter_vocab_ko(words, used):
+    """Similar to __filter_vocab, but allows words of length 1"""
+    return list(filter(lambda w: w.surface not in used, words))[:MAX_EXAMPLE_VOCAB]
+
+
 def select_vocab_ko(data, out_dir):
     char_data = data["char_data"]
+
+    # TODO: Kengdic needs a ton of cleaning for this to work okay
+    word_list: List[Word] = get_kengdic()
+    char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
+
+    used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
-            # TODO: need Korean vocab data
-            pron_data["vocab"] = []
+            words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
+            pron_data["vocab"] = __filter_vocab_ko(words, used_vocab)
+            used_vocab.update({v.surface for v in pron_data["vocab"]})
+
+    def char_data_iter():
+        for c, c_data in char_data.items():
+            yield c, c_data
+
+    _report_missing_words(char_data_iter(), out_dir)
+
     return data
 
 

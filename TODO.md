@@ -1,22 +1,7 @@
 # TODO
 
-Next: sort and assign IDs to components, chars, and words
 
 Sometime soon: Unit tests for pipeline steps
-
-Goal design:
-
-* Pipeline starting from data sources and progressing through processing, indexing, and enrichment steps.
-    - char data (gather_char_data.py)
-    - pronunciations (from vocab or standards like Joyo) -> char2prons (get_char_prons)
-    - char2prons + components -> purity groups (find_regularities)
-    - select vocab (select_vocab)
-    - ordering/organizing -> purity to groups to chars to ... (order)
-    - enrich groups with OC/MC data (enrich_groups)
-    - assign IDs (index)
-    - combine langs (cross_ref)
-    - incorporate custom notes (prose)
-    - write output (format)
 
 
 Topic: final output
@@ -33,6 +18,7 @@ Topic: final output
 * show weird characters like ㍻ somewhere because it's interesting.
 * Where to put 略字 such as 门, 㐧, 才, 圕, 广K, 木キ, etc.?
 * List country characters somewhere
+* Sample of Kanbun from each country, which pronunciations
 
 Topic: groupings
 
@@ -64,6 +50,7 @@ Topic: Japanese Support
     - Sometimes much better examples can be found by allowing kun-yomi; the advantage of using non-joyo chars is more debatable, though
 * 文字もんじ is a serious problem! Need to list もじ pronunciation
     - same with 日本語 にっぽんご
+    - can grab same word marked with (P), which means common in EDICT
 * Char notes: kokuji section, 動 is also kokuji but has a phonetic component
 * track down unfound Baxter/Sagart data for 125 components
 * Would be nice to have Japanese names for components
@@ -101,6 +88,7 @@ Topic: Vietnamese Support
     - will require lots of work to make it usable
 * How to find modern words, though?
 * short intro to chu nom (common words like I, is, you, etc.)
+* Old/Middle Vietnamese pronunciations?
 
 ## Tasks
 
@@ -183,6 +171,8 @@ Prediction experiments:
 * Unihan: would be nice to list kokuji/gukja/chu nom
 * Unihan/Ytenx: semantic variant for 砲 is not 礮
 * Unihan: many characters (曲帶挾, etc.) are set to simplified variant of themselves
+* Datapackage: no helpful error message printed when a field cannot be cast to the type in the schema. `validate` only checks that schema definition can be parsed, not that data conforms to it.
+    - `package.get_resource('kengdic').read(keyed=True)` gives `datapackage.exceptions.CastError: There are 1 cast errors (see exception.errors) for row "2"`, but does not say what the cast error was (or which column). Had to edit schema.py to print out the actual errors (which were informative!)
 
 ## Dev Tools
 * Consider integrating doit to manage the processing pipeline
