@@ -3,6 +3,8 @@
 
 from typing import List
 
+from loguru import logger
+
 from uniunihan_db.data.datasets import (
     get_cedict,
     get_ckip_20k,
@@ -14,14 +16,12 @@ from uniunihan_db.data.datasets import (
 from uniunihan_db.data.paths import JP_VOCAB_OVERRIDE
 from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
 from uniunihan_db.lingua.aligner import JpAligner, SpaceAligner
-from uniunihan_db.util import configure_logging, format_json
-
-log = configure_logging(__name__)
+from uniunihan_db.util import format_json
 
 MAX_EXAMPLE_VOCAB = 2
 
 
-def select_vocab_jp(data, out_dir):
+def select_vocab_jp(data):
     char_data = data["char_data"]
     # construct data necessary for char/pronunciation alignment
     new_char_to_prons = {}
@@ -53,7 +53,7 @@ def select_vocab_jp(data, out_dir):
         for c_data in char_data.values():
             yield c_data["new"], c_data
 
-    _report_missing_words(char_data_iter(), out_dir)
+    _report_missing_words(char_data_iter())
 
     return data
 
@@ -66,7 +66,7 @@ def __filter_vocab(words, used):
     ]
 
 
-def select_vocab_zh(data, out_dir):
+def select_vocab_zh(data):
     char_data = data["char_data"]
     word_list: List[ZhWord] = get_cedict()
     _incorporate_ckip_freq_data(word_list)
@@ -83,7 +83,7 @@ def select_vocab_zh(data, out_dir):
         for c, c_data in char_data.items():
             yield c, c_data
 
-    _report_missing_words(char_data_iter(), out_dir)
+    _report_missing_words(char_data_iter())
 
     return data
 
@@ -103,7 +103,7 @@ def __filter_vocab_ko(words, used):
     return list(filter(lambda w: w.surface not in used, words))[:MAX_EXAMPLE_VOCAB]
 
 
-def select_vocab_ko(data, out_dir):
+def select_vocab_ko(data):
     char_data = data["char_data"]
 
     # TODO: Kengdic needs a ton of cleaning for this to work okay
@@ -121,12 +121,12 @@ def select_vocab_ko(data, out_dir):
         for c, c_data in char_data.items():
             yield c, c_data
 
-    _report_missing_words(char_data_iter(), out_dir)
+    _report_missing_words(char_data_iter())
 
     return data
 
 
-def _report_missing_words(char_data_iter, out_dir):
+def _report_missing_words(char_data_iter):
     missing_words = set()
     for c, char_data in char_data_iter:
         for pron, pron_data in char_data["prons"].items():
@@ -134,11 +134,8 @@ def _report_missing_words(char_data_iter, out_dir):
                 missing_words.add(f"{c}/{pron}")
 
     if missing_words:
-        log.warn(f"Missing vocab for {len(missing_words)} char/pron pairs")
-
-    with open(out_dir / "missing_words.json", "w") as f:
-        # Character/pronunciation pairs for which no vocab examples could be found
-        f.write(format_json(sorted(list(missing_words))))
+        logger.warning(f"Missing vocab for {len(missing_words)} char/pron pairs")
+        logger.debug(format_json(sorted(list(missing_words))))
 
 
 SELECT_VOCAB = {

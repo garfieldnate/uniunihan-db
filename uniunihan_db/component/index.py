@@ -1,7 +1,5 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from logging import Logger
-from pathlib import Path
 from typing import Collection, Mapping, MutableMapping, MutableSequence
 
 from uniunihan_db.component.group import ComponentGroup, PurityType
@@ -21,9 +19,8 @@ class ComponentGroupIndex:
     # characters with no pronunciation components
     no_comp_chars: Collection[str]
 
-    def log_diagnostics(self, log: Logger, out_dir: Path):
-        """Write a diagnostic summary to log and more details where necessary to
-        files in out_dir."""
+    def log_diagnostics(self, logger):
+        """Write a diagnostic summary to the logs"""
 
         purity_to_chars = defaultdict(set)
         purity_to_groups: MutableMapping[PurityType, int] = defaultdict(int)
@@ -32,21 +29,24 @@ class ComponentGroupIndex:
             purity_to_groups[g.purity_type] += 1
 
         if self.no_comp_chars:
-            log.warn(f"{len(self.no_comp_chars)} characters with no phonetic component")
-            with open(out_dir / "no_component_chars.json", "w") as f:
-                f.write(format_json(self.no_comp_chars))
-        if self.missing_pron_chars:
-            log.warn(
-                f"{len(self.missing_pron_chars)} characters with no pronunciations: {self.missing_pron_chars}"
+            logger.warning(
+                f"{len(self.no_comp_chars)} character(s) with no phonetic component"
             )
+            logger.debug(format_json(self.no_comp_chars))
+        if self.missing_pron_chars:
+            logger.warning(
+                f"{len(self.missing_pron_chars)} character(s) with no pronunciations"
+            )
+            logger.debug(self.missing_pron_chars)
 
-        log.info(f"{len(self.unique_pron_to_char)} characters with unique readings")
-        with open(out_dir / "unique_readings.json", "w") as f:
-            f.write(format_json(self.unique_pron_to_char))
+        logger.info(
+            f"{len(self.unique_pron_to_char)} character(s) with unique readings"
+        )
+        logger.debug(format_json(self.unique_pron_to_char))
 
-        log.info(f"{len(self.groups)} total groups:")
+        logger.info(f"{len(self.groups)} total groups:")
         for purity_type in PurityType:
-            log.info(
+            logger.info(
                 f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
             )
 

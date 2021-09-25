@@ -1,12 +1,12 @@
 # Integrate Old and Middle Chinese data
 
+from loguru import logger
+
 from uniunihan_db.data.datasets import get_baxter_sagart, get_ytenx_rhymes
-from uniunihan_db.util import configure_logging, format_json
-
-log = configure_logging(__name__)
+from uniunihan_db.util import format_json
 
 
-def integrate_historical_chinese(all_data, out_dir):
+def integrate_historical_chinese(all_data):
     """For now, we just add the historical data to the components to
     illustrate the original pronunciations they signalled"""
 
@@ -14,8 +14,7 @@ def integrate_historical_chinese(all_data, out_dir):
     ytenx_rhymes = get_ytenx_rhymes()
     missing_data_components = []
     for g in all_data["group_index"].groups:
-        historical_data = []
-        g.sup_info["historical"] = historical_data
+        g.sup_info["historical"] = historical_data = []
 
         component = g.component
         # Filter out groups that aren't based off of real components
@@ -50,11 +49,10 @@ def integrate_historical_chinese(all_data, out_dir):
             missing_data_components.append(component)
 
     if missing_data_components:
-        log.warn(
+        logger.warning(
             f"Missing historical data for {len(missing_data_components)} components"
         )
-        with open(out_dir / "components_missing_historical_prons.json", "w") as f:
-            f.write(format_json(missing_data_components))
+        logger.debug(format_json(missing_data_components))
 
     return all_data
 

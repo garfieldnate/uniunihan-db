@@ -6,6 +6,7 @@ from shutil import copy2
 import jaconv
 import jinja2
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from loguru import logger as log
 
 from uniunihan_db.collate import collate
 from uniunihan_db.component.group import PurityType
@@ -17,7 +18,6 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 INPUT_FILE = GENERATED_DATA_DIR / "collated" / "final.json"
 OUTPUT_FILE = GENERATED_DATA_DIR / "book" / "book.html"
 OUTPUT_FILE.parent.mkdir(exist_ok=True, parents=True)
-log = configure_logging(__name__)
 
 
 # filters and functions for our jinja template
@@ -95,3 +95,12 @@ def build_book():
     out_dir = OUTPUT_FILE.parent
     for css_file in list((Path(__file__).parent.parent / "css").glob("*.css")):
         copy2(css_file, out_dir)
+
+
+def main():
+    configure_logging()
+    build_book()
+
+
+if __name__ == "__main__":
+    main()

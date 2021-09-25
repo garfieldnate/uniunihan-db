@@ -11,6 +11,7 @@ import commentjson
 import jaconv
 import requests
 from datapackage import Package
+from loguru import logger
 from unihan_etl.process import Packager as unihan_packager
 from unihan_etl.process import export_json
 
@@ -35,15 +36,12 @@ from uniunihan_db.data.paths import (
 )
 from uniunihan_db.data.types import Char2Pron2Words, StringToStrings, Word, ZhWord
 from uniunihan_db.lingua.aligner import Aligner
-from uniunihan_db.util import configure_logging
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
 YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
 
 BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
-
-log = configure_logging(__name__)
 
 #################
 ## Downloaders ##
@@ -55,10 +53,10 @@ def __download_unihan():
     and store it has a normalized JSON file"""
 
     if UNIHAN_FILE.exists() and UNIHAN_FILE.stat().st_size > 0:
-        log.info(f"{UNIHAN_FILE.name} already exists; skipping download")
+        logger.info(f"{UNIHAN_FILE.name} already exists; skipping download")
         return
 
-    log.info("  Downloading unihan data...")
+    logger.info("  Downloading unihan data...")
     p = unihan_packager.from_cli(["-F", "json", "--destination", str(UNIHAN_FILE)])
     p.download()
     # instruct packager to return data instead of writing to file
@@ -66,10 +64,10 @@ def __download_unihan():
     p.options["format"] = "python"
     unihan = p.export()
 
-    log.info("  Converting unihan data to dictionary format...")
+    logger.info("  Converting unihan data to dictionary format...")
     unihan_dict = {entry["char"]: entry for entry in unihan}
 
-    log.info("  Simplifying variant fields...")
+    logger.info("  Simplifying variant fields...")
     for d in unihan_dict.values():
         # TODO: address duplication below
         if compat_variant := d.get("kCompatibilityVariant"):
@@ -108,7 +106,7 @@ def __download_unihan():
                     new_variants.append(char)
             d["kJoyoKanji"] = new_variants
 
-    log.info(f"  Writing unihan to {UNIHAN_FILE}...")
+    logger.info(f"  Writing unihan to {UNIHAN_FILE}...")
     export_json(unihan_dict, UNIHAN_FILE)
     global UNIHAN_DICT
     UNIHAN_DICT = unihan_dict
@@ -119,9 +117,9 @@ def __download_edict_freq():
 
     # download
     if EDICT_FREQ_TARBALL.exists() and EDICT_FREQ_TARBALL.stat().st_size > 0:
-        log.info(f"{EDICT_FREQ_TARBALL.name} already exists; skipping download")
+        logger.info(f"{EDICT_FREQ_TARBALL.name} already exists; skipping download")
     else:
-        log.info(
+        logger.info(
             f"Downloading frequency-annotated EDICT to {EDICT_FREQ_TARBALL.name}..."
         )
         r = requests.get(EDICT_FREQ_URL, stream=True)
@@ -131,7 +129,7 @@ def __download_edict_freq():
 
     # unzip
     if EDICT_FREQ_DIR.exists() and EDICT_FREQ_DIR.is_dir():
-        log.info(f"  {EDICT_FREQ_DIR.name} already exists; skipping decompress")
+        logger.info(f"  {EDICT_FREQ_DIR.name} already exists; skipping decompress")
     else:
         tar = tarfile.open(EDICT_FREQ_TARBALL, "r:gz")
         tar.extractall(GENERATED_DATA_DIR)
@@ -143,7 +141,7 @@ def get_edict_freq(file=EDICT_FREQ_FILE):
 
     __download_edict_freq()
 
-    log.info(f"Reading EDICT frequency data from {file}...")
+    logger.info(f"Reading EDICT frequency data from {file}...")
     words = []
     with open(file) as f:
         # skip header
@@ -170,9 +168,9 @@ def __download_cedict():
 
     # download
     if CEDICT_ZIP.exists() and CEDICT_ZIP.stat().st_size > 0:
-        log.info(f"{CEDICT_ZIP.name} already exists; skipping download")
+        logger.info(f"{CEDICT_ZIP.name} already exists; skipping download")
     else:
-        log.info(f"Downloading CC-CEDICT to {CEDICT_ZIP.name}...")
+        logger.info(f"Downloading CC-CEDICT to {CEDICT_ZIP.name}...")
         r = requests.get(CEDICT_URL, stream=True)
         with open(CEDICT_ZIP, "wb") as fd:
             for chunk in r.iter_content(chunk_size=128):
@@ -181,9 +179,9 @@ def __download_cedict():
     CEDICT_DIR = CEDICT_ZIP.with_suffix("")
     # unzip
     if CEDICT_DIR.exists() and CEDICT_DIR.stat().st_size > 0:
-        log.info(f"  {CEDICT_DIR.name} already exists; skipping decompress")
+        logger.info(f"  {CEDICT_DIR.name} already exists; skipping decompress")
     else:
-        log.info(f"  Writing decompressed contents to {CEDICT_DIR.name}")
+        logger.info(f"  Writing decompressed contents to {CEDICT_DIR.name}")
         with zipfile.ZipFile(CEDICT_ZIP, "r") as zip_ref:
             zip_ref.extractall(CEDICT_DIR)
 
@@ -194,10 +192,10 @@ def __download_jun_da_char_freq():
     # a data package version of the list somewhere.
 
     if JUN_DA_CHAR_FREQ_FILE.exists() and JUN_DA_CHAR_FREQ_FILE.stat().st_size > 0:
-        log.info(f"{JUN_DA_CHAR_FREQ_FILE.name} already exists; skipping download")
+        logger.info(f"{JUN_DA_CHAR_FREQ_FILE.name} already exists; skipping download")
         return
 
-    log.info(
+    logger.info(
         f"Downloading Jun Da's character frequency list from {JUN_DA_CHAR_FREQ_URL}..."
     )
     r = requests.get(JUN_DA_CHAR_FREQ_URL)
@@ -209,7 +207,7 @@ def __download_jun_da_char_freq():
             # remove trailing </pre> and extra content
             line = line.split("</pre>")[0]
 
-            log.info(
+            logger.info(
                 f"  Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
             )
             with open(JUN_DA_CHAR_FREQ_FILE, "w") as f:
@@ -226,9 +224,9 @@ def __download_libhangul():
     """Download and unzip the libhangul hanja word list data."""
     # download
     if LIB_HANGUL_ZIP_FILE.exists() and LIB_HANGUL_ZIP_FILE.stat().st_size > 0:
-        log.info(f"{LIB_HANGUL_ZIP_FILE.name} already exists; skipping download")
+        logger.info(f"{LIB_HANGUL_ZIP_FILE.name} already exists; skipping download")
     else:
-        log.info(f"Downloading libhangul to {LIB_HANGUL_ZIP_FILE}...")
+        logger.info(f"Downloading libhangul to {LIB_HANGUL_ZIP_FILE}...")
         r = requests.get(LIB_HANGUL_URL, stream=True)
         with open(LIB_HANGUL_ZIP_FILE, "wb") as fd:
             for chunk in r.iter_content(chunk_size=128):
@@ -236,7 +234,7 @@ def __download_libhangul():
 
     # unzip
     if LIB_HANGUL_DIR.exists() and LIB_HANGUL_DIR.is_dir():
-        log.info(f"  {LIB_HANGUL_DIR.name} already exists; skipping unzip")
+        logger.info(f"  {LIB_HANGUL_DIR.name} already exists; skipping unzip")
     else:
         with zipfile.ZipFile(LIB_HANGUL_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
@@ -246,9 +244,9 @@ def __download_ytenx():
     """Download and unzip the ytenx rhyming data."""
     # download
     if YTENX_ZIP_FILE.exists() and YTENX_ZIP_FILE.stat().st_size > 0:
-        log.debug(f"{YTENX_ZIP_FILE.name} already exists; skipping download")
+        logger.debug(f"{YTENX_ZIP_FILE.name} already exists; skipping download")
     else:
-        log.info(f"Downloading ytenx rhyming data to {YTENX_ZIP_FILE}...")
+        logger.info(f"Downloading ytenx rhyming data to {YTENX_ZIP_FILE}...")
         r = requests.get(YTENX_URL, stream=True)
         with open(YTENX_ZIP_FILE, "wb") as fd:
             for chunk in r.iter_content(chunk_size=128):
@@ -256,7 +254,7 @@ def __download_ytenx():
 
     # unzip
     if YTENX_DIR.exists() and YTENX_DIR.is_dir():
-        log.debug(f"  {YTENX_DIR.name} already exists; skipping unzip")
+        logger.debug(f"  {YTENX_DIR.name} already exists; skipping unzip")
     else:
         with zipfile.ZipFile(YTENX_ZIP_FILE, "r") as zip_ref:
             zip_ref.extractall(GENERATED_DATA_DIR)
@@ -280,7 +278,7 @@ class YtenxRhyme:
 def get_ytenx_rhymes():
     __download_ytenx()
 
-    log.info("  Reading rhymes from ytenx...")
+    logger.info("  Reading rhymes from ytenx...")
     char_to_component = defaultdict(list)
     with open(YTENX_DIR / "ytenx" / "sync" / "dciangx" / "DrienghTriang.txt") as f:
         rows = csv.DictReader(f, delimiter=" ")
@@ -312,7 +310,7 @@ class BaxterSagart:
 
 @cache
 def get_baxter_sagart():
-    log.info("Loading Baxter/Sagart reconstruction data...")
+    logger.info("Loading Baxter/Sagart reconstruction data...")
     char_to_info = defaultdict(list)
     with BAXTER_SAGART_FILE.open() as f:
         # filter comments
@@ -335,7 +333,7 @@ def get_baxter_sagart():
 def get_ytenx_variants():
     __download_ytenx()
 
-    log.info("Constructing variants index from Ytenx...")
+    logger.info("Constructing variants index from Ytenx...")
     char_to_variants = defaultdict(set)
     with open(YTENX_DIR / "ytenx" / "sync" / "jihthex" / "JihThex.csv") as f:
         rows = csv.DictReader(f)
@@ -359,7 +357,7 @@ def get_ytenx_variants():
 @cache
 def get_ckip_20k() -> Mapping[str, Any]:
     ckip_path = INCLUDED_DATA_DIR / "CKIP_20000" / "mandarin_20K.tsv"
-    log.info(f"Loading {ckip_path}")
+    logger.info(f"Loading {ckip_path}")
 
     # surface form -> word list
     entries = defaultdict(list)
@@ -379,14 +377,14 @@ def get_ckip_20k() -> Mapping[str, Any]:
             num_words += 1
             entries[word].append(word_dict)
 
-    log.info(f"  Read {num_words} words from CKIP frequency list")
+    logger.info(f"  Read {num_words} words from CKIP frequency list")
     return entries
 
 
 @cache
 def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
     __download_cedict()
-    log.info("Loading CEDICT data...")
+    logger.info("Loading CEDICT data...")
 
     words: List[ZhWord] = []
     with open(file) as f:
@@ -427,7 +425,7 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
             )
             words.append(word)
 
-    log.info(f"  Read {len(words)} entries from CEDICT")
+    logger.info(f"  Read {len(words)} entries from CEDICT")
     return words
 
 
@@ -450,7 +448,7 @@ class Joyo:
 
 @cache
 def get_joyo():
-    log.info("Loading joyo data...")
+    logger.info("Loading joyo data...")
     char_info: MutableMapping[str, MutableMapping[str, Any]] = {}
     with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
         # filter comments
@@ -490,7 +488,7 @@ def get_joyo():
 def get_phonetic_components():
     """Extract and augment the phonetic component data in ytenx"""
 
-    log.info("Determining phonetic components...")
+    logger.info("Determining phonetic components...")
 
     ytenx_rhyme_data = get_ytenx_rhymes()
     char_to_component = {
@@ -502,7 +500,7 @@ def get_phonetic_components():
         char_to_component.update(extra_char_to_components)
 
     variants = get_variants()
-    log.info("  Addding phonetic components for variants...")
+    logger.info("  Addding phonetic components for variants...")
     variant_to_component = {}
     for char in char_to_component:
         for c in variants.get(char, []):
@@ -532,7 +530,7 @@ def index_vocab(words: List[W], aligner: Aligner) -> Char2Pron2Words:
 
 @cache
 def get_historical_on_yomi():
-    log.info("Loading historical on-yomi data...")
+    logger.info("Loading historical on-yomi data...")
     char_to_new_to_old_pron = defaultdict(dict)
     with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
         # filter comments
@@ -572,10 +570,10 @@ def get_vocab_override(file) -> Char2Pron2Words:
 @cache
 def get_unihan(file=UNIHAN_FILE) -> Mapping[str, Any]:
     __download_unihan()
-    log.info("Loading unihan data...")
+    logger.info("Loading unihan data...")
     with open(file) as f:
         unihan = json.load(f)
-    log.info(f"  Read {len(unihan)} characters from Unihan DB")
+    logger.info(f"  Read {len(unihan)} characters from Unihan DB")
 
     return unihan
 
@@ -583,7 +581,7 @@ def get_unihan(file=UNIHAN_FILE) -> Mapping[str, Any]:
 @cache
 def get_unihan_variants(file=GENERATED_DATA_DIR / "unihan.json"):
     unihan = get_unihan(file)
-    log.info("Constructing variants index from Unihan...")
+    logger.info("Constructing variants index from Unihan...")
 
     char_to_variants = defaultdict(set)
     for char, entry in unihan.items():
@@ -628,7 +626,7 @@ def get_variants():
 @cache
 def get_kengdic():
     # TODO: add separate download step
-    log.info("Loading kengdic data...")
+    logger.info("Loading kengdic data...")
     package = Package(KENGDIC_DATA_PACKAGE_URL)
     resource = package.get_resource("kengdic")
     data = resource.read(keyed=True)
@@ -653,5 +651,5 @@ def get_kengdic():
             )
             words.append(w)
 
-    log.info(f"Loaded {len(words)} usable words from Kengdic")
+    logger.info(f"Loaded {len(words)} usable words from Kengdic")
     return sorted(words, key=lambda w: -w.frequency)

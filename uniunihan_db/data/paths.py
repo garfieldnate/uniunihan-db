@@ -5,6 +5,8 @@ PROJECT_DIR = Path(__file__).parents[2]
 DATA_DIR = PROJECT_DIR / "data"
 
 GENERATED_DATA_DIR = DATA_DIR / "generated"
+GENERATED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 PIPELINE_OUTPUT_DIR = GENERATED_DATA_DIR / "pipeline"
 
 INCLUDED_DATA_DIR = DATA_DIR / "included"

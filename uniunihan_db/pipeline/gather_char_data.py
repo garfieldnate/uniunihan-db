@@ -1,11 +1,11 @@
 # Step 1: gather data for characters to be learned
 # Final structure: {char -> {char data}}
 
+from loguru import logger
+
 from uniunihan_db.data.datasets import get_historical_on_yomi, get_joyo, get_unihan
 from uniunihan_db.data.paths import KO_ED_CHARS_FILE
-from uniunihan_db.util import configure_logging, read_csv
-
-log = configure_logging(__name__)
+from uniunihan_db.util import read_csv
 
 
 def load_char_data_jp():
@@ -17,7 +17,7 @@ def load_char_data_jp():
         if c_data := char_data.get(c):
             c_data["historical_pron"] = new_to_old_pron
 
-    log.info(f"Loaded data for {len(char_data)} characters")
+    logger.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 
@@ -34,7 +34,7 @@ def load_char_data_zh():
             simp = list(filter(lambda x: x != char, simp))
             char_data[char]["simp"] = simp
 
-    log.info(f"Loaded data for {len(char_data)} characters")
+    logger.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 
@@ -51,7 +51,7 @@ def load_char_data_ko():
                 row[key] = None
         char_data[char] = row
 
-    log.info(f"Loaded data for {len(char_data)} characters")
+    logger.info(f"Loaded data for {len(char_data)} characters")
     return char_data
 
 

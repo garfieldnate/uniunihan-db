@@ -3,16 +3,16 @@
 
 from typing import List
 
+from loguru import logger
+
 from uniunihan_db.data.datasets import get_cedict, get_unihan, index_vocab
 from uniunihan_db.data.types import ZhWord
 from uniunihan_db.lingua.aligner import SpaceAligner
 from uniunihan_db.lingua.mandarin import pinyin_tone_marks_to_numbers
-from uniunihan_db.util import configure_logging, format_json
-
-log = configure_logging(__name__)
+from uniunihan_db.util import format_json
 
 
-def load_prons_jp(char_data, out_dir):
+def load_prons_jp(char_data):
     # Use pronunciations from Joyo specification.
     # This only requires restructuring; no new data loading.
     for _, c_data in char_data.items():
@@ -36,7 +36,7 @@ def load_prons_jp(char_data, out_dir):
     return char_data
 
 
-def load_prons_zh(char_data, out_dir):
+def load_prons_zh(char_data):
     # Get pronunciations that are used in modern words present in CEDICT. This allows
     # us to guarantee that we have examples for most pronunciations, and avoids super
     # obscure pronunciations that increase the grouping complexity significantly.
@@ -68,15 +68,13 @@ def load_prons_zh(char_data, out_dir):
                     c_data["prons"][p]["frequency"] = up_data["frequency"]
 
     if fallback_chars:
-        log.warn(
+        logger.warning(
             f"Fell back to using Mandarin readings from Unihan for {len(fallback_chars)} characters"
         )
-        with open(out_dir / "mandarin_reading_fallback_chars.json", "w") as f:
-            f.write(format_json(fallback_chars))
+        logger.debug(format_json(fallback_chars))
     if no_pron_chars:
-        log.warn(
-            f"No pronunciations found for {len(no_pron_chars)} characters: {no_pron_chars}"
-        )
+        logger.warning(f"No pronunciations found for {len(no_pron_chars)} characters")
+        logger.debug(no_pron_chars)
 
     return char_data
 
@@ -99,7 +97,7 @@ def __get_mandarin_pronunciations(unihan_entry):
     return {}
 
 
-def load_prons_ko(char_data, out_dir):
+def load_prons_ko(char_data):
     # no new data loading; only requires restructuring
     for _, c_data in char_data.items():
         c_data["prons"] = prons = {}
