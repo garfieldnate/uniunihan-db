@@ -15,7 +15,7 @@ from uniunihan_db.data.datasets import (
 )
 from uniunihan_db.data.paths import JP_VOCAB_OVERRIDE
 from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
-from uniunihan_db.lingua.aligner import JpAligner, SpaceAligner
+from uniunihan_db.lingua.aligner import JpAligner, KoAligner, ZhAligner
 from uniunihan_db.util import format_json
 
 MAX_EXAMPLE_VOCAB = 2
@@ -70,7 +70,7 @@ def select_vocab_zh(data):
     char_data = data["char_data"]
     word_list: List[ZhWord] = get_cedict()
     _incorporate_ckip_freq_data(word_list)
-    char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
+    char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
 
     used_vocab = set()
     for c, c_data in char_data.items():
@@ -98,23 +98,18 @@ def _incorporate_ckip_freq_data(words: List[ZhWord]) -> None:
     words.sort(key=lambda w: (-w.frequency, w.surface))
 
 
-def __filter_vocab_ko(words, used):
-    """Similar to __filter_vocab, but allows words of length 1"""
-    return list(filter(lambda w: w.surface not in used, words))[:MAX_EXAMPLE_VOCAB]
-
-
 def select_vocab_ko(data):
     char_data = data["char_data"]
 
     # TODO: Kengdic needs a ton of cleaning for this to work okay
     word_list: List[Word] = get_kengdic()
-    char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
+    char_to_pron_to_vocab = index_vocab(word_list, KoAligner())
 
     used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-            pron_data["vocab"] = __filter_vocab_ko(words, used_vocab)
+            pron_data["vocab"] = __filter_vocab(words, used_vocab)
             used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():

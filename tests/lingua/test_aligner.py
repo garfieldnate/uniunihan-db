@@ -1,4 +1,4 @@
-from uniunihan_db.lingua.aligner import JpAligner, SpaceAligner
+from uniunihan_db.lingua.aligner import JpAligner, KoAligner, ZhAligner
 
 
 class TestJpAligner:
@@ -67,7 +67,7 @@ class TestJpAligner:
 
 
 class TestSpaceAligner:
-    ALIGNER = SpaceAligner()
+    ALIGNER = ZhAligner()
 
     @staticmethod
     def test_basic_alignment():
@@ -78,3 +78,27 @@ class TestSpaceAligner:
     def test_multi_syllable_chars_skipped():
         alignment = TestSpaceAligner.ALIGNER.align("㍻", "ping2 cheng2")
         assert alignment == set()
+
+
+class TestKoAligner:
+    ALIGNER = KoAligner()
+
+    @staticmethod
+    def test_no_hanja():
+        alignment = TestKoAligner.ALIGNER.align("입구", "입구")
+        assert alignment == set()
+
+    @staticmethod
+    def test_different_length():
+        alignment = TestKoAligner.ALIGNER.align("入입구", "입구")
+        assert alignment == set()
+
+    @staticmethod
+    def test_no_hangeul():
+        alignment = TestKoAligner.ALIGNER.align("入口", "입구")
+        assert alignment == {("入", "입"), ("口", "구")}
+
+    @staticmethod
+    def test_with_hangeul():
+        alignment = TestKoAligner.ALIGNER.align("急增하다", "급증하다")
+        assert alignment == {("急", "급"), ("增", "증")}

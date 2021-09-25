@@ -4,6 +4,7 @@ from typing import Set, Tuple
 import jaconv
 
 from uniunihan_db.data.types import StringToStrings
+from uniunihan_db.util import is_han
 
 
 class Aligner(metaclass=abc.ABCMeta):
@@ -17,19 +18,42 @@ class Aligner(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
-class SpaceAligner(Aligner):
-    """This aligner only works on words which have the same number of characters as
-    pronounced syllables. The phonetic spelling must be syllables separated by a space
-    (such as pinyin)."""
+class ZhAligner(Aligner):
+    """Align hanzi with space-separated syllabic pronunciations (i.e. pinyin).
+    Alignments of strings of different length are not possible."""
 
     def align(self, surface: str, phonetic_spelling: str) -> Set[Tuple[str, str]]:
         syllables = phonetic_spelling.split(" ")
         # We can't automatically (simply) align many words, e.g. those with
         # numbers or letters or multi-syllabic characters like ㍻. So we just
-        # remove these from the index altogether
+        # remove these from the index altogether. TODO
         if len(syllables) != len(surface):
             return set()
         return set(zip(surface, syllables))
+
+
+class KoAligner(Aligner):
+    """Aligns a hanja surface with a hangeul phonetic_spelling of the same length. Hangeul
+    and other non-han characters are allowed and will be ignored, as long as they appear verbatim
+    in the same indices in both surface and phonetic_spelling. Alignments of strings of different
+    length, or of hangeul-pronunciations of non-han characters such as Roman letters, are not possible."""
+
+    def align(self, surface: str, phonetic_spelling: str) -> Set[Tuple[str, str]]:
+        if len(phonetic_spelling) != len(surface):
+            return set()
+        alignment = set()
+        for s, p in zip(surface, phonetic_spelling):
+            # non-hanja surface should be contained verbatim in phonetic spelling,
+            # but the alignment would have no use for us
+            if s == p:
+                continue
+            # otherwise, the strings cannot be aligned
+            if not is_han(s):
+                return set()
+            # otherwise, consider the han/char pair an alignment
+            alignment.add((s, p))
+
+        return alignment
 
 
 class JpAligner(Aligner):

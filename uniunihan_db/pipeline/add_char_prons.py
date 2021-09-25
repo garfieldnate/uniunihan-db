@@ -7,7 +7,7 @@ from loguru import logger
 
 from uniunihan_db.data.datasets import get_cedict, get_unihan, index_vocab
 from uniunihan_db.data.types import ZhWord
-from uniunihan_db.lingua.aligner import SpaceAligner
+from uniunihan_db.lingua.aligner import ZhAligner
 from uniunihan_db.lingua.mandarin import pinyin_tone_marks_to_numbers
 from uniunihan_db.util import format_json
 
@@ -44,7 +44,7 @@ def load_prons_zh(char_data):
     # Supplement all pronunciations with with kHanyuPinlu pronunciation frequency data.
 
     word_list: List[ZhWord] = get_cedict()
-    char_to_pron_to_vocab = index_vocab(word_list, SpaceAligner())
+    char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
     for c, pron_to_vocab in char_to_pron_to_vocab.items():
         if c_data := char_data.get(c):
             prons = c_data.setdefault("prons", {})

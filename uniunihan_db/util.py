@@ -66,3 +66,8 @@ def read_csv(path: Path) -> csv.DictReader:
     csvfile = open(path, newline="")
     # skip comments
     return csv.DictReader(filter(lambda row: row[0] != "#", csvfile))
+
+
+def is_han(c):
+    """Return true if the input is a han character, false otherwise"""
+    return 0x4E00 <= ord(c) <= 0x9FFF

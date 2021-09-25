@@ -14,7 +14,7 @@ from uniunihan_db.data.datasets import (
 )
 from uniunihan_db.data.paths import TEST_CORPUS_DIR
 from uniunihan_db.data.types import Word, ZhWord
-from uniunihan_db.lingua.aligner import SpaceAligner
+from uniunihan_db.lingua.aligner import ZhAligner
 
 
 def test_get_ytenx_rhymes():
@@ -127,7 +127,7 @@ def test_index_vocab():
         Word("同伴", "", "dou han", "", 0),
         Word("漢字", "", "kan ji", "", 0),
     ]
-    char_to_pron_to_words = index_vocab(words, SpaceAligner())
+    char_to_pron_to_words = index_vocab(words, ZhAligner())
     print(char_to_pron_to_words)
     assert len(char_to_pron_to_words) == 5
     assert len(char_to_pron_to_words["伴"]) == 2
