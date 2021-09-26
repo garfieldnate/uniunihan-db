@@ -10,8 +10,9 @@ from loguru import logger
 from uniunihan_db.data.paths import GENERATED_DATA_DIR
 
 
-def configure_logging():
-    """Configure the core logger; write to stderr in color and to a log file in the generated data dir."""
+def configure_logging(name):
+    """Configure the core logger; write to stderr in color and to a log file in the generated data dir (using `name`
+    in the file name)."""
 
     logger.configure(
         handlers=[
@@ -19,7 +20,7 @@ def configure_logging():
                 sink=sys.stderr, format="[<lvl>{level}</lvl>] {message}", level="INFO"
             ),
             dict(
-                sink=GENERATED_DATA_DIR / "debug-log.txt",
+                sink=GENERATED_DATA_DIR / f"debug-log-{name}.txt",
                 format="[<lvl>{level}</lvl>] {name} line {line}: {message}",
                 level="DEBUG",
                 mode="w",

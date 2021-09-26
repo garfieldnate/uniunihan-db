@@ -103,7 +103,7 @@ def __cross_reference(all_indices):
 
 
 def main():
-    configure_logging()
+    configure_logging(__name__)
     collate()
 
 

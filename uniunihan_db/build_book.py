@@ -98,7 +98,7 @@ def build_book():
 
 
 def main():
-    configure_logging()
+    configure_logging(__name__)
     build_book()
 
 

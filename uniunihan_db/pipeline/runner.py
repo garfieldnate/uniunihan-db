@@ -17,7 +17,7 @@ LANGUAGES = ["zh", "jp", "ko"]
 
 
 def main() -> None:
-    configure_logging()
+    configure_logging(__name__)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-l",

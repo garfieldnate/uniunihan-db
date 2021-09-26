@@ -70,6 +70,8 @@ Topic: Korean Support
 * Short section on gukja, like ones that include hangeul, etc.
     - https://en.wiktionary.org/wiki/Category:Korean-only_CJKV_Characters
 * Note somewhere: interesting that hundok for some characters like 畜 and 安 contain the eumdok
+* possibly interesting: https://ko.wiktionary.org/wiki/%EC%82%AC%EC%9A%A9%EC%9E%90:Catagorae/%EC%98%81%EC%96%B4_%ED%95%9C%EA%B5%AD%EC%96%B4_%EB%B2%95%EB%A5%A0%EC%9A%A9%EC%96%B4
+* 女 can also be 여 (from book)
 
 Topic: Vietnamese Support
 
