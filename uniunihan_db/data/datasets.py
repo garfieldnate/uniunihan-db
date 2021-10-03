@@ -653,3 +653,30 @@ def get_kengdic():
 
     logger.info(f"Loaded {len(words)} usable words from Kengdic")
     return sorted(words, key=lambda w: -w.frequency)
+
+
+@cache
+def get_chunom_org_vocab() -> List[Word]:
+    with open(CHUNOM_VOCAB_FILE, "r") as f:
+        rows = csv.DictReader(f, delimiter="\t")
+        seen = set()
+        words = []
+        for r in rows:
+            # skip character rows and only read vocab rows
+            if r["Unicode"]:
+                continue
+            key = "{Text}/{QN}/{English}".format(**r)
+            if key in seen:
+                continue
+            seen.add(key)
+            w = Word(
+                r["Text"],
+                # remove trailing dot before converting to int
+                "chunom.org-" + r["#"][:-1],
+                r["QN"],
+                r["English"],
+                # negative so that we can use it as a sorting key
+                -int(r["Freq."]),
+            )
+            words.append(w)
+    return words
