@@ -108,8 +108,17 @@ def load_prons_ko(char_data):
     return char_data
 
 
+def load_prons_vi(char_data):
+    # no new data loading; only requires restructuring
+    for _, c_data in char_data.items():
+        c_data["prons"] = {p: {} for p in c_data["prons"]}
+
+    return char_data
+
+
 ADD_PRONUNCIATIONS = {
     "jp": load_prons_jp,
     "zh": load_prons_zh,
     "ko": load_prons_ko,
+    "vi": load_prons_vi,
 }
