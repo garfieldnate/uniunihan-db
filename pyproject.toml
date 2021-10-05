@@ -26,6 +26,7 @@ pre-commit = "^2.7.1"
 unihan-etl = "^0.11.0"
 requests = "^2.24.0"
 jaconv = "^0.2.4"
+beautifulsoup4 = "^4.10.0"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
