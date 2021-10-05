@@ -61,10 +61,15 @@ def __get_variants_zh(char, char_info):
     return []
 
 
+def __get_variants_vi(char, char_info):
+    return char_info["gray_variants"] + char_info["black_variants"]
+
+
 __get_variants = {
     "jp": __get_variants_jp,
     "ko": __get_variants_ko,
     "zh": __get_variants_zh,
+    "vi": __get_variants_vi,
 }
 
 

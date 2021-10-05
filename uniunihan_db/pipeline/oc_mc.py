@@ -61,4 +61,5 @@ OC_MC = {
     "jp": integrate_historical_chinese,
     "ko": integrate_historical_chinese,
     "zh": integrate_historical_chinese,
+    "vi": integrate_historical_chinese,
 }

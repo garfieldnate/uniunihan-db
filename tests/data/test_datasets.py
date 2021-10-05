@@ -3,6 +3,7 @@ from uniunihan_db.data.datasets import (
     YtenxRhyme,
     get_baxter_sagart,
     get_cedict,
+    get_chunom_org_vocab,
     get_ckip_20k,
     get_edict_freq,
     get_historical_on_yomi,

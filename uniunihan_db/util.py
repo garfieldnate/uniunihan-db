@@ -61,12 +61,12 @@ def format_json(data: object) -> str:
     )
 
 
-def read_csv(path: Path) -> csv.DictReader:
+def read_csv(path: Path, *args, **kwargs) -> csv.DictReader:
     """Return a csv.DictReader, removing commented lines
     (which start with a #)."""
     csvfile = open(path, newline="")
     # skip comments
-    return csv.DictReader(filter(lambda row: row[0] != "#", csvfile))
+    return csv.DictReader(filter(lambda row: row[0] != "#", csvfile), *args, **kwargs)
 
 
 def is_han(c):

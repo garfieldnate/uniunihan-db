@@ -4,7 +4,7 @@
 from loguru import logger
 
 from uniunihan_db.data.datasets import get_historical_on_yomi, get_joyo, get_unihan
-from uniunihan_db.data.paths import KO_ED_CHARS_FILE
+from uniunihan_db.data.paths import CHUNOM_CHAR_FILE, KO_ED_CHARS_FILE
 from uniunihan_db.util import read_csv
 
 
@@ -45,10 +45,28 @@ def load_char_data_ko():
     for row in reader:
         char = row["char"]
         del row["char"]
-        # set blannk fields to None
+        # set blank fields to None
         for key in ["variant", "note"]:
             if not row[key]:
                 row[key] = None
+        char_data[char] = row
+
+    logger.info(f"Loaded data for {len(char_data)} characters")
+    return char_data
+
+
+def load_char_data_vi():
+    char_data = {}
+
+    reader = read_csv(CHUNOM_CHAR_FILE)
+    for row in reader:
+        char = row["char"]
+        del row["char"]
+        # parse boolean fields
+        for key in ["loan1", "loan2"]:
+            row[key] = row[key] == "True"
+        row["prons"] = row["prons"].split("|")
+        row["note"] = ""
         char_data[char] = row
 
     logger.info(f"Loaded data for {len(char_data)} characters")
@@ -59,4 +77,5 @@ LOAD_CHAR_DATA = {
     "jp": load_char_data_jp,
     "zh": load_char_data_zh,
     "ko": load_char_data_ko,
+    "vi": load_char_data_vi,
 }

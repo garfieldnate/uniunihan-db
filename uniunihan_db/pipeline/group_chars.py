@@ -33,4 +33,9 @@ def group_chars(char_data):
     return {"char_data": char_data, "group_index": index}
 
 
-GROUP_CHARS = {"jp": group_chars_jp, "ko": group_chars, "zh": group_chars}
+GROUP_CHARS = {
+    "jp": group_chars_jp,
+    "ko": group_chars,
+    "zh": group_chars,
+    "vi": group_chars,
+}

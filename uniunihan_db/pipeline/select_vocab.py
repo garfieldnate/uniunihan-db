@@ -7,6 +7,7 @@ from loguru import logger
 
 from uniunihan_db.data.datasets import (
     get_cedict,
+    get_chunom_org_vocab,
     get_ckip_20k,
     get_edict_freq,
     get_kengdic,
@@ -121,6 +122,27 @@ def select_vocab_ko(data):
     return data
 
 
+def select_vocab_vi(data):
+    char_data = data["char_data"]
+    word_list: List[Word] = get_chunom_org_vocab()
+    char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
+
+    used_vocab = set()
+    for c, c_data in char_data.items():
+        for pron, pron_data in c_data["prons"].items():
+            words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
+            pron_data["vocab"] = words
+            used_vocab.update({v.surface for v in pron_data["vocab"]})
+
+    def char_data_iter():
+        for c, c_data in char_data.items():
+            yield c, c_data
+
+    _report_missing_words(char_data_iter())
+
+    return data
+
+
 def _report_missing_words(char_data_iter):
     missing_words = set()
     for c, char_data in char_data_iter:
@@ -137,4 +159,5 @@ SELECT_VOCAB = {
     "jp": select_vocab_jp,
     "zh": select_vocab_zh,
     "ko": select_vocab_ko,
+    "vi": select_vocab_vi,
 }
