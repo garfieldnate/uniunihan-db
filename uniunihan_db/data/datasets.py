@@ -19,6 +19,7 @@ from uniunihan_db.data.paths import (
     CEDICT_FILE,
     CEDICT_URL,
     CEDICT_ZIP,
+    CHUNOM_VOCAB_FILE,
     COMPONENT_OVERRIDE_FILE,
     EDICT_FREQ_DIR,
     EDICT_FREQ_FILE,
@@ -36,6 +37,7 @@ from uniunihan_db.data.paths import (
 )
 from uniunihan_db.data.types import Char2Pron2Words, StringToStrings, Word, ZhWord
 from uniunihan_db.lingua.aligner import Aligner
+from uniunihan_db.util import read_csv
 
 YTENX_URL = "https://github.com/BYVoid/ytenx/archive/master.zip"
 YTENX_ZIP_FILE = GENERATED_DATA_DIR / "ytenx-master.zip"
@@ -312,20 +314,18 @@ class BaxterSagart:
 def get_baxter_sagart():
     logger.info("Loading Baxter/Sagart reconstruction data...")
     char_to_info = defaultdict(list)
-    with BAXTER_SAGART_FILE.open() as f:
-        # filter comments
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
-        for r in rows:
-            char = r["zi"]
-            char_to_info[char].append(
-                BaxterSagart(
-                    char=char.strip(),
-                    pinyin=r["py"].strip(),
-                    middle_chinese=r["MC"].strip(),
-                    old_chinese=r["OC"].strip(),
-                    gloss=r["gloss"].strip(),
-                )
+    rows = read_csv(BAXTER_SAGART_FILE)
+    for r in rows:
+        char = r["zi"]
+        char_to_info[char].append(
+            BaxterSagart(
+                char=char.strip(),
+                pinyin=r["py"].strip(),
+                middle_chinese=r["MC"].strip(),
+                old_chinese=r["OC"].strip(),
+                gloss=r["gloss"].strip(),
             )
+        )
     return char_to_info
 
 
@@ -361,21 +361,20 @@ def get_ckip_20k() -> Mapping[str, Any]:
 
     # surface form -> word list
     entries = defaultdict(list)
-    with open(ckip_path) as f:
-        num_words = 0
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f), delimiter="\t")
-        for r in rows:
-            # rows contains: word, function, roman, meaning, freq
-            pronunciation = r["roman"]
-            word = r["word"]
-            word_dict = {
-                "surface": word,
-                "pron": pronunciation,
-                "freq": int(r["freq"]),
-                "en": r["meaning"],
-            }
-            num_words += 1
-            entries[word].append(word_dict)
+    num_words = 0
+    rows = read_csv(ckip_path, delimiter="\t")
+    for r in rows:
+        # rows contains: word, function, roman, meaning, freq
+        pronunciation = r["roman"]
+        word = r["word"]
+        word_dict = {
+            "surface": word,
+            "pron": pronunciation,
+            "freq": int(r["freq"]),
+            "en": r["meaning"],
+        }
+        num_words += 1
+        entries[word].append(word_dict)
 
     logger.info(f"  Read {num_words} words from CKIP frequency list")
     return entries
@@ -450,35 +449,33 @@ class Joyo:
 def get_joyo():
     logger.info("Loading joyo data...")
     char_info: MutableMapping[str, MutableMapping[str, Any]] = {}
-    with open(INCLUDED_DATA_DIR / "augmented_joyo.csv") as f:
-        # filter comments
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
-        for r in rows:
-            kun_yomi = {yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi}
-            supplementary_info = {
-                "keyword": r["English_meaning"].split("|"),
-                "kun_yomi": kun_yomi,
-                "grade": r["grade"],
-                "strokes": r["strokes"],
-                "new": r["new"],
-                "old": None,
-            }
-            # remove empty readings
-            readings = {yomi for yomi in r["on-yomi"].split("|") if yomi}
-            # note the non-Joyo readings and strip the indicator asterisk
-            supplementary_info["non_joyo"] = {
-                yomi[:-1] for yomi in readings if yomi[-1] == "*"
-            }
-            readings = {yomi.rstrip("*") for yomi in readings if yomi}
-            supplementary_info["readings"] = readings
+    rows = read_csv(INCLUDED_DATA_DIR / "augmented_joyo.csv")
+    for r in rows:
+        kun_yomi = {yomi for yomi in (r["kun-yomi"] or "").split("|") if yomi}
+        supplementary_info = {
+            "keyword": r["English_meaning"].split("|"),
+            "kun_yomi": kun_yomi,
+            "grade": r["grade"],
+            "strokes": r["strokes"],
+            "new": r["new"],
+            "old": None,
+        }
+        # remove empty readings
+        readings = {yomi for yomi in r["on-yomi"].split("|") if yomi}
+        # note the non-Joyo readings and strip the indicator asterisk
+        supplementary_info["non_joyo"] = {
+            yomi[:-1] for yomi in readings if yomi[-1] == "*"
+        }
+        readings = {yomi.rstrip("*") for yomi in readings if yomi}
+        supplementary_info["readings"] = readings
 
-            new_c = r["new"]
-            # old glyph same as new glyph when missing
-            old_c = r["old"] or new_c
-            char_info[old_c] = supplementary_info
+        new_c = r["new"]
+        # old glyph same as new glyph when missing
+        old_c = r["old"] or new_c
+        char_info[old_c] = supplementary_info
 
-            if old_c != new_c:
-                supplementary_info["old"] = old_c
+        if old_c != new_c:
+            supplementary_info["old"] = old_c
 
     return char_info
 
@@ -532,16 +529,14 @@ def index_vocab(words: List[W], aligner: Aligner) -> Char2Pron2Words:
 def get_historical_on_yomi():
     logger.info("Loading historical on-yomi data...")
     char_to_new_to_old_pron = defaultdict(dict)
-    with open(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv") as f:
-        # filter comments
-        rows = csv.DictReader(filter(lambda row: row[0] != "#", f))
-        for r in rows:
-            modern = r["現代仮名遣い"]
-            historical = jaconv.hira2kata(r["字音仮名遣い"])
-            if historical != modern:
-                chars = r["字"]
-                for c in chars:
-                    char_to_new_to_old_pron[c][modern] = historical
+    rows = read_csv(INCLUDED_DATA_DIR / "historical_kanji_on-yomi.csv")
+    for r in rows:
+        modern = r["現代仮名遣い"]
+        historical = jaconv.hira2kata(r["字音仮名遣い"])
+        if historical != modern:
+            chars = r["字"]
+            for c in chars:
+                char_to_new_to_old_pron[c][modern] = historical
 
     return char_to_new_to_old_pron
 
@@ -653,3 +648,25 @@ def get_kengdic():
 
     logger.info(f"Loaded {len(words)} usable words from Kengdic")
     return sorted(words, key=lambda w: -w.frequency)
+
+
+@cache
+def get_chunom_org_vocab() -> List[Word]:
+    with open(CHUNOM_VOCAB_FILE, "r") as f:
+        rows = csv.DictReader(f, delimiter="\t")
+        words = []
+        for r in rows:
+            # skip character rows and only read vocab rows
+            if r["Unicode"]:
+                continue
+            w = Word(
+                r["Text"],
+                # remove trailing dot before converting to int
+                "chunom.org-" + r["#"][:-1],
+                r["QN"],
+                r["English"],
+                # negative so that we can use it as a sorting key
+                -int(r["Freq."]),
+            )
+            words.append(w)
+    return words

@@ -19,6 +19,7 @@ CEDICT_DIR = CEDICT_ZIP.with_suffix("")
 CEDICT_FILE = CEDICT_DIR / "cedict_ts.u8"
 
 CHUNOM_CHAR_FILE = INCLUDED_DATA_DIR / "chunom_org" / "char_data.csv"
+CHUNOM_VOCAB_FILE = INCLUDED_DATA_DIR / "chunom_org" / "standard-list.csv"
 
 COMPONENT_OVERRIDE_FILE = INCLUDED_DATA_DIR / "manual_components.json"
 

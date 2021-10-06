@@ -13,7 +13,7 @@ from .oc_mc import OC_MC
 from .organize import ORGANIZE_DATA
 from .select_vocab import SELECT_VOCAB
 
-LANGUAGES = ["zh", "jp", "ko"]
+LANGUAGES = ["zh", "jp", "ko", "vi"]
 
 
 def main() -> None:

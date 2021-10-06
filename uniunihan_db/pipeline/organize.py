@@ -73,4 +73,5 @@ ORGANIZE_DATA = {
     "jp": organize_data,
     "zh": organize_data,
     "ko": organize_data,
+    "vi": organize_data,
 }

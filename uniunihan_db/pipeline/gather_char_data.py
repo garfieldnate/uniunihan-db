@@ -64,7 +64,7 @@ def load_char_data_vi():
         del row["char"]
         # parse boolean fields
         for key in ["loan1", "loan2"]:
-            row[key] = bool(row[key])
+            row[key] = row[key] == "True"
         row["prons"] = row["prons"].split("|")
         char_data[char] = row
 

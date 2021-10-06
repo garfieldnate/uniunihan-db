@@ -3,6 +3,7 @@ from uniunihan_db.data.datasets import (
     YtenxRhyme,
     get_baxter_sagart,
     get_cedict,
+    get_chunom_org_vocab,
     get_ckip_20k,
     get_edict_freq,
     get_historical_on_yomi,
@@ -157,3 +158,15 @@ def test_get_cedict_full() -> None:
     words = get_cedict()
     # Assuming the size of the dictionary will only grow over time
     assert len(words) >= 113420
+
+
+def test_get_chunom_vocab() -> None:
+    words = get_chunom_org_vocab()
+    assert words[0] == Word(
+        "𧵑公",
+        "chunom.org-2",
+        "của công",
+        "public property",
+        -9999999,
+    )
+    assert len(words) >= 3090

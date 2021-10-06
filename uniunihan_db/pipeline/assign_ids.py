@@ -17,4 +17,5 @@ ASSIGN_IDS = {
     "jp": lambda data: assign_ids("jp", data),
     "zh": lambda data: assign_ids("zh", data),
     "ko": lambda data: assign_ids("ko", data),
+    "vi": lambda data: assign_ids("vi", data),
 }
