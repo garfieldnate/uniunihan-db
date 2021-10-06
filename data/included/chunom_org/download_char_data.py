@@ -3,6 +3,7 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 HTML_URL = "https://www.chunom.org/pages/standard/"
 TSV_URL = "https://www.chunom.org/pages/standard-list/?max=2000&download=1"
@@ -37,15 +38,18 @@ def parse_cell_3(cell):
     return freq_score
 
 
-def parse_cell_4(cell):
+def parse_cell_4(cell: Tag):
     gray_variants = ""
     black_variants = ""
-    for span in cell.find("span"):
+    for span in cell.find_all("span", recursive=False):
+        anchors = span.find_all("a", recursive=False)
+        # page address is "/pages/𢫘/", etc.
+        chars = "".join(a["href"][-2] for a in anchors)
         # TODO: what is this supposed to indicate?
         if "opacity" in span.get("style", ""):
-            gray_variants += span.text
+            gray_variants += chars
         else:
-            black_variants += span.text
+            black_variants += chars
     return black_variants, gray_variants
 
 
@@ -60,7 +64,7 @@ def fetch_char_data():
         cells = r.find_all("td")
 
         id_, prons = parse_cell_0(cells[0])
-        loan1, loan2, char = parse_cell_1(cells[1])
+        char, loan1, loan2 = parse_cell_1(cells[1])
         definition = parse_cell_2(cells[2])
         freq_score = parse_cell_3(cells[3])
         black_variants, gray_variants = parse_cell_4(cells[4])
