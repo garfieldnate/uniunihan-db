@@ -16,7 +16,7 @@ from uniunihan_db.util import configure_logging
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 INPUT_FILE = GENERATED_DATA_DIR / "collated" / "final.json"
-OUTPUT_FILE = GENERATED_DATA_DIR / "book" / "book.html"
+OUTPUT_FILE = GENERATED_DATA_DIR / "book" / "index.html"
 OUTPUT_FILE.parent.mkdir(exist_ok=True, parents=True)
 
 
