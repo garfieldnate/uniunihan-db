@@ -83,6 +83,7 @@ def build_book():
             "jp": "<h1>Japanese (joyo)</h1>",
             "zh": "<h1>Mandarin (HSK)</h1>",
             "ko": "<h1>Korean (kyoyuk)</h1>",
+            "vi": "<h1>Vietnamese (chunom.org)</h1>",
         },
     )
 
