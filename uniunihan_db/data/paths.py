@@ -23,7 +23,7 @@ CHUNOM_VOCAB_FILE = INCLUDED_DATA_DIR / "chunom_org" / "standard-list.csv"
 
 COMPONENT_OVERRIDE_FILE = INCLUDED_DATA_DIR / "manual_components.json"
 
-EDICT_FREQ_URL = "http://ftp.monash.edu.au/pub/nihongo/edict-freq-20081002.tar.gz"
+EDICT_FREQ_URL = "http://ftp.edrdg.org/pub/Nihongo/edict-freq-20081002.tar.gz"
 EDICT_FREQ_TARBALL = GENERATED_DATA_DIR / "edict-freq-20081002.tar.gz"
 EDICT_FREQ_DIR = EDICT_FREQ_TARBALL.with_suffix("").with_suffix("")
 EDICT_FREQ_FILE = EDICT_FREQ_DIR / "edict-freq-20081002"
