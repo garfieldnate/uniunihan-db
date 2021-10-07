@@ -1,0 +1,9 @@
+.old-form {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.kun-yomi {
+    grid-column: 4;
+    text-align: right;
+}

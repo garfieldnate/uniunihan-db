@@ -1,0 +1,126 @@
+/* https://codepen.io/garfieldnate/pen/oNwjQqW */
+
+/*TODO: print styling (margins, font)*/
+
+html {
+    font-family: sans-serif;
+}
+
+@media print {
+    html {
+        font-family: serif;
+        font-size: 12pt;
+    }
+}
+
+@media screen {
+    html {
+        font-size: 150%;
+    }
+}
+
+body {
+    margin: 40px;
+}
+
+.cell {
+    display: grid;
+    /* Technically we need 2ic + 4ch in the third colum,
+    but ic is experimental */
+    grid-template-columns: 10% 80% 11ch;
+    background-color: #fff;
+    color: #444;
+    line-height: 1.5em;
+    width: 100%;
+}
+
+.cell:not(:first-child) {
+    /* Collapse top border with previous cell*/
+    margin-top: -1px;
+}
+
+.border {
+    border: 1px solid black;
+}
+
+.box {
+    /*   background-color: #444; */
+    /*   color: #fff; */
+    padding: 0.5em;
+}
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.character {
+    font-size: 200%;
+}
+
+.id {
+    font-size: 110%;
+}
+
+.right-column {
+    grid-template-rows: 1fr min-content;
+    /* Collapse border with right column*/
+    margin-left: -1px;
+}
+
+.char-data {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+}
+
+.char-info-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.pron {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.keywords {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.vocab {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.vocab-pron {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.vocab-meaning {
+    grid-column: 3 / span 2;
+    grid-row: 2;
+}
+
+.cross-ref {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    grid-row: span 2;
+    /* Collapse border with left column*/
+    margin-left: -1px;
+}
+
+.char-note {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    font-style: italic;
+}
+
+.component-etymology-section {
+    margin-bottom: 2em;
+}

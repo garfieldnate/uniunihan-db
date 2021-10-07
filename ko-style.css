@@ -1,0 +1,9 @@
+.variant {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.hundok {
+    grid-column: 4;
+    text-align: right;
+}
