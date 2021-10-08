@@ -1,7 +1,13 @@
 # Original data taken from https://ko.wiktionary.org/wiki/부록:한문_교육용_기초_한자_1800
 # Wiktionary content is dual licensed under CC-BY-SA and GFDL
-# Fields: character, level ("m" or "h" indicating middle or high school), Sino-korean pronunciation, meaning of the character in Korean
-# The eum and hun fields together form the character's "eumhun", which serves as the name of the character in Korean.
+# Fields:
+# - character
+# - variant
+# - level ("m" or "h" indicating middle or high school),
+# - Sino-korean pronunciations separated by |,
+# - meaning of the character in Korean
+# The first character of the eum field together with the hun field form
+# the character's "eumhun", which serves as the name of the character in Korean.
 char,variant,level,eum,hun,note
 一,,m,일,한,
 丁,,m,정,고무래,
@@ -382,7 +388,7 @@ char,variant,level,eum,hun,note
 奪,,h,탈,빼앗을,
 奬,,h,장,장려할,
 奮,,h,분,떨칠,
-女,,m,녀,계집,
+女,,m,녀|여,계집,
 奴,,h,노,종,
 好,,m,호,좋을,
 如,,m,여,같을,
@@ -806,12 +812,12 @@ char,variant,level,eum,hun,note
 暢,,h,창,펼,
 暫,,h,잠,잠시,
 暮,,m,모,저물,
-暴,,m,폭,사나울,
+暴,,m,폭|포|박,사나울,
 曆,,h,력,책력,
 曉,,h,효,새벽,
 曰,,m,왈,가로,
 曲,,m,곡,굽을,
-更,,m,갱,다시,
+更,,m,갱|경,다시,
 書,,m,서,쓸,
 曾,,m,증,일찍,
 替,,h,체,바꿀,
@@ -876,7 +882,7 @@ char,variant,level,eum,hun,note
 榮,,m,영,영화로울,
 構,,h,구,얽을,
 槪,,h,개,대개,
-樂,,m,락,즐길,
+樂,,m,락|악|요,즐길,
 樓,,h,루,다락,
 標,,h,표,표,
 模,,h,모,법,
@@ -1426,7 +1432,7 @@ char,variant,level,eum,hun,note
 西,,m,서,서녘,
 要,,m,요,구할,
 覆,,h,복,뒤집힐,
-見,,m,견,볼,
+見,,m,견|현,볼,
 規,,h,규,법,
 視,,m,시,볼,
 親,,m,친,친할,
@@ -1554,7 +1560,7 @@ char,variant,level,eum,hun,note
 蹟,,h,적,자취,
 躍,,h,약,뛸,
 身,,m,신,몸,
-車,,m,거,수레,
+車,,m,거|차,수레,
 軌,,h,궤,길,
 軍,,m,군,군사,
 軒,,h,헌,추녀,

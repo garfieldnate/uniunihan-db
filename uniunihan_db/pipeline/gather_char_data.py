@@ -45,6 +45,8 @@ def load_char_data_ko():
     for row in reader:
         char = row["char"]
         del row["char"]
+        if row["eum"]:
+            row["eum"] = row["eum"].split("|")
         # set blank fields to None
         for key in ["variant", "note"]:
             if not row[key]:

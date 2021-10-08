@@ -101,8 +101,9 @@ def load_prons_ko(char_data):
     # no new data loading; only requires restructuring
     for _, c_data in char_data.items():
         c_data["prons"] = prons = {}
-        if pron := c_data.get("eum"):
-            prons[pron] = {}
+        if c_data["eum"]:
+            for pron in c_data.get("eum") or []:
+                prons[pron] = {}
             del c_data["eum"]
 
     return char_data
