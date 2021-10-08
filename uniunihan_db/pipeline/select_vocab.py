@@ -36,6 +36,7 @@ def select_vocab_jp(data):
     # Some words have to be specified manually instead of extracted from our downloaded dictionary
     vocab_override: Char2Pron2Words = get_vocab_override(JP_VOCAB_OVERRIDE)
 
+    duplicate_used = set()
     used_vocab = set()
     for old_c, c_data in char_data.items():
         # Vocab override uses old forms, edict vocab data uses new forms
@@ -48,6 +49,9 @@ def select_vocab_jp(data):
             for pron, pron_data in c_data["prons"].items():
                 words = char_to_pron_to_vocab.get(new_c, {}).get(pron, [])
                 pron_data["vocab"] = __filter_vocab(words, used_vocab)
+                for w in pron_data["vocab"]:
+                    if w.surface in used_vocab:
+                        duplicate_used.add(w.surface)
                 used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
@@ -55,16 +59,17 @@ def select_vocab_jp(data):
             yield c_data["new"], c_data
 
     _report_missing_words(char_data_iter())
+    _report_duplicate_use(duplicate_used)
 
     return data
 
 
 def __filter_vocab(words, used):
-    """Take the top MAX_EXAMPLE_VOCAB unused vocab which contain 2 or more characters
-    (words should be pre-sorted by frequency)"""
-    return list(filter(lambda w: len(w.surface) > 1 and w.surface not in used, words))[
-        :MAX_EXAMPLE_VOCAB
-    ]
+    """Take the top MAX_EXAMPLE_VOCAB vocab which contain 2 or more characters,
+    preferring ones that haven't been used yet (words should be pre-sorted by frequency, etc.)"""
+    # TODO: warn when words are double-used
+    words = sorted(words, key=lambda w: w.surface in used)
+    return list(filter(lambda w: len(w.surface) > 1, words))[:MAX_EXAMPLE_VOCAB]
 
 
 def select_vocab_zh(data):
@@ -73,11 +78,15 @@ def select_vocab_zh(data):
     _incorporate_ckip_freq_data(word_list)
     char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
 
+    duplicate_used = set()
     used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
             pron_data["vocab"] = __filter_vocab(words, used_vocab)
+            for w in pron_data["vocab"]:
+                if w.surface in used_vocab:
+                    duplicate_used.add(w.surface)
             used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
@@ -85,6 +94,7 @@ def select_vocab_zh(data):
             yield c, c_data
 
     _report_missing_words(char_data_iter())
+    _report_duplicate_use(duplicate_used)
 
     return data
 
@@ -106,11 +116,15 @@ def select_vocab_ko(data):
     word_list: List[Word] = get_kengdic()
     char_to_pron_to_vocab = index_vocab(word_list, KoAligner())
 
+    duplicate_used = set()
     used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
             pron_data["vocab"] = __filter_vocab(words, used_vocab)
+            for w in pron_data["vocab"]:
+                if w.surface in used_vocab:
+                    duplicate_used.add(w.surface)
             used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
@@ -118,6 +132,7 @@ def select_vocab_ko(data):
             yield c, c_data
 
     _report_missing_words(char_data_iter())
+    _report_duplicate_use(duplicate_used)
 
     return data
 
@@ -127,11 +142,15 @@ def select_vocab_vi(data):
     word_list: List[Word] = get_chunom_org_vocab()
     char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
 
+    duplicate_used = set()
     used_vocab = set()
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
             pron_data["vocab"] = words
+            for w in pron_data["vocab"]:
+                if w.surface in used_vocab:
+                    duplicate_used.add(w.surface)
             used_vocab.update({v.surface for v in pron_data["vocab"]})
 
     def char_data_iter():
@@ -139,6 +158,7 @@ def select_vocab_vi(data):
             yield c, c_data
 
     _report_missing_words(char_data_iter())
+    _report_duplicate_use(duplicate_used)
 
     return data
 
@@ -153,6 +173,12 @@ def _report_missing_words(char_data_iter):
     if missing_words:
         logger.warning(f"Missing vocab for {len(missing_words)} char/pron pairs")
         logger.debug(format_json(sorted(list(missing_words))))
+
+
+def _report_duplicate_use(words):
+    if words:
+        logger.warning(f"{len(words)} duplicate vocab used")
+        logger.debug(words)
 
 
 SELECT_VOCAB = {

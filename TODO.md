@@ -6,6 +6,7 @@ Sometime soon: Unit tests for pipeline steps
 
 Topic: final output
 
+* separate files; single file is too large
 * 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
 * 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
 * Number the chapters/purity groups for easier navigation
