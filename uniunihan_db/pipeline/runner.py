@@ -31,6 +31,7 @@ def main() -> None:
 
 
 def run_pipeline(language):
+    logger.info(f"Running {language} pipeline")
     char_data = LOAD_CHAR_DATA[language]()
     char_data = ADD_PRONUNCIATIONS[language](char_data)
     all_data = GROUP_CHARS[language](char_data)

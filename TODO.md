@@ -26,6 +26,9 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* Allow but disprefer surnames and old stuff
+* Unihan: 醣 should be listed as a variant of 糖, which is the standard form
+    - similarly, the 糖 entry has variant 餹 but not 醣饄糛𥹥
 * Why is 天方夜譚 used twice?
 * Next: integrate baidu frequencies
 * nǎi nai listed twice because it represents two different pronunciations
