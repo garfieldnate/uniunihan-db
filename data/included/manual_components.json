@@ -51,7 +51,7 @@
     // Scholars assume that the Sino-Korean pronunciation of this 國字 was borrowed from a similar-looking character
     "畓": "沓",
     // Mandarin
-    "叭": "",
+    "叭": "八",
     "叼": "刀",
     "吋": "寸",
     "呎": "尺",
@@ -137,30 +137,31 @@
     "柺": "枴", // should actually be 叧, but this makes it consistent with ytenx
     "毽": "建",
     // TODO: next
-    // "氖": "",
-    // "氟": "",
-    // "氦": "",
-    // "氨": "",
-    // "氫": "",
-    // "氮": "",
-    // "氯": "",
-    // "浬": "",
-    // "燜": "",
-    // "燴": "",
-    // "獗": "",
-    // "玀": "",
-    // "琊": "",
-    // "琺": "",
-    // "甩": "",
-    // "甭": "",
-    // "疳": "",
-    // "瘐": "",
-    // "瘩": "",
-    // "癌": "",
-    // "瞄": "",
-    // "瞇": "",
-    // "矓": "",
-    // "矽": "",
-    // "硼": "",
-    // "碉": ""
+    "氖": "乃",
+    "氟": "弗",
+    "氦": "亥", // borrowed from New Latin "helium"
+    "氨": "安", // borrowed from English "ammonia"
+    "氫": "巠", // abbreviated phonetic 輕 (helium as a "light gas")
+    "氮": "炎", // abbreviated phonetic 淡 (nitrogen dilutes oxygen in the air)
+    // TODO: form should be 彔, right?
+    "氯": "录", // abbreviated phonetic 綠 (calque of English chlorine, which means "green gas")
+    "浬": "里",
+    "燜": "門",
+    "燴": "會",
+    "獗": "欮",
+    "玀": "羅",
+    "琊": "牙",
+    "琺": "法",
+    "甩": "甩",
+    "甭": "甭", // contraction of 不用 or 毋通
+    "疳": "甘",
+    "瘐": "臾",
+    "瘩": "合",
+    "癌": "嵒",
+    "瞄": "苗",
+    "瞇": "米",
+    "矓": "龍",
+    "矽": "夕",
+    "硼": "朋",
+    "碉": "周"
 }

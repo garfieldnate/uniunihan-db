@@ -6,6 +6,10 @@ Sometime soon: Unit tests for pipeline steps
 
 Topic: final output
 
+* NEXT: generator for website
+    - copy in book
+    - copy in debug outputs
+    - write index.html
 * separate files; single file is too large
 * 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
 * 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
@@ -26,6 +30,7 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* Crawl wiktionary data for "abbreviated phonetic keyword" and add this info
 * Allow but disprefer surnames and old stuff
 * Unihan: 醣 should be listed as a variant of 糖, which is the standard form
     - similarly, the 糖 entry has variant 餹 but not 醣饄糛𥹥
