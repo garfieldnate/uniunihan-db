@@ -398,7 +398,7 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
             en = en.rstrip("/")
             if filter:
                 if (
-                    "variant of" in en
+                    en.startswith("variant of")
                     or en.startswith("surname")
                     or en.startswith("(old)")
                 ):
