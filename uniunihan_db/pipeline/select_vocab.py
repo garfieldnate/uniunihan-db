@@ -48,7 +48,7 @@ def select_vocab_jp(data):
             new_c = c_data["new"]
             for pron, pron_data in c_data["prons"].items():
                 words = char_to_pron_to_vocab.get(new_c, {}).get(pron, [])
-                pron_data["vocab"] = __filter_vocab(words, used_vocab)
+                pron_data["vocab"] = __order_vocab(words, used_vocab)
                 for w in pron_data["vocab"]:
                     if w.surface in used_vocab:
                         duplicate_used.add(w.surface)
@@ -64,12 +64,13 @@ def select_vocab_jp(data):
     return data
 
 
-def __filter_vocab(words, used):
-    """Take the top MAX_EXAMPLE_VOCAB vocab which contain 2 or more characters,
-    preferring ones that haven't been used yet (words should be pre-sorted by frequency, etc.)"""
-    # TODO: warn when words are double-used
-    words = sorted(words, key=lambda w: w.surface in used)
-    return list(filter(lambda w: len(w.surface) > 1, words))[:MAX_EXAMPLE_VOCAB]
+def __order_vocab(words, used):
+    """Take the top MAX_EXAMPLE_VOCAB vocab, preferring those which consist of multiple
+    characters and which have not been used yet (words should also be
+    pre-sorted by frequency, etc.)"""
+
+    words = sorted(words, key=lambda w: (w.surface in used, len(w.surface) == 1))
+    return words[:MAX_EXAMPLE_VOCAB]
 
 
 def select_vocab_zh(data):
@@ -83,7 +84,7 @@ def select_vocab_zh(data):
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-            pron_data["vocab"] = __filter_vocab(words, used_vocab)
+            pron_data["vocab"] = __order_vocab(words, used_vocab)
             for w in pron_data["vocab"]:
                 if w.surface in used_vocab:
                     duplicate_used.add(w.surface)
@@ -121,7 +122,7 @@ def select_vocab_ko(data):
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-            pron_data["vocab"] = __filter_vocab(words, used_vocab)
+            pron_data["vocab"] = __order_vocab(words, used_vocab)
             for w in pron_data["vocab"]:
                 if w.surface in used_vocab:
                     duplicate_used.add(w.surface)
