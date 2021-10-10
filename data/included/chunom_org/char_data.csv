@@ -6,7 +6,7 @@ id,prons,loan1,loan2,char,definition,freq_score,black_variants,gray_variants
 5,có,False,True,固,"there is; to have; sure, of course",5,𣎏,
 6,người,False,False,𠊛,people; person; human,7,,
 7,trong,False,False,𥪝,in; within,8,,𥪞冲
-8,"được|đặc,đực",False,False,特,to get; to obtain; to be able to,9,,
+8,được|đặc|đực,False,False,特,to get; to obtain; to be able to,9,,
 9,không,False,False,空,no; not; without; (closed-question marker),10,,
 10,đã,False,True,㐌,already,11,,𠰹
 11,với,False,True,唄,(together) with,12,貝,
@@ -656,7 +656,7 @@ id,prons,loan1,loan2,char,definition,freq_score,black_variants,gray_variants
 655,phụ,False,False,輔,"to help, to assist, to aid",1108,,
 656,tạm,False,False,暫,"temporary, provisional",1110,,
 657,sử,False,False,史,history,1111,,
-658,"à|a,ạ",False,False,啊,"oh, aha, I see",1116,,
+658,à|a|ạ,False,False,啊,"oh, aha, I see",1116,,
 659,đấu,False,False,鬥,"to fight, to compete",1125,,
 660,đấu,False,False,斗,"peck, bushel",1125,,
 661,khổ|khó,False,False,苦,"painful, hard, bitter",1126,,

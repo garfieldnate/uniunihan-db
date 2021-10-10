@@ -37,6 +37,7 @@ Topic: Mandarin support
 * Why is 天方夜譚 used twice?
 * Next: integrate baidu frequencies
 * nǎi nai listed twice because it represents two different pronunciations
+    - also 伯伯
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation or put in ruby text: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
 * parse out "see": see 羊拐[yang2 guai3]
