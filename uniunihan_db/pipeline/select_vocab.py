@@ -44,6 +44,9 @@ def select_vocab_jp(data):
             for pron, words in pron_to_words.items():
                 c_data["prons"].get(pron, {})["vocab"] = words
                 used_vocab.update({v.surface for v in c_data["prons"][pron]["vocab"]})
+            for pron_data in c_data["prons"].values():
+                if "vocab" not in pron_data:
+                    pron_data["vocab"] = []
         else:
             new_c = c_data["new"]
             for pron, pron_data in c_data["prons"].items():
@@ -167,6 +170,8 @@ def select_vocab_vi(data):
 def _report_missing_words(char_data_iter):
     missing_words = set()
     for c, char_data in char_data_iter:
+        print(c)
+        print(char_data)
         for pron, pron_data in char_data["prons"].items():
             if not pron_data["vocab"]:
                 missing_words.add(f"{c}/{pron}")

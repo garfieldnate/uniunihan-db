@@ -138,5 +138,15 @@
                 "en": "(n) The sleeve of a robe"
             }
         ]
+    },
+    "串": {
+        "カン": [
+            {
+                "surface": "串戯",
+                "pron": "カンギ",
+                "freq": -1,
+                "en": "(n) A comedic routine, a joke, antics; an actor"
+            }
+        ]
     }
 }
