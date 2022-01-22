@@ -1,7 +1,9 @@
 # TODO
 
+Next: split pages by language/purity group to make loading faster
+Next: why wasn't 一日中 found automatically?
 
-Sometime soon: Unit tests for pipeline steps
+Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough that it needs to be split by language
 
 
 Topic: final output
@@ -23,7 +25,7 @@ Topic: final output
 * show weird characters like ㍻ somewhere because it's interesting.
 * Where to put 略字 such as 门, 㐧, 才, 圕, 广K, 木キ, etc.?
 * List country characters somewhere
-* Sample of Kanbun from each country, which pronunciations
+* Sample of Kanbun from each country, with pronunciations
 
 Topic: groupings
 
@@ -40,6 +42,7 @@ Topic: Mandarin support
     - also 伯伯
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation or put in ruby text: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
+* zì gě r5
 * parse out "see": see 羊拐[yang2 guai3]
 * Differentiate baidu and wendu
 * Get 三体 word list
@@ -82,6 +85,7 @@ Topic: Korean Support
 * possibly interesting: https://ko.wiktionary.org/wiki/%EC%82%AC%EC%9A%A9%EC%9E%90:Catagorae/%EC%98%81%EC%96%B4_%ED%95%9C%EA%B5%AD%EC%96%B4_%EB%B2%95%EB%A5%A0%EC%9A%A9%EC%96%B4
 
 Topic: Vietnamese Support
+
 
 * mark phonetic loans explicitly
 * Get word frequency list

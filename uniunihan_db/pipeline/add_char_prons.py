@@ -38,8 +38,8 @@ def load_prons_jp(char_data):
 
 def load_prons_zh(char_data):
     # Get pronunciations that are used in modern words present in CEDICT. This allows
-    # us to guarantee that we have examples for most pronunciations, and avoids super
-    # obscure pronunciations that increase the grouping complexity significantly.
+    # us to guarantee that we have examples for most pronunciations, and avoids more
+    # obscure pronunciations present in Unihan, which increase the grouping complexity significantly.
     # If a character is not found in CEDICT, fall back to using Unihan pronunciation data.
     # Supplement all pronunciations with with kHanyuPinlu pronunciation frequency data.
 
@@ -49,8 +49,18 @@ def load_prons_zh(char_data):
         if c_data := char_data.get(c):
             prons = c_data.setdefault("prons", {})
             for p, _ in pron_to_vocab.items():
+                # if p without its tone can be found among the other pronunciations,
+                # assume it's derivable and skip it. We could also try to find the
+                # full tones from another source, but during testing Unihan data did
+                # not yield anything.
+                if '5' in p and len(pron_to_vocab) > 1:
+                    other_p_no_tone = [pron[:-1] for pron in pron_to_vocab.keys() if pron != p]
+                    if p[:-1] in other_p_no_tone:
+                        continue
                 prons[p] = {}
 
+    # supplement with unihan pronunciations and pronunciation frequency
+    # data where available
     unihan = get_unihan()
     fallback_chars = set()
     no_pron_chars = set()
@@ -63,13 +73,14 @@ def load_prons_zh(char_data):
             else:
                 no_pron_chars.add(c)
         else:
+            prons = c_data["prons"]
             for p, up_data in unihan_prons.items():
-                if p in c_data["prons"] and "frequency" in up_data:
-                    c_data["prons"][p]["frequency"] = up_data["frequency"]
+                if p in prons and "frequency" in up_data:
+                    prons[p]["frequency"] = up_data["frequency"]
 
     if fallback_chars:
         logger.warning(
-            f"Fell back to using Mandarin readings from Unihan for {len(fallback_chars)} characters"
+            f"Fell back to using Unihan Mandarin readings for {len(fallback_chars)} characters"
         )
         logger.debug(format_json(fallback_chars))
     if no_pron_chars:
