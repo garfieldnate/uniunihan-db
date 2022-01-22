@@ -1,4 +1,4 @@
-# Step 4: Add useful vocabulary that illustrates the
+# Step 4: Add useful vocabulary that illustrate the
 # pronunciations of each character
 
 from typing import List
@@ -170,8 +170,6 @@ def select_vocab_vi(data):
 def _report_missing_words(char_data_iter):
     missing_words = set()
     for c, char_data in char_data_iter:
-        print(c)
-        print(char_data)
         for pron, pron_data in char_data["prons"].items():
             if not pron_data["vocab"]:
                 missing_words.add(f"{c}/{pron}")

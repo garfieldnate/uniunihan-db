@@ -1,5 +1,5 @@
 # Create the final book structure (for one language) by organizing the characters
-# by purity level, component gruop, and cluster, and by sorting everything so that
+# by purity level, component group, and cluster, and by sorting everything so that
 # the most useful, general information comes first.
 
 
