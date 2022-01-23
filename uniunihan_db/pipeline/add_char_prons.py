@@ -53,8 +53,10 @@ def load_prons_zh(char_data):
                 # assume it's derivable and skip it. We could also try to find the
                 # full tones from another source, but during testing Unihan data did
                 # not yield anything.
-                if '5' in p and len(pron_to_vocab) > 1:
-                    other_p_no_tone = [pron[:-1] for pron in pron_to_vocab.keys() if pron != p]
+                if "5" in p and len(pron_to_vocab) > 1:
+                    other_p_no_tone = [
+                        pron[:-1] for pron in pron_to_vocab.keys() if pron != p
+                    ]
                     if p[:-1] in other_p_no_tone:
                         continue
                 prons[p] = {}
