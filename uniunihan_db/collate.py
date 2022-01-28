@@ -1,3 +1,5 @@
+# create cross-reference links between character data of different languages
+
 from loguru import logger as log
 
 from uniunihan_db.data.paths import GENERATED_DATA_DIR

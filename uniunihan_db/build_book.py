@@ -16,8 +16,10 @@ from uniunihan_db.util import configure_logging
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 INPUT_FILE = GENERATED_DATA_DIR / "collated" / "final.json"
-OUTPUT_FILE = GENERATED_DATA_DIR / "book" / "index.html"
-OUTPUT_FILE.parent.mkdir(exist_ok=True, parents=True)
+OUTPUT_DIR = GENERATED_DATA_DIR / "book"
+OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
+LANG_TO_HAN = {"jp": "日", "zh": "中", "ko": "韓", "vi": "越"}
+LANG_ENGLISH = {"jp": "Japanese", "zh": "Mandarin", "ko": "Korean", "vi": "Vietnamese"}
 
 
 # filters and functions for our jinja template
@@ -43,11 +45,11 @@ def __format_id(s):
     return s.split("-")[-1]
 
 
-LANG_TO_HAN = {"jp": "日", "zh": "中", "ko": "韓", "vi": "越"}
-
-
-def __lang_to_han(s):
-    return LANG_TO_HAN[s]
+def __format_char_cross_ref(char_id):
+    _, lang, purity_type, c_num = char_id.split("-")
+    return (
+        f'<a href="{lang}-{purity_type}.html#{char_id}">{LANG_TO_HAN[lang]}：{c_num}</a>'
+    )
 
 
 def get_jinja_env():
@@ -62,11 +64,87 @@ def get_jinja_env():
     jinja_env.globals["purity_group_header"] = __purity_group_header
     jinja_env.filters["num2diacritic"] = pinyin_numbers_to_tone_marks
     jinja_env.filters["format_id"] = __format_id
-    jinja_env.filters["lang_to_han"] = __lang_to_han
+    jinja_env.filters["format_char_cross_ref"] = __format_char_cross_ref
     return jinja_env
 
 
+def lang_intro_page_name(lang):
+    return f"{lang}-intro.html"
+
+
+def purity_group_page_name(lang, purity_type: int):
+    return f"{lang}-{purity_type}.html"
+
+
+def generate_toc(all_data):
+    toc = []
+    for lang, data in all_data.items():
+        toc.append(
+            {
+                "title": f"{LANG_ENGLISH[lang]}: introduction",
+                "file_name": lang_intro_page_name(lang),
+            }
+        )
+        for purity_type, pg in data.items():
+            if not pg["groups"]:
+                continue
+
+            purity = PurityType(int(purity_type))
+            toc.append(
+                {
+                    "title": f"{purity.display.title()} Groups",
+                    "file_name": purity_group_page_name(lang, purity_type),
+                }
+            )
+    return toc
+
+
+def render_front_matter(jinja_env, toc):
+    front_matter_template = jinja_env.get_template("front_matter.html.jinja")
+    result = front_matter_template.render(
+        book_title="Dictionary of Chinese Characters for Sinoxenic Language Learners",
+        intro="TODO: intro text",
+        toc=toc,
+    )
+    with open(OUTPUT_DIR / "index.html", "w") as f:
+        f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
+        f.write(result)
+
+
+def render_part_intro(jinja_env, lang, part_num):
+    part_intro_template = jinja_env.get_template("part_intro.html.jinja")
+    result = part_intro_template.render(
+        lang=lang, part_num=part_num, intro=intros[lang]
+    )
+    with open(OUTPUT_DIR / lang_intro_page_name(lang), "w") as f:
+        f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
+        f.write(result)
+
+
+def render_purity_group(jinja_env, lang, part_num, purity_type, pg):
+    purity_group_template = jinja_env.get_template("purity_group.html.jinja")
+    result = purity_group_template.render(
+        purity_type=purity_type,
+        pg=pg,
+        lang=lang,
+        part_num=part_num,
+        intro=intros[lang],
+    )
+    with open(OUTPUT_DIR / f"{lang}-{purity_type}.html", "w") as f:
+        f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
+        f.write(result)
+
+
+intros = {
+    "jp": "<h1>Japanese (joyo)</h1>",
+    "zh": "<h1>Mandarin (HSK)</h1>",
+    "ko": "<h1>Korean (kyoyuk)</h1>",
+    "vi": "<h1>Vietnamese (chunom.org)</h1>",
+}
+
+
 def build_book():
+    """TODO: explain structure here"""
     if INPUT_FILE.exists():
         log.info(f"Loading collated data from {INPUT_FILE}...")
         all_data = json.load(INPUT_FILE.open())
@@ -74,28 +152,27 @@ def build_book():
         log.info("Re-generating collated data...")
         all_data = collate()
 
+    toc = generate_toc(all_data)
     jinja_env = get_jinja_env()
-    template = jinja_env.get_template("base.html.jinja")
-    log.info("Rendering template...")
-    result = template.render(
-        all_data=all_data,
-        intros={
-            "jp": "<h1>Japanese (joyo)</h1>",
-            "zh": "<h1>Mandarin (HSK)</h1>",
-            "ko": "<h1>Korean (kyoyuk)</h1>",
-            "vi": "<h1>Vietnamese (chunom.org)</h1>",
-        },
-    )
 
-    # write resulting HTML file
-    with open(OUTPUT_FILE, "w") as f:
-        f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
-        f.write(result)
+    render_front_matter(jinja_env, toc)
+
+    toc_index = -1
+    for part_num, (lang, data) in enumerate(all_data.items()):
+        log.info(f"Rendering {lang} files...")
+        toc_index += 1
+
+        render_part_intro(jinja_env, lang, part_num)
+
+        for purity_type, pg in data.items():
+            if not pg["groups"]:
+                continue
+            toc_index += 1
+            render_purity_group(jinja_env, lang, part_num, purity_type, pg)
 
     # copy CSS files
-    out_dir = OUTPUT_FILE.parent
     for css_file in list((Path(__file__).parent.parent / "css").glob("*.css")):
-        copy2(css_file, out_dir)
+        copy2(css_file, OUTPUT_DIR)
 
 
 def main():

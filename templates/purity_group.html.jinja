@@ -1,0 +1,23 @@
+{% include 'header.html.jinja' %}
+<div id="content">
+    <div class="purity-group-header">
+        {{ purity_group_header(purity_type) }}
+    </div><!-- end purity-group-header -->
+    {% for component, group in pg.groups.items() %}
+    <div class="component" id="{{ group.ID }}">
+        {% include 'component_header.html.jinja' %}
+        {%- set spacing = joiner("<br />") %}
+        {% for cluster in group.clusters %}{{ spacing() }}
+        <div class="cluster" id="cluster-{{ lang }}-{{ component }}-{{ part_num }}">
+            {% for char, char_info in cluster.items() %}
+            <div class="cell" id="{{ char_info.ID }}">
+                {% include lang + '_char.html.jinja' %}
+            </div><!-- end cell -->
+            {% endfor %}
+        </div><!-- end cluster -->
+        {% endfor %}
+    </div><!-- end component -->
+    {% endfor %}
+</div><!-- end content -->
+{% include 'nav.html.jinja' %}
+{% include 'footer.html.jinja' %}

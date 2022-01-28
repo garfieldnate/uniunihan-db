@@ -2,13 +2,13 @@ def assign_ids(lang, data):
     """Add ID values for groups and characters"""
     group_id = 1
     char_id = 1
-    for purity_group in data.values():
+    for purity_type, purity_group in data.items():
         for group in purity_group["groups"].values():
-            group["ID"] = f"g-{lang}-{group_id}"
+            group["ID"] = f"g-{lang}-{purity_type}-{group_id}"
             group_id += 1
             for cluster in group["clusters"]:
                 for char_data in cluster.values():
-                    char_data["ID"] = f"c-{lang}-{char_id}"
+                    char_data["ID"] = f"c-{lang}-{purity_type}-{char_id}"
                     char_id += 1
     return data
 

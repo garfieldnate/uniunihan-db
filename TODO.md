@@ -1,6 +1,6 @@
 # TODO
 
-Next: split pages by language/purity group to make loading faster
+Next: fix links in split-page output
 Next: why wasn't 一日中 found automatically?
 
 Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough that it needs to be split by language
@@ -12,7 +12,6 @@ Topic: final output
     - copy in book
     - copy in debug outputs
     - write index.html
-* separate files; single file is too large
 * 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
 * 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
 * Number the chapters/purity groups for easier navigation
@@ -26,6 +25,7 @@ Topic: final output
 * Where to put 略字 such as 门, 㐧, 才, 圕, 广K, 木キ, etc.?
 * List country characters somewhere
 * Sample of Kanbun from each country, with pronunciations
+* links to same groups in other languages
 
 Topic: groupings
 
@@ -55,6 +55,7 @@ Topic: Mandarin support
 
 Topic: Japanese Support
 
+* Why does 埼 come first in its group? It has no example words.
 * investigate kun-yomi with stars (むな*、むね); maybe sort to end? Maybe change formatting?
 * investigate char/prons with missing example words
 * Consider getting rid of (obsc) and (arch) words (貞治 is in output!)
