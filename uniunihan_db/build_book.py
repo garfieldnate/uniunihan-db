@@ -81,7 +81,7 @@ def generate_toc(all_data):
     toc_html = ['<a href="#intro">Introduction</a><br/>']
     toc_html.append("<ol>")
     for lang, data in all_data.items():
-        title = f"{LANG_ENGLISH[lang]}: Introduction"
+        title = f"{LANG_ENGLISH[lang]} &mdash; Introduction"
         file_name = lang_intro_page_name(lang)
         toc.append(
             {
@@ -99,7 +99,7 @@ def generate_toc(all_data):
             file_name = purity_group_page_name(lang, purity_type)
             toc.append(
                 {
-                    "title": f"{LANG_ENGLISH[lang]}: {purity.display.title()} Groups",
+                    "title": f"{LANG_ENGLISH[lang]} &mdash; {purity.display.title()} Groups",
                     "file_name": file_name,
                 }
             )

@@ -1,11 +1,11 @@
-<div id="nav">
+<div id="nav" style="display: flex">
     {% if prev is not none %}
     <div id="prev">
     <a href="{{prev.file_name}}">Prev: {{prev.title}}</a>
     </div>
     {% endif %}
     {% if next is not none %}
-    <div id="prev">
+    <div id="next" style="margin-left: auto">
     <a href="{{next.file_name}}">Next: {{next.title}}</a>
     </div>
     {% endif %}
