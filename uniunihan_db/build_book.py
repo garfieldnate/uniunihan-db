@@ -1,3 +1,7 @@
+# Write the book HTML files. The book is organized into front matter,
+# then language ("part"), then purity group. One page is written to introduce
+# each part, and one page is written for each purity group in each language.
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -77,6 +81,10 @@ def purity_group_page_name(lang, purity_type: int):
 
 
 def generate_toc(all_data):
+    """Returns (toc, toc_html), where toc is a list of {title, file_name}
+    entries corresponding to every page on the site, and toc_html the same
+    but formatted for display in the front matter"""
+
     toc = [{"title": "Introduction", "file_name": "index.html"}]
     toc_html = ['<a href="#intro">Introduction</a><br/>']
     toc_html.append("<ol>")
@@ -152,10 +160,10 @@ def render_purity_group(jinja_env, lang, purity_type, pg, prev, next):
 
 
 intros = {
-    "jp": "<h1>Japanese (joyo)</h1>",
-    "zh": "<h1>Mandarin (HSK)</h1>",
-    "ko": "<h1>Korean (kyoyuk)</h1>",
-    "vi": "<h1>Vietnamese (chunom.org)</h1>",
+    "jp": "<h1>Japanese (joyo)</h1><p>TODO: write introduction</p>",
+    "zh": "<h1>Mandarin (HSK)</h1><p>TODO: write introduction</p>",
+    "ko": "<h1>Korean (kyoyuk)</h1><p>TODO: write introduction</p>",
+    "vi": "<h1>Vietnamese (chunom.org)</h1><p>TODO: write introduction</p>",
 }
 
 

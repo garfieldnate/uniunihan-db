@@ -1,6 +1,5 @@
 # TODO
 
-Next: Write TOC in front matter
 Next: why wasn't 一日中 found automatically?
 
 Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough that it needs to be split by language
@@ -14,6 +13,7 @@ Topic: final output
     - write index.html
 * 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
 * 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
+* maybe link to wiktionary?
 * Number the chapters/purity groups for easier navigation
 * continuous (but not intrusive) headers for language and purity group
 * output language-specific names of components (BS gives pinyin but not Japanese, etc.)
@@ -26,6 +26,11 @@ Topic: final output
 * List country characters somewhere
 * Sample of Kanbun from each country, with pronunciations
 * links to same groups in other languages
+* character search functionality
+* back matter?
+    - citations
+    - character index
+    - timelines
 
 Topic: groupings
 
