@@ -173,7 +173,7 @@ def build_book():
         log.info(f"Rendering {lang} files...")
         toc_index += 1
 
-        render_part_intro(jinja_env, lang, part_num, **get_toc_nav(toc, toc_index))
+        render_part_intro(jinja_env, lang, part_num + 1, **get_toc_nav(toc, toc_index))
 
         for purity_type, pg in data.items():
             if not pg["groups"]:
