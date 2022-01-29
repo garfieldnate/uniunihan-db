@@ -3,7 +3,7 @@
     {% set needs_num = group.historical|length > 1 %}
     {% for hist_info in group.historical %}
     <div class="component-etymology-section">
-        <p class="component-keyword">{{part_num if needs_num else ''}}{{hist_info.gloss}}</p>
+        <p class="component-keyword">{{loop.index|string + ': ' if needs_num else ''}}{{hist_info.gloss}}</p>
         {% if hist_info.OC %}
         <p class="component-pronunciation"><em>Old Chinese:</em> {{ hist_info.OC|join(',')}}</p>
         {% endif %}
