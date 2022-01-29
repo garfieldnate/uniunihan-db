@@ -1,6 +1,6 @@
 # TODO
 
-Next: fix links in split-page output
+Next: Write TOC in front matter
 Next: why wasn't 一日中 found automatically?
 
 Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough that it needs to be split by language
