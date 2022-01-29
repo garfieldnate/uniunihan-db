@@ -1,3 +1,12 @@
 <div id="nav">
-    TODO: Nav
+    {% if prev is not none %}
+    <div id="prev">
+    <a href="{{prev.file_name}}">Prev: {{prev.title}}</a>
+    </div>
+    {% endif %}
+    {% if next is not none %}
+    <div id="prev">
+    <a href="{{next.file_name}}">Next: {{next.title}}</a>
+    </div>
+    {% endif %}
 </div>

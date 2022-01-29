@@ -92,7 +92,7 @@ def generate_toc(all_data):
             purity = PurityType(int(purity_type))
             toc.append(
                 {
-                    "title": f"{purity.display.title()} Groups",
+                    "title": f"{LANG_ENGLISH[lang]}: {purity.display.title()} Groups",
                     "file_name": purity_group_page_name(lang, purity_type),
                 }
             )
@@ -105,34 +105,46 @@ def render_front_matter(jinja_env, toc):
         book_title="Dictionary of Chinese Characters for Sinoxenic Language Learners",
         intro="TODO: intro text",
         toc=toc,
+        prev=None,
+        next=toc[1],
     )
     with open(OUTPUT_DIR / "index.html", "w") as f:
         f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
         f.write(result)
 
 
-def render_part_intro(jinja_env, lang, part_num):
+def render_part_intro(jinja_env, lang, part_num, prev, next):
     part_intro_template = jinja_env.get_template("part_intro.html.jinja")
     result = part_intro_template.render(
-        lang=lang, part_num=part_num, intro=intros[lang]
+        lang=lang, part_num=part_num, intro=intros[lang], prev=prev, next=next
     )
     with open(OUTPUT_DIR / lang_intro_page_name(lang), "w") as f:
         f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
         f.write(result)
 
 
-def render_purity_group(jinja_env, lang, part_num, purity_type, pg):
+def render_purity_group(jinja_env, lang, purity_type, pg, prev, next):
     purity_group_template = jinja_env.get_template("purity_group.html.jinja")
     result = purity_group_template.render(
         purity_type=purity_type,
         pg=pg,
         lang=lang,
-        part_num=part_num,
         intro=intros[lang],
+        prev=prev,
+        next=next,
     )
     with open(OUTPUT_DIR / f"{lang}-{purity_type}.html", "w") as f:
         f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
         f.write(result)
+
+
+def get_toc_nav(toc, index):
+    """Returns {prev: {...}, next: {...}} given the TOC and the index for the current page.
+    Values are set to None when no next or previous nav element apply."""
+    return {
+        "prev": toc[index - 1] if index > 0 else None,
+        "next": toc[index + 1] if index < len(toc) - 1 else None,
+    }
 
 
 intros = {
@@ -144,7 +156,6 @@ intros = {
 
 
 def build_book():
-    """TODO: explain structure here"""
     if INPUT_FILE.exists():
         log.info(f"Loading collated data from {INPUT_FILE}...")
         all_data = json.load(INPUT_FILE.open())
@@ -162,13 +173,19 @@ def build_book():
         log.info(f"Rendering {lang} files...")
         toc_index += 1
 
-        render_part_intro(jinja_env, lang, part_num)
+        render_part_intro(jinja_env, lang, part_num, **get_toc_nav(toc, toc_index))
 
         for purity_type, pg in data.items():
             if not pg["groups"]:
                 continue
             toc_index += 1
-            render_purity_group(jinja_env, lang, part_num, purity_type, pg)
+            render_purity_group(
+                jinja_env,
+                lang,
+                purity_type,
+                pg,
+                **get_toc_nav(toc, toc_index),
+            )
 
     # copy CSS files
     for css_file in list((Path(__file__).parent.parent / "css").glob("*.css")):

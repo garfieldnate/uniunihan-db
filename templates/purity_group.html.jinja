@@ -8,7 +8,7 @@
         {% include 'component_header.html.jinja' %}
         {%- set spacing = joiner("<br />") %}
         {% for cluster in group.clusters %}{{ spacing() }}
-        <div class="cluster" id="cluster-{{ lang }}-{{ component }}-{{ part_num }}">
+        <div class="cluster" id="cluster-{{ component }}">
             {% for char, char_info in cluster.items() %}
             <div class="cell" id="{{ char_info.ID }}">
                 {% include lang + '_char.html.jinja' %}
@@ -19,5 +19,4 @@
     </div><!-- end component -->
     {% endfor %}
 </div><!-- end content -->
-{% include 'nav.html.jinja' %}
 {% include 'footer.html.jinja' %}
