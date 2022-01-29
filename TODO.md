@@ -113,23 +113,7 @@ Topic: Vietnamese Support
 
 ## Tasks
 
-Prediction experiments:
-- components -> Japanese (sanity check with Heisig)
-- components -> Mandarin
-- Japanese -> Mandarin
-- Japanese -> Cantonese
-- Cantonese -> Mandarin
-
 * Convert Jun Da frequency list to traditional characters so we have traditional frequency list (roughly)
-* generate decision trees with accuracy stats for pronunciations:
-    - components -> Japanese (check against Heisig)
-    - components -> Mandarin
-    - Japanese -> Mandarin
-    - Japanese -> Cantonese
-    - Cantonese -> Mandarin
-* lib for parsing Syllables:
-    - Cantonese
-    - Vietnamese
 * Character lists (grade level, newspaper standard, etc.)
     - https://en.wikisource.org/wiki/Translation:List_of_Frequently_Used_Characters_in_Modern_Chinese#Inferior_frequently_used_characters
     - https://web.archive.org/web/20160404231631/http://resources.publicense.moe.edu.tw/dict_reviseddict_download.html
@@ -137,8 +121,6 @@ Prediction experiments:
 * Investigate https://github.com/cburgmer/cjklib
     - website is long gone, project no longer maintained, but it looks pretty comprehensive!
     - Can we revive/modernize it? May be a better data source!
-* Incorporate http://ocbaxtersagart.lsait.lsa.umich.edu/ (historical reconstructions)
-    - or try making a datapackage
 * Investigate http://www.lrec-conf.org/proceedings/lrec2012/pdf/306_Paper.pdf
     - lists some good resources
     - they don't share their results :(
@@ -200,13 +182,8 @@ Prediction experiments:
 * integrate darglint and/or pydocstyle to help keep documentation together
 * mypy doesn't check that types are used in signatures, nor that methods are used correctly 😡 Maybe try pyre, pyright, or pytype
 * Try rope for refactoring
-* verify vscode integration
-* Standalone build script
 * Dockerfile
 * Faster-to-load format than JSON? Is pickle better?
-
-## Technical Questions
-* Should we use importlib or something intead of Path(__file__).parents[1]?
 
 ## Inspirations
 
