@@ -399,6 +399,7 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
             if filter:
                 if (
                     en.startswith("variant of")
+                    or en.startswith("see ")
                     or en.startswith("surname")
                     or en.startswith("(old)")
                 ):
