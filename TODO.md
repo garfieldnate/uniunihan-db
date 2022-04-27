@@ -1,16 +1,14 @@
 # TODO
 
 Next: why wasn't 一日中 found automatically?
+Then: integrate Baidu frequencies
 
 Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough that it needs to be split by language
 
 
 Topic: final output
 
-* NEXT: generator for website
-    - copy in book
-    - copy in debug outputs
-    - write index.html
+* host debug outputs somewhere
 * 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
 * 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
 * maybe link to wiktionary?
@@ -37,12 +35,13 @@ Topic: groupings
 
 Topic: Mandarin support
 
+* Next: integrate baidu frequencies
+    - maybe just for those not in CKIP?
 * Crawl wiktionary data for "abbreviated phonetic keyword" and add this info
 * Allow but disprefer surnames and old stuff
 * Unihan: 醣 should be listed as a variant of 糖, which is the standard form
     - similarly, the 糖 entry has variant 餹 but not 醣饄糛𥹥
 * Why is 天方夜譚 used twice?
-* Next: integrate baidu frequencies
 * nǎi nai listed twice because it represents two different pronunciations
     - also 伯伯
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
