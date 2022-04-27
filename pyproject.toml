@@ -27,6 +27,7 @@ unihan-etl = "^0.11.0"
 requests = "^2.24.0"
 jaconv = "^0.2.4"
 beautifulsoup4 = "^4.10.0"
+poethepoet = "^0.13.1"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
@@ -35,12 +36,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
-[tool.poetry.scripts]
-pipeline = "uniunihan_db.pipeline.runner:main"
-collate = "uniunihan_db.collate:main"
-build-book = "uniunihan_db.build_book:main"
-# test = "pre-commit run --all-files"
 
 [tool.isort]
 profile = "black"
@@ -67,3 +62,16 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:"
 ]
+
+[tool.poe.tasks.verify]
+cmd  = "pre-commit run --all-files"
+help = "Run all lints and tests"
+[tool.poe.tasks.pipeline]
+cmd = "python -m uniunihan_db.pipeline.runner"
+help = "Run Chinese character data pipeline(s) for individual languages and save the output"
+[tool.poe.tasks.collate]
+cmd = "python -m uniunihan_db.collate"
+help = "Combine the Chinese character data from all languages into one data file"
+[tool.poe.tasks.build_book]
+cmd = "python -m uniunihan_db.build_book"
+help = "Generate HTML files from the collated data"

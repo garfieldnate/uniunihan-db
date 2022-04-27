@@ -44,11 +44,9 @@ If you _have_ to commit or push right now and don't have time to fix a failing t
     git commit --no-verify
     git push --no-verify
 
-For now, all of the tests, formatting, etc. can be run only from the pre-commit hook:
+All of the lints and tests can be run using the poe task `verify`:
 
-    poetry run pre-commit run --hook-stage commit --all-files
-
-I know it's dumb... I'm looking into it.
+    poetry run poe verify
 
 A VSCode settings file is included which contains configurations for all of the linting and formatting tools installed.
 
