@@ -1,6 +1,4 @@
 [flake8]
-;  black-compatible settings
-ignore = E203, E266, E501, W503
+;  black-compatible settings: https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8
 max-line-length = 88
-max-complexity = 18
-select = B,C,E,F,W,T4
+extend-ignore = E203
