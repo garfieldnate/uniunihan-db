@@ -1,9 +1,11 @@
 try:
     import importlib.metadata as importlib_metadata
 except ModuleNotFoundError:
-    import importlib_metadata  # type: ignore # https://github.com/python/mypy/issues/1153
+    # https://github.com/microsoft/pyright/issues/656
+    import importlib_metadata  # type: ignore
 
 try:
     __version__ = importlib_metadata.version(__name__)
-except ModuleNotFoundError:  # happens during development or with `poetry install`'d module for some reason
+# happens during development or with `poetry install`'d module for some reason
+except ModuleNotFoundError:
     __version__ = ""

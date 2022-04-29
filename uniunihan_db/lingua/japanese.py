@@ -1,5 +1,5 @@
-# Parse Japanese sino-xenic vocabulary, which were imported from syllables in foreign languages
-# into mono- or polymoraic morphemes.
+# Parse Japanese sino-xenic vocabulary, which were imported from syllables in foreign
+# languages into mono- or polymoraic morphemes.
 
 import re
 from dataclasses import dataclass
@@ -202,7 +202,8 @@ def kana_to_alpha(word: str, romanization: Romanization = Romanization.IME) -> s
         word = word.replace(v, k)
     for k, v in VOWELS.items():
         word = word.replace(v, k)
-    # Personally, I type "nn" in IME's, but "n'" is easier to read, so we'll go with that
+    # Personally, I type "nn" in IME's, but "n'" is easier to read,
+    # so we'll go with that
     word = re.sub("ん(?=[aiueoy])", "n'", word)
     word = word.replace("ん", "n")
     # geminates
@@ -240,14 +241,17 @@ class HanSyllable:
         # TODO: provide morae count (1,2 or 3)
 
 
-HAN_SYLLABLE_RE = r"(?i)^(?P<onset>[kgsztdnhpbmr](?:u(?=w)|i(?=y))?)?(?P<semivowel>y|w)?(?P<vowel>[aiueo]+)(?P<coda>n|[ktshbmn](?P<epenthetic_vowel>i|u)|)$"
+HAN_SYLLABLE_RE = (
+    r"(?i)^(?P<onset>[kgsztdnhpbmr](?:u(?=w)|i(?=y))?)?"
+    r"(?P<semivowel>y|w)?(?P<vowel>[aiueo]+)"
+    r"(?P<coda>n|[ktshbmn](?P<epenthetic_vowel>i|u)|)$"
+)
 
 
 def parse_han_syllable(s: str) -> Optional[HanSyllable]:
     """Parse an IME-romanized han syllable on'yomi into its constituent parts.
-    This does not attempt
-    to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
-    then None will be returned."""
+    This does not attempt to prevent any nonsense syllables from being parsed, but if
+    the input cannot be parsed then None will be returned."""
     s = s.strip().lower()
     match = re.match(HAN_SYLLABLE_RE, s)
     if match is None:

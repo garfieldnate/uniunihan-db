@@ -30,7 +30,8 @@ def load_char_data_zh():
             char_data[char]["english"] = info.get("kDefinition", [])
 
             simp = unihan[char].get("kSimplifiedVariant", [])
-            # Remove char from its own list of simplified variants. Pretty sure this is an issue with Unihan data.
+            # Remove char from its own list of simplified variants.
+            # Pretty sure this is an issue with Unihan data.
             simp = list(filter(lambda x: x != char, simp))
             char_data[char]["simp"] = simp
 
@@ -46,11 +47,11 @@ def load_char_data_ko():
         char = row["char"]
         del row["char"]
         if row["eum"]:
-            row["eum"] = row["eum"].split("|")
+            row["eum"] = row["eum"].split("|")  # type: ignore
         # set blank fields to None
         for key in ["variant", "note"]:
             if not row[key]:
-                row[key] = None
+                row[key] = None  # type: ignore
         char_data[char] = row
 
     logger.info(f"Loaded data for {len(char_data)} characters")
@@ -66,8 +67,8 @@ def load_char_data_vi():
         del row["char"]
         # parse boolean fields
         for key in ["loan1", "loan2"]:
-            row[key] = row[key] == "True"
-        row["prons"] = row["prons"].split("|")
+            row[key] = row[key] == "True"  # type: ignore
+        row["prons"] = row["prons"].split("|")  # type: ignore
         row["note"] = ""
         char_data[char] = row
 

@@ -6,11 +6,11 @@ from typing import Optional, Tuple
 @dataclass
 class Syllable:
     """
-    The structure of this class follows the traditional classification of Mandarin syllables,
-    which are divided into
-    C, G, V and X. These are an initial consonant, a glide or prenuclear vowel, the nucleus
-    or nuclear vowel, and a final vowel or nasal consonant.
-    See http://orient.avcr.cz/miranda2/export/sitesavcr/data.avcr.cz/humansci/orient/kontakty/pracovnici/publikace/Triskova/ArOr_Mandarin_Syllable.pdf
+    The structure of this class follows the traditional classification of Mandarin
+    syllables, which are divided into C, G, V and X. These are an initial consonant, a
+    glide or prenuclear vowel, the nucleus or nuclear vowel, and a final vowel or
+    nasal consonant. See
+    http://orient.avcr.cz/miranda2/export/sitesavcr/data.avcr.cz/humansci/orient/kontakty/pracovnici/publikace/Triskova/ArOr_Mandarin_Syllable.pdf
     for a more detailed explanation.
     Fields:
     `surface`: the entire syllable in pinyin romanization
@@ -63,7 +63,10 @@ VOWEL_LIST, TONE_MATCHERS, TONE_REMOVERS = __setup_pinyin_parsing()
 
 ONSETS = "tdkgpbwqryljhszxcnmf"
 
-SYLLABLE_RE = f"(?i)^(?P<onset>[{ONSETS}]h?)?(?P<glide>i|u|ü)?(?P<nucleus>[{VOWEL_LIST}])(?P<final>ng?|r|i|u|o)?$"
+SYLLABLE_RE = (
+    f"(?i)^(?P<onset>[{ONSETS}]h?)?(?P<glide>i|u|ü)?"
+    f"(?P<nucleus>[{VOWEL_LIST}])(?P<final>ng?|r|i|u|o)?$"
+)
 
 
 def strip_tone(s: str) -> Tuple[str, int]:
@@ -77,9 +80,9 @@ def strip_tone(s: str) -> Tuple[str, int]:
 
 
 def parse_syllable(s: str) -> Optional[Syllable]:
-    """Parse a pinyin-romanized syllable into its constituent parts. This does not attempt
-    to prevent any nonsense syllables from being parsed, but if the input cannot be parsed
-    then None will be returned."""
+    """Parse a pinyin-romanized syllable into its constituent parts. This does not
+    attempt to prevent any nonsense syllables from being parsed, but if the input
+    cannot be parsed then None will be returned."""
     s = s.strip().lower()
     surface = s
 

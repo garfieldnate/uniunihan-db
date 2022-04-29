@@ -22,11 +22,11 @@ repos:
         entry: poetry run flake8
         types: [python]
 
-      - id: mypy
-        name: mypy
+      - id: pyright
+        name: pyright
         stages: [commit]
         language: system
-        entry: poetry run mypy
+        entry: poetry run pyright
         types: [python]
 
       - id: pytest

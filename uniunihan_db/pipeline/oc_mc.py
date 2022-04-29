@@ -38,8 +38,11 @@ def integrate_historical_chinese(all_data):
             for yt in ytenx_infos:
                 historical_data.append(
                     {
-                        "source": "ZZ",  # Zheng/Zhang # TODO: confirm it's Zheng/Zhang
-                        "gloss": "TODO: gloss",  # get it from Unihan? (be sure to mark source in that case)
+                        # TODO: confirm it's Zheng/Zhang
+                        "source": "ZZ",  # Zheng/Zhang
+                        # TODO: get it from Unihan? (be sure to
+                        # mark source in that case)
+                        "gloss": "TODO: gloss",
                         "OC": yt.old_chinese,
                         "MC": yt.middle_chinese,
                         "LMC": yt.late_middle_chinese,

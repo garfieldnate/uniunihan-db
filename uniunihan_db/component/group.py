@@ -8,6 +8,8 @@ from uniunihan_db.data.datasets import StringToStrings
 
 # Inspired by Heisig volume 2 (except for MIXED_D and SINGLETON)
 class PurityType(IntEnum):
+    display: str
+
     # Custom constructor to allow specifying documentation string;
     # See https://stackoverflow.com/a/50473952/474819 for discussion
     def __new__(cls, value, display=None, doc=None):
@@ -23,7 +25,8 @@ class PurityType(IntEnum):
     PURE = (
         1,
         "pure",
-        "These groups have only a single pronunciation shared by all characters in the group, making them the easiest to learn and remember.",
+        "These groups have only a single pronunciation shared by all characters in "
+        "the group, making them the easiest to learn and remember.",
     )
     # 2 Pronunciations, one of them contains only one character
     SEMI_PURE = (
@@ -47,31 +50,38 @@ class PurityType(IntEnum):
     MIXED_C = (
         5,
         "mixed-C",
-        "These groups have at least 4 characters and share at least 1 pronunciation among all the contained characters.",
+        "These groups have at least 4 characters and share at least 1 pronunciation "
+        "among all the contained characters.",
     )
     # At least one shared pronunciation
     MIXED_D = (
         6,
         "mixed-D",
-        "These groups have less than 4 characters but still share at least 1 pronunciation among all the contained characters.",
+        "These groups have less than 4 characters but still share at least 1 "
+        "pronunciation among all the contained characters.",
     )
     # Multiple characters, no pattern found
     NO_PATTERN = (
         7,
         "potpourri",
-        "There are no shared pronunciations in these groups. However, the pronunciations are still related, since they have a common ancestor in ancient Chinese.",
+        "There are no shared pronunciations in these groups. However, the "
+        "pronunciations are still related, since they have a common ancestor in ancient"
+        " Chinese.",
     )
     # Only one character in the group
     SINGLETON = (
         8,
         "loner",
-        "These groups each contain only one character. It is still good to know the phonetic component, since it may be of use in learning new characters not treated here, in the same or other languages.",
+        "These groups each contain only one character. It is still good to know the "
+        "phonetic component, since it may be of use in learning new characters not "
+        "treated here, in the same or other languages.",
     )
     # No pronunciations are available to judge the group's purity
     NO_PRONUNCIATIONS = (
         9,
         "neologism",
-        "The characters in these groups have no pronunciations based on ancient Chinese.",
+        "The characters in these groups have no pronunciations based on ancient "
+        "Chinese.",
     )
 
 
@@ -110,7 +120,8 @@ class ComponentGroup:
                 # If a group contains only 国字, then it won't have any Chinese readings;
                 # otherwise, all characters should have them.
                 raise ValueError(
-                    f"Characters both with and without pronunciations were provided to group {self.component}; {self.pron_to_chars}"
+                    "Characters both with and without pronunciations were provided "
+                    f"to group {self.component}; {self.pron_to_chars}"
                 )
             self.purity_type = PurityType.NO_PRONUNCIATIONS
             return
@@ -135,10 +146,11 @@ class ComponentGroup:
 
     def get_ordered_clusters(self) -> Sequence[Sequence[str]]:
         """Returns a list of lists of characters (clusters) which share a pronunciation.
-        The lists are sorted by their size and then by the pronunciation which they share.
-        This ordering is meant to allow the learner to memorize pronunciations as rules
-        with exceptions."""
-        # sort by number of characters descending and then orthographically by pronunciation
+        The lists are sorted by their size and then by the pronunciation which they
+        share. This ordering is meant to allow the learner to memorize pronunciations
+        as rules with exceptions."""
+        # sort by number of characters descending and then
+        # orthographically by pronunciation
         def sorter(item: Tuple[str, Collection[str]]) -> Tuple[int, str]:
             return (-len(item[1]), item[0])
 

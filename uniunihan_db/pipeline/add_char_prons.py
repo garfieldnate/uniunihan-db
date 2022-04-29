@@ -1,5 +1,6 @@
 # Step 2: gather pronunciations for each character
-# Final structure: {char -> {char data, 'prons': {pron1: {pron data}, pron2: {pron data}...}}}
+# Final structure: {char ->
+# {char data, 'prons': {pron1: {pron data}, pron2: {pron data}...}}}
 
 from typing import List
 
@@ -39,9 +40,10 @@ def load_prons_jp(char_data):
 def load_prons_zh(char_data):
     # Get pronunciations that are used in modern words present in CEDICT. This allows
     # us to guarantee that we have examples for most pronunciations, and avoids more
-    # obscure pronunciations present in Unihan, which increase the grouping complexity significantly.
-    # If a character is not found in CEDICT, fall back to using Unihan pronunciation data.
-    # Supplement all pronunciations with with kHanyuPinlu pronunciation frequency data.
+    # obscure pronunciations present in Unihan, which increase the grouping complexity
+    # significantly. If a character is not found in CEDICT, fall back to using Unihan
+    # pronunciation data. Supplement all pronunciations with with kHanyuPinlu
+    # pronunciation frequency data.
 
     word_list: List[ZhWord] = get_cedict()
     char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
@@ -82,7 +84,8 @@ def load_prons_zh(char_data):
 
     if fallback_chars:
         logger.warning(
-            f"Fell back to using Unihan Mandarin readings for {len(fallback_chars)} characters"
+            "Fell back to using Unihan Mandarin readings for "
+            f"{len(fallback_chars)} characters"
         )
         logger.debug(format_json(fallback_chars))
     if no_pron_chars:

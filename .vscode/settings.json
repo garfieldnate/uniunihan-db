@@ -1,11 +1,7 @@
 {
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
-    "python.linting.mypyEnabled": true,
     "python.linting.flake8Enabled": true,
-    // turn off other linters to avoid confusion
-    "python.linting.pylintEnabled": false,
-    "python.linting.pylamaEnabled": false,
     "[python]": {
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
@@ -17,5 +13,4 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.nosetestsEnabled": false
 }

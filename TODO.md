@@ -177,9 +177,7 @@ Topic: Vietnamese Support
     - `package.get_resource('kengdic').read(keyed=True)` gives `datapackage.exceptions.CastError: There are 1 cast errors (see exception.errors) for row "2"`, but does not say what the cast error was (or which column). Had to edit schema.py to print out the actual errors (which were informative!)
 
 ## Dev Tools
-* Consider integrating doit to manage the processing pipeline
 * integrate darglint and/or pydocstyle to help keep documentation together
-* mypy doesn't check that types are used in signatures, nor that methods are used correctly 😡 Maybe try pyre, pyright, or pytype
 * Try rope for refactoring
 * Dockerfile
 * Faster-to-load format than JSON? Is pickle better?

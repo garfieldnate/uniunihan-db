@@ -5,7 +5,16 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
-from typing import AbstractSet, Any, List, Mapping, MutableMapping, MutableSet, TypeVar
+from typing import (
+    AbstractSet,
+    Any,
+    List,
+    Mapping,
+    MutableMapping,
+    MutableSet,
+    Optional,
+    TypeVar,
+)
 
 import commentjson
 import jaconv
@@ -46,7 +55,7 @@ YTENX_DIR = YTENX_ZIP_FILE.with_suffix("")
 BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
 
 #################
-## Downloaders ##
+# Downloaders ###
 #################
 
 
@@ -65,6 +74,8 @@ def __download_unihan():
     # https://github.com/cihai/unihan-etl/issues/233
     p.options["format"] = "python"
     unihan = p.export()
+    if unihan is None:
+        raise ValueError("Could not load unihan data")
 
     logger.info("  Converting unihan data to dictionary format...")
     unihan_dict = {entry["char"]: entry for entry in unihan}
@@ -210,11 +221,13 @@ def __download_jun_da_char_freq():
             line = line.split("</pre>")[0]
 
             logger.info(
-                f"  Writing Jun Da's character frequency list to {JUN_DA_CHAR_FREQ_FILE}"
+                "  Writing Jun Da's character frequency list to "
+                f"{JUN_DA_CHAR_FREQ_FILE}"
             )
             with open(JUN_DA_CHAR_FREQ_FILE, "w") as f:
                 f.write(
-                    "Rank\tCharacter\tRaw Frequency\tFrequency Percentile\tPinyin\tEnglish\n"
+                    "Rank\tCharacter\tRaw Frequency\t"
+                    "Frequency Percentile\tPinyin\tEnglish\n"
                 )
                 for entry in line.split("<br>"):
                     if entry:
@@ -263,7 +276,7 @@ def __download_ytenx():
 
 
 ###############
-## Accessors ##
+# Accessors ###
 ###############
 
 
@@ -272,8 +285,8 @@ class YtenxRhyme:
     char: str
     phonetic_component: str
     old_chinese: List[str]
-    middle_chinese: str
-    late_middle_chinese: str
+    middle_chinese: Optional[str]
+    late_middle_chinese: Optional[str]
 
 
 @cache
@@ -288,7 +301,7 @@ def get_ytenx_rhymes():
             char = r["#字"]
             del r["#字"]
             # store two alternative OC pronunciations in a list
-            r["擬音"] = [r["擬音"]]
+            r["擬音"] = [r["擬音"]]  # type: ignore
             if pron_2 := r["擬音2"]:
                 r["擬音"].append(pron_2)
             del r["擬音2"]
@@ -410,7 +423,8 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
             trad, simp = remaining.rstrip().split(" ")
             if len(trad) != len(simp):
                 raise ValueError(
-                    f"Number of characters for traditional and simplified forms do not match: {trad}/{simp}"
+                    "Number of characters for traditional and simplified "
+                    f"forms do not match: {trad}/{simp}"
                 )
 
             pron = pron.lstrip("[").rstrip("] ").lower()
@@ -597,7 +611,8 @@ def get_unihan_variants(file=GENERATED_DATA_DIR / "unihan.json"):
                 for v in variants:
                     char_to_variants[char].add(v)
 
-        # These are asymmetrically noted in Unihan, so we need to reverse the mapping direction
+        # These are asymmetrically noted in Unihan, so
+        # we need to reverse the mapping direction
         for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
             if comp_variant := entry.get(field_name):
                 if type(comp_variant) != list:
@@ -625,6 +640,8 @@ def get_kengdic():
     logger.info("Loading kengdic data...")
     package = Package(KENGDIC_DATA_PACKAGE_URL)
     resource = package.get_resource("kengdic")
+    if resource is None:
+        raise ValueError("Could not load kengdic resource")
     data = resource.read(keyed=True)
 
     # No frequency data available, so we'll translate the level data to fake

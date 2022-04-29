@@ -19,7 +19,6 @@ loguru = "^0.5.3"
 pytest = "^6.0.0"
 pytest-cov = "^2.10.1"
 flake8 = "^3.8.4"
-mypy = "^0.790"
 black = "^21.12b0"
 isort = "^5.6.4"
 pre-commit = "^2.7.1"
@@ -28,6 +27,7 @@ requests = "^2.24.0"
 jaconv = "^0.2.4"
 beautifulsoup4 = "^4.10.0"
 poethepoet = "^0.13.1"
+pyright = "^1.1.239"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
@@ -39,6 +39,10 @@ testpaths = ["tests"]
 
 [tool.isort]
 profile = "black"
+
+[tool.pyright]
+typeCheckingMode = "basic"
+ignore = ["data/generated"]
 
 [tool.coverage.run]
 source = ["uniunihan_db"]

@@ -30,7 +30,8 @@ def __get_char_index(data, get_variants):
     def add_to_char_index(char):
         if char in char_index:
             log.warning(
-                f"{char} already in index! Conflicting IDs: {char_index[char]['ID']}, {char_info['ID']}"
+                f"{char} already in index! Conflicting IDs: "
+                f"{char_index[char]['ID']}, {char_info['ID']}"
             )
         else:
             char_index[char] = char_info
@@ -99,13 +100,15 @@ def __cross_reference(all_indices):
                 if char_info2 := index2.get(char1):
                     if lang2 in cross_ref1:
                         log.debug(
-                            f"Character {char1} already linked from {lang1} to {lang2} (IDs: {char_info2['ID']}, {cross_ref1[lang2]})"
+                            f"Character {char1} already linked from {lang1} to {lang2} "
+                            f"(IDs: {char_info2['ID']}, {cross_ref1[lang2]})"
                         )
                         duplicates += 1
                     else:
                         cross_ref1[lang2] = char_info2["ID"]
     log.warning(
-        f"{duplicates} character entries with multiple link possibilities in another language"
+        f"{duplicates} character entries with multiple link "
+        f"possibilities in another language"
     )
 
 

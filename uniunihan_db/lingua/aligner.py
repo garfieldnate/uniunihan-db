@@ -33,10 +33,11 @@ class ZhAligner(Aligner):
 
 
 class KoAligner(Aligner):
-    """Aligns a hanja surface with a hangeul phonetic_spelling of the same length. Hangeul
-    and other non-han characters are allowed and will be ignored, as long as they appear verbatim
-    in the same indices in both surface and phonetic_spelling. Alignments of strings of different
-    length, or of hangeul-pronunciations of non-han characters such as Roman letters, are not possible."""
+    """Aligns a hanja surface with a hangeul phonetic_spelling of the same length.
+    Hangeul and other non-han characters are allowed and will be ignored, as long as
+    they appear verbatim in the same indices in both surface and phonetic_spelling.
+    Alignments of strings of different length, or of hangeul-pronunciations of non-han
+    characters such as Roman letters, are not possible."""
 
     def align(self, surface: str, phonetic_spelling: str) -> Set[Tuple[str, str]]:
         if len(phonetic_spelling) != len(surface):
@@ -115,17 +116,19 @@ class JpAligner(Aligner):
     def __align(self, surface, word_pron):
         if surface:
             char = surface[0]
-            # if surface char is katakana, align with identical katakana in pronunciation;
-            # matching_kana will signal not to store the useless alignment
+            # if surface char is katakana, align with identical katakana in
+            # pronunciation; matching_kana will signal not to store the useless
+            # alignment
             codepoint = ord(char)
             if JpAligner.KATAKANA_LOW <= codepoint <= JpAligner.KATAKANA_HIGH:
                 prons = [char]
                 matching_kana = True
             else:
-                # Otherwise, we have kanji. Go through the pronunciations we have for the character,
-                # in reverse order to get dakuon spellings first, providing more exact pronunciations
-                # for characters with matching pronunciations with and without dakuon (e.g. a character
-                # with listed pronunciations ハン and バン)
+                # Otherwise, we have kanji. Go through the pronunciations we have for
+                # the character, in reverse order to get dakuon spellings first,
+                # providing more exact pronunciations for characters with matching
+                # pronunciations with and without dakuon (e.g. a character with listed
+                # pronunciations ハン and バン)
                 prons = sorted(self.char_to_prons.get(char, []), reverse=True)
                 matching_kana = False
             for pron in prons:
@@ -158,7 +161,8 @@ class JpAligner(Aligner):
                     if alignment := self.__align(
                         surface[1:], word_pron.removeprefix(matched_pron)
                     ):
-                        # if successful and match is a kanji, add this char->pron mapping to the alignment and return it
+                        # if successful and match is a kanji, add this char->pron
+                        # mapping to the alignment and return it
                         if not matching_kana:
                             alignment.add((char, pron))
                         return alignment

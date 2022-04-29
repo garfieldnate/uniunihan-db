@@ -1,6 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Collection, Mapping, MutableMapping, MutableSequence
+from typing import Collection, Mapping, MutableMapping, MutableSequence, Set
 
 from uniunihan_db.component.group import ComponentGroup, PurityType
 from uniunihan_db.data.datasets import StringToStrings
@@ -17,7 +17,7 @@ class ComponentGroupIndex:
     # characters assigned to a component group but missing a pronunciation
     missing_pron_chars: Collection[str]
     # characters with no pronunciation components
-    no_comp_chars: Collection[str]
+    no_comp_chars: Set[str]
 
     def log_diagnostics(self, logger):
         """Write a diagnostic summary to the logs"""
@@ -47,7 +47,8 @@ class ComponentGroupIndex:
         logger.info(f"{len(self.groups)} total groups:")
         for purity_type in PurityType:
             logger.info(
-                f"    {purity_to_groups[purity_type]} {purity_type.name} groups ({len(purity_to_chars[purity_type])} characters)"
+                f"    {purity_to_groups[purity_type]} {purity_type.name} "
+                f"groups ({len(purity_to_chars[purity_type])} characters)"
             )
 
 
@@ -56,8 +57,10 @@ def find_component_groups(
 ) -> ComponentGroupIndex:
     """Group characters by component and classify the groups by their pronunciation
     regularity.
-    char_to_prons: mapping from a character to a collection of pronunciations for the character
-    comp_to_char: mapping from phonetic phonetic components to the characters which use the compooent phonetically
+    char_to_prons: mapping from a character to a collection of pronunciations for the
+        character
+    comp_to_char: mapping from phonetic phonetic components to the characters which use
+        the compooent phonetically
     """
     # loop through the provided dictionaries and create ComponentGroup objects
     groups = []

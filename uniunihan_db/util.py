@@ -11,8 +11,8 @@ from uniunihan_db.data.paths import GENERATED_DATA_DIR
 
 
 def configure_logging(name):
-    """Configure the core logger; write to stderr in color and to a log file in the generated data dir (using `name`
-    in the file name)."""
+    """Configure the core logger; write to stderr in color and to a log file in the
+    generated data dir (using `name` in the file name)."""
 
     logger.configure(
         handlers=[

@@ -45,7 +45,9 @@ def read_ime_test_data() -> Collection[Tuple[str, str]]:
     return data
 
 
-###### Tests ######
+##############
+# Tests ######
+##############
 
 
 def test_hepburn_to_kana(hepburn: str, expected: str) -> None:

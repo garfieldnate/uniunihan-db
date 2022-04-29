@@ -57,6 +57,11 @@ def fetch_char_data():
     page = requests.get(HTML_URL)
     soup = BeautifulSoup(page.content, "html.parser")
     table = soup.find(id="std-table")
+    if not isinstance(table, Tag):
+        raise ValueError(
+            "Unexpected HTML found when parsing Chunom website. "
+            "Was the website updated?"
+        )
     rows = table.find_all("tr")
     all_char_data = []
     # skip header row

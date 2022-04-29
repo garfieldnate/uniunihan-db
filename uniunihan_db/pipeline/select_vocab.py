@@ -33,7 +33,8 @@ def select_vocab_jp(data):
     word_list: List[Word] = get_edict_freq()
     aligner = JpAligner(new_char_to_prons)
     char_to_pron_to_vocab: Char2Pron2Words = index_vocab(word_list, aligner)
-    # Some words have to be specified manually instead of extracted from our downloaded dictionary
+    # Some words have to be specified manually instead of extracted from our
+    # downloaded dictionary
     vocab_override: Char2Pron2Words = get_vocab_override(JP_VOCAB_OVERRIDE)
 
     duplicate_used = set()

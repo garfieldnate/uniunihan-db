@@ -107,7 +107,8 @@ def generate_toc(all_data):
             file_name = purity_group_page_name(lang, purity_type)
             toc.append(
                 {
-                    "title": f"{LANG_ENGLISH[lang]} &mdash; {purity.display.title()} Groups",
+                    "title": f"{LANG_ENGLISH[lang]} &mdash; "
+                    f"{purity.display.title()} Groups",
                     "file_name": file_name,
                 }
             )
