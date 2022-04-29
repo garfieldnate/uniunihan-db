@@ -18,9 +18,9 @@ jobs:
       - name: Install dev dependencies
         run: poetry install
       - name: Collate
-        run: poetry run collate
+        run: poetry run poe collate
       - name: Build Book
-        run: poetry run build-book
+        run: poetry run poe build_book
         # TODO: upload debug-level logs, too
     #   - name: Move debug logs
     #     run: cp data/generated/debug-log*.txt data/generated/book/

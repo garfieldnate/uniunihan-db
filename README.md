@@ -14,7 +14,7 @@ The book is divided into 4 parts, one for each language, and the characters are 
 -   Aid in learning sino-xenic languages through knowledge transfer based on other sinoxenic languages
 -   Collect every last shred of (legally usable) info on the Kanji/Hanja/Hanzi/Hán tự
 -   Support building a website to satisfy sino-xenic language and linguistics nerds
--   Explore the Python ecosystem and have fun :)
+-   Explore the Python ecosystem and have fun :) This repository will serve as my source of a good Python project setup.
 
 ## Desired Data
 
