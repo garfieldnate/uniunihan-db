@@ -81,6 +81,7 @@ Topic: Japanese Support
 
 Topic: Korean Support
 
+* sort hanja somehow, e.g. purity group for 方 should have 方 before 倣. Frequency usage from Mandarin would probably do fine.
 * There is apparently a hanja test Koreans can take, and 1geup has 3500 hanja
 * Source keywords
 * Load libhangul data, align to get readings
@@ -150,6 +151,7 @@ Topic: Vietnamese Support
 ## Ideas
 
 * Generate shiritori sequence for all characters in a group
+* Look into EtymDB (Sargot), generated from Wiktionary
 
 ## Issues to Open
 
