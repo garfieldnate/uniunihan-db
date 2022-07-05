@@ -9,8 +9,6 @@ Sometime soon: Unit tests for pipeline steps; add_char_prons is large enough tha
 Topic: final output
 
 * host debug outputs somewhere
-* 𰡻 not displaying correctly; come up with JS test for non-displaying characters?
-* 多瑙 and 多瑙河, 無沙汰 and ご無沙汰: should not select words that contain each other like this
 * maybe link to wiktionary?
 * Number the chapters/purity groups for easier navigation
 * continuous (but not intrusive) headers for language and purity group
@@ -35,19 +33,10 @@ Topic: groupings
 
 Topic: Mandarin support
 
-* Next: integrate baidu frequencies
-    - maybe just for those not in CKIP?
 * Crawl wiktionary data for "abbreviated phonetic keyword" and add this info
-* Allow but disprefer surnames and old stuff
-* Unihan: 醣 should be listed as a variant of 糖, which is the standard form
-    - similarly, the 糖 entry has variant 餹 but not 醣饄糛𥹥
-* Why is 天方夜譚 used twice?
-* nǎi nai listed twice because it represents two different pronunciations
-    - also 伯伯
 * messed up pron formatting: 好心倒做了驢肝肺 hǎo xīn dào zuò le lu:2 gān fēi
 * parse out classifiers for vocab, remove pronunciation or put in ruby text: ear/CL:隻|只[zhi1],個|个[ge4],對|对[dui4]/handle (on a cup)
 * zì gě r5
-* parse out "see": see 羊拐[yang2 guai3]
 * Differentiate baidu and wendu
 * Get 三体 word list
     - simp to trad conversion
@@ -161,6 +150,8 @@ Topic: Vietnamese Support
 * Unihan does not indicate where okurigana in a kun'yomi begin
 * Would be great if unihan-etl (or better yet, Unihan itself!) structurized the (traditional variant of X), (non-classical variant of X), (same as X), etc. in the `kDefinition` field.
     - 㑶 is listed as the traditional variant of 㐹, but the Mandarin pronunciations are different! The kDefinition field notes that it's treated as a variant of 仡, which does have the same pronunciation.
+* Unihan: 醣 should be listed as a variant of 糖, which is the standard form
+    - similarly, the 糖 entry has variant 餹 but not 醣饄糛𥹥
 * Unihan-etl doesn't provide the new kStrange field?
 * Unihan entries 彙彚𢑥 do not mention each other as variants
 * Really wish unihan had kyuujitai/sinjitai links; 綠 links to 緑 only in the jinmeiyo kanji field.
