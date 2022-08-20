@@ -7,6 +7,8 @@ from uniunihan_db.component.group import ComponentGroup
 from uniunihan_db.component.index import find_component_groups
 from uniunihan_db.data.datasets import get_phonetic_components
 
+# Note that 畑 was also invented independently
+# in Vietnam as a phonosemantic character for đèn, an oil lamp
 KOKUJI = {"峠", "畑", "込", "匂", "枠"}
 
 
