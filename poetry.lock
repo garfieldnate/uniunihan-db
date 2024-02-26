@@ -1608,19 +1608,20 @@ files = [
 
 [[package]]
 name = "unihan-etl"
-version = "0.11.0"
-description = "Export UNIHAN to Python, Data Package, CSV, JSON and YAML"
+version = "0.33.1"
+description = "Export UNIHAN data of Chinese, Japanese, Korean to CSV, JSON or YAML"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "unihan-etl-0.11.0.tar.gz", hash = "sha256:482f1efb70b99bb31c2f78f5aea28615279b1eba16dcb10f0af9d993f4b9ed9c"},
-    {file = "unihan_etl-0.11.0-py2.py3-none-any.whl", hash = "sha256:42be46b5f080b4c683e462059ba68ab8ef7d0c93eda37f3acf268788c7136f84"},
+    {file = "unihan_etl-0.33.1-py3-none-any.whl", hash = "sha256:bb8df80a592ca49ef79a361f54fd4e0d42285867e60e6b78e134c89d2b14c022"},
+    {file = "unihan_etl-0.33.1.tar.gz", hash = "sha256:3822042c5225bd1a04558d223bb6357cc10616aa1ac146788391799eaa01d969"},
 ]
 
 [package.dependencies]
 appdirs = "*"
+PyYAML = "*"
 unicodecsv = "*"
-zhon = "*"
+zhon = ">=2.0,<2.1"
 
 [[package]]
 name = "urllib3"
@@ -1719,4 +1720,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "c583394c0b4a6a0ff4c578e785e186f70545c47c2355d4c247b0ca955f534114"
+content-hash = "a01bfce9e9b8d22bdd35a4d39e17805afbd428a55301d6f7e9428ae00133ccbe"

@@ -69,11 +69,3 @@ This discovers all of the tests successfully. Then run:
 This correctly runs the tests. However, if you try to run the tests in the UI they will hang forever.
 
 The extension paths above may be different with different versions of the Python extension for VSCode. Tested as of 2/25/2024.
-
-### Unihan dataset download fails
-
-Noted here: https://github.com/cihai/unihan-etl/issues/233#issuecomment-1963109939. This means that our unit tests fail and we can't build the book :(. May be able to use an older version of unihan_etl.
-
-### CEDict load failure
-
-Not sure what's going on here. Also prevents tests and building the book.

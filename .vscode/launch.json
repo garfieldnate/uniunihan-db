@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug build_book",
+            // run python -m uniunihan_db.build_book
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uniunihan_db.build_book",
+            "justMyCode": false,
+            "console": "integratedTerminal"
+        }
+    ]
+}

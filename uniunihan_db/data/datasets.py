@@ -5,9 +5,11 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cache
+from pathlib import Path
 from typing import (
     AbstractSet,
     Any,
+    Dict,
     List,
     Mapping,
     MutableMapping,
@@ -21,8 +23,8 @@ import jaconv
 import requests
 from datapackage import Package
 from loguru import logger
-from unihan_etl.process import Packager as unihan_packager
-from unihan_etl.process import export_json
+from unihan_etl.core import Packager as unihan_packager
+from unihan_etl.types import UntypedUnihanData
 
 from uniunihan_db.data.paths import (
     CEDICT_FILE,
@@ -72,57 +74,70 @@ def __download_unihan():
     p.download()
     # instruct packager to return data instead of writing to file
     # https://github.com/cihai/unihan-etl/issues/233
-    p.options["format"] = "python"
+    p.options.format = "python"
     unihan = p.export()
     if unihan is None:
         raise ValueError("Could not load unihan data")
 
     logger.info("  Converting unihan data to dictionary format...")
-    unihan_dict = {entry["char"]: entry for entry in unihan}
+    unihan_dict: Dict[
+        str, UntypedUnihanData
+    ] = {}  # {entry["char"]: entry for entry in unihan}
 
     logger.info("  Simplifying variant fields...")
-    for d in unihan_dict.values():
+    # for entry in (dict(e) for e in unihan_dict.values()):
+    for entry in (dict(e) for e in unihan):
+        unihan_dict[entry["char"]] = entry
         # TODO: address duplication below
-        if compat_variant := d.get("kCompatibilityVariant"):
+        if compat_variant := entry.get("kCompatibilityVariant"):
             codepoint = compat_variant[2:]
             char = chr(int(codepoint, 16))
-            d["kCompatibilityVariant"] = char
+            entry["kCompatibilityVariant"] = char
         for field_name in [
             "kSemanticVariant",
             "kZVariant",
             "kSimplifiedVariant",
             "kTraditionalVariant",
         ]:
-            if variants := d.get(field_name, []):
+            if variants := entry.get(field_name, []):
                 new_variants = []
                 for v in variants:
                     # https://github.com/cihai/unihan-etl/issues/80#issuecomment-757470998
                     codepoint = v.split("<")[0][2:]
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
-                d[field_name] = new_variants
+                entry[field_name] = new_variants
         # slightly different structure
-        if jinmeiyo := d.get("kJinmeiyoKanji", []):
+        if jinmeiyo := entry.get("kJinmeiyoKanji", []):
             new_variants = []
             for variant in jinmeiyo:
                 if "U+" in variant:
                     codepoint = variant[7:]
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
-            d["kJinmeiyoKanji"] = new_variants
-        if joyo := d.get("kJoyoKanji"):
+            entry["kJinmeiyoKanji"] = new_variants
+        if joyo := entry.get("kJoyoKanji"):
             new_variants = []
             for variant in joyo:
                 if "U+" in variant:
                     codepoint = variant[2:]
                     char = chr(int(codepoint, 16))
                     new_variants.append(char)
-            d["kJoyoKanji"] = new_variants
+            entry["kJoyoKanji"] = new_variants
 
     logger.info(f"  Writing unihan to {UNIHAN_FILE}...")
-    export_json(unihan_dict, UNIHAN_FILE)
+    with Path(UNIHAN_FILE).open("w", encoding="utf-8") as f:
+        json.dump(unihan_dict, f, indent=2, ensure_ascii=False)
+    logger.info(f"  Saved unihan DB to: {UNIHAN_FILE}")
+
     global UNIHAN_DICT
     UNIHAN_DICT = unihan_dict
+
+
+def export_json(data, destination):
+    """Export UNIHAN in JSON format."""
+    with Path(destination).open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def __download_edict_freq():
@@ -404,46 +419,53 @@ def get_cedict(file=CEDICT_FILE, filter: bool = True) -> List[ZhWord]:
 
     words: List[ZhWord] = []
     with open(file) as f:
+        # current CEDICT has one bad line in it, and may have more in the future,
+        # so we'll skip over them
+        failed = 0
         for i, line in enumerate(f.readlines()):
-            # skip comments or empty lines
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-
-            # parse format: trad simp [pin yin] /en1/en2/en3/
-            remaining, en = line.split("/", 1)
-            en = en.rstrip("/")
-            if filter:
-                if (
-                    en.startswith("variant of")
-                    or en.startswith("see ")
-                    or en.startswith("surname")
-                    or en.startswith("(old)")
-                ):
+            try:
+                # skip comments or empty lines
+                line = line.strip()
+                if not line or line.startswith("#"):
                     continue
 
-            remaining, pron = remaining.split("[")
+                # parse format: trad simp [pin yin] /en1/en2/en3/
+                remaining, en = line.split("/", 1)
+                en = en.rstrip("/")
+                if filter:
+                    if (
+                        en.startswith("variant of")
+                        or en.startswith("see ")
+                        or en.startswith("surname")
+                        or en.startswith("(old)")
+                    ):
+                        continue
 
-            trad, simp = remaining.rstrip().split(" ")
-            if len(trad) != len(simp):
-                raise ValueError(
-                    "Number of characters for traditional and simplified "
-                    f"forms do not match: {trad}/{simp}"
+                remaining, pron = remaining.split("[")
+
+                trad, simp = remaining.rstrip().split(" ")
+                if len(trad) != len(simp):
+                    raise ValueError(
+                        "Number of characters for traditional and simplified "
+                        f"forms do not match: {trad}/{simp}"
+                    )
+
+                pron = pron.lstrip("[").rstrip("] ").lower()
+                # frequency is TODO
+                word = ZhWord(
+                    surface=trad,
+                    id=f"cedict-{i+1}",
+                    pron=pron,
+                    english=en,
+                    frequency=-1,
+                    simplified=simp,
                 )
+                words.append(word)
+            except Exception as e:
+                failed += 1
+                logger.error(f"Failed to parse line {i+1}: {line} ({e})")
 
-            pron = pron.lstrip("[").rstrip("] ").lower()
-            # frequency is TODO
-            word = ZhWord(
-                surface=trad,
-                id=f"cedict-{i+1}",
-                pron=pron,
-                english=en,
-                frequency=-1,
-                simplified=simp,
-            )
-            words.append(word)
-
-    logger.info(f"  Read {len(words)} entries from CEDICT")
+    logger.info(f"  Read {len(words)} entries from CEDICT. {failed} failed to parse.")
     return words
 
 
