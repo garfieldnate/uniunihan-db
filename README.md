@@ -50,3 +50,30 @@ All of the lints and tests can be run using the poe task `verify`:
 
 A VSCode settings file is included which contains configurations for all of the linting and formatting tools installed.
 
+## Known Issues
+
+### Can't discover/run tests in VSCode
+
+Set up the project as described above, and ensure VSCode is using the local virtual environment.
+
+Following discussions [here](https://github.com/microsoft/vscode-python/issues/21757), open the testing tab. It will say that it did not find any tests. Check the output console to get TEST_PORT and TEST_UUID. Then run the following commands in a new terminal:
+
+    export TEST_PORT=...
+    export TEST_UUID=...
+    PYTHONPATH=~/.vscode/extensions/ms-python.python-2024.0.1/pythonFiles .venv/bin/python -m pytest -p vscode_pytest --collect-only tests
+
+This discovers all of the tests successfully. Then run:
+
+    .venv/bin/python ~/.vscode/extensions/ms-python.python-2024.0.1/pythonFiles/vscode_pytest/run_pytest_script.py --rootdir .
+
+This correctly runs the tests. However, if you try to run the tests in the UI they will hang forever.
+
+The extension paths above may be different with different versions of the Python extension for VSCode. Tested as of 2/25/2024.
+
+### Unihan dataset download fails
+
+Noted here: https://github.com/cihai/unihan-etl/issues/233#issuecomment-1963109939. This means that our unit tests fail and we can't build the book :(. May be able to use an older version of unihan_etl.
+
+### CEDict load failure
+
+Not sure what's going on here. Also prevents tests and building the book.
