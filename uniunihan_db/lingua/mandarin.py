@@ -36,7 +36,6 @@ class Syllable:
 
 
 def __setup_pinyin_parsing():
-
     pinyin_vowels = [
         "aāáǎà",
         "eēéěè",

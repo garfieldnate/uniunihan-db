@@ -170,7 +170,7 @@ def get_edict_freq(file=EDICT_FREQ_FILE):
             words.append((-freq, word, pron, english, i))
 
     output = []
-    for (freq, word, pron, english, i) in sorted(words):
+    for freq, word, pron, english, i in sorted(words):
         output.append(Word(word, f"edict-{i+1}", pron, english, -freq))
 
     return output
@@ -307,7 +307,11 @@ def get_ytenx_rhymes():
             del r["擬音2"]
             char_to_component[char].append(
                 YtenxRhyme(
-                    char, r["聲符"], r["擬音"], r["擬音（後世）"] or None, r["擬音（更後世）"] or None
+                    char,
+                    r["聲符"],
+                    r["擬音"],
+                    r["擬音（後世）"] or None,
+                    r["擬音（更後世）"] or None,
                 )
             )
 
@@ -606,7 +610,7 @@ def get_unihan_variants(file=GENERATED_DATA_DIR / "unihan.json"):
             "kCompatibilityVariant",
         ]:
             if variants := entry.get(field_name):
-                if type(variants) != list:
+                if not isinstance(variants, list):
                     variants = [variants]
                 for v in variants:
                     char_to_variants[char].add(v)
@@ -615,7 +619,7 @@ def get_unihan_variants(file=GENERATED_DATA_DIR / "unihan.json"):
         # we need to reverse the mapping direction
         for field_name in ["kCompatibilityVariant", "kJinmeiyoKanji", "kJoyoKanji"]:
             if comp_variant := entry.get(field_name):
-                if type(comp_variant) != list:
+                if not isinstance(comp_variant, list):
                     comp_variant = [comp_variant]
                 for v in comp_variant:
                     char_to_variants[v].add(char)

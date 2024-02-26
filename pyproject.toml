@@ -4,34 +4,47 @@ version = "0.1.0"
 description = "Han character database"
 authors = ["Nathan Glenn <garfieldnate@gmail.com>"]
 keywords = [
-    "unihan", "linguistics", "sinoxenic", "Chinese", "Mandarin", "Cantonese",
-    "Japanese", "Korean", "Vietnamese", "kanji", "hanzi", "hanja", "han tu", "hantu"]
+    "unihan",
+    "linguistics",
+    "sinoxenic",
+    "Chinese",
+    "Mandarin",
+    "Cantonese",
+    "Japanese",
+    "Korean",
+    "Vietnamese",
+    "kanji",
+    "hanzi",
+    "hanja",
+    "han tu",
+    "hantu",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-importlib-metadata = {version = "^1.0", python = "<3.8"}
+importlib-metadata = { version = "^1.0", python = "<3.8" }
 Jinja2 = "^3.0.1"
 commentjson = "^0.9.0"
 datapackage = "^1.15.2"
 loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0.0"
-pytest-cov = "^2.10.1"
-flake8 = "^3.8.4"
-black = "^21.12b0"
-isort = "^5.6.4"
-pre-commit = "^2.7.1"
+pytest = "^8.0.2"
+pytest-cov = "^4.1.0"
+flake8 = "^7.0.0"
+black = "^23.3.0"
+isort = "^5.13.2"
+pre-commit = "^3.6.2"
 unihan-etl = "^0.11.0"
 requests = "^2.24.0"
 jaconv = "^0.2.4"
 beautifulsoup4 = "^4.10.0"
 poethepoet = "^0.13.1"
-pyright = "^1.1.239"
+pyright = "^1.1.351"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153
-requires = ["setuptools","poetry-core>=1.0.0"]
+requires = ["setuptools", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
@@ -64,11 +77,11 @@ exclude_lines = [
 
     # Don't complain if non-runnable code isn't run:
     "if 0:",
-    "if __name__ == .__main__.:"
+    "if __name__ == .__main__.:",
 ]
 
 [tool.poe.tasks.verify]
-cmd  = "pre-commit run --all-files"
+cmd = "pre-commit run --all-files"
 help = "Run all lints and tests"
 [tool.poe.tasks.pipeline]
 cmd = "python -m uniunihan_db.pipeline.runner"

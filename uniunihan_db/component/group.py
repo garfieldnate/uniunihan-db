@@ -149,6 +149,7 @@ class ComponentGroup:
         The lists are sorted by their size and then by the pronunciation which they
         share. This ordering is meant to allow the learner to memorize pronunciations
         as rules with exceptions."""
+
         # sort by number of characters descending and then
         # orthographically by pronunciation
         def sorter(item: Tuple[str, Collection[str]]) -> Tuple[int, str]:

@@ -1,16 +1,15 @@
 {
     "editor.formatOnSave": true,
-    "python.formatting.provider": "black",
-    "python.linting.flake8Enabled": true,
     "[python]": {
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        }
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
     },
-    "python.testing.pytestEnabled": true,
     "python.testing.cwd": "uniunihan_db",
+    "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": [
         "tests"
     ],
-    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
