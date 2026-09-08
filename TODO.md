@@ -81,6 +81,22 @@ Topic: Korean Support
 
 Topic: Vietnamese Support
 
+### NEXT SESSION (planned 2026-09-08): provenance for a publishable book
+
+Three distinct data layers — don't conflate them:
+* **Character readings** (長→trưởng): re-enable WinVNKey (`USE_WINVNKEY_READINGS=True`)
+  for ~40% more coverage incl. modern words, and add a Credits section attributing
+  WinVNKey compilers (Thanh Sơn Lê, Học D. Ngô) + their source dictionaries (Thiều
+  Chửu 1943, Nguyễn Quốc Hùng 1975, Trần Văn Chánh 2000). Rationale: readings are
+  facts; credit the compilation. Re-add the WinVNKey files (removed in fc1f393).
+* **Character keywords** (Unihan kDefinition): permissive — keep as-is.
+* **Word definitions** (currently CEDICT, CC BY-SA): **clean-room rewrite** — feed a
+  sub-agent example Vietnamese sentences from the Leipzig corpus (target word
+  highlighted) and have it write original definitions from usage, not from CEDICT or
+  copyrighted dicts. Fan-out over ~thousands of words (use a Workflow). Keep CEDICT
+  internally only (word-candidate list + Han spellings + meaning-confirmation signal).
+* Do NOT rely on a PD-1943-only source — it loses modern words (e.g. computer).
+
 ### DONE (2026-09-07): initial Hán-Việt part + Chữ Nôm appendix
 
 The `vi` pipeline now builds a proper **Hán-Việt** part (parallel to jp/ko/zh),
