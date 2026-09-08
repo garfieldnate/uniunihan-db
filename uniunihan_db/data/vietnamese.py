@@ -354,6 +354,29 @@ def _unihan_han_viet_readings() -> Mapping[str, Set[str]]:
 
 
 @cache
+def _vnedict_entries() -> Mapping[str, str]:
+    """Normalized Vietnamese headword -> full English gloss text, from vnedict
+    (Paul Denisowski, CC BY 3.0). Multiple entries for a headword are joined.
+
+    This is the human-attested Vietnamese meaning shown for each word in the book.
+    """
+    _download_vnedict()
+    entries: MutableMapping[str, List[str]] = defaultdict(list)
+    with VNEDICT_FILE.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            headword, sep, gloss = line.partition(":")
+            if not sep:
+                continue
+            gloss = gloss.strip()
+            if gloss:
+                entries[_norm(headword)].append(gloss)
+    return {hw: " / ".join(glosses) for hw, glosses in entries.items()}
+
+
+@cache
 def _vnedict_glosses() -> Mapping[str, Set[str]]:
     """Normalized Vietnamese headword -> set of English gloss tokens, from vnedict.
 
@@ -361,16 +384,7 @@ def _vnedict_glosses() -> Mapping[str, Set[str]]:
     the gloss tokens let us check that a reconstructed reading actually means what
     its source Chinese word means (see ``_reconstruct_han_viet_reading``).
     """
-    _download_vnedict()
-    glosses: MutableMapping[str, Set[str]] = defaultdict(set)
-    with VNEDICT_FILE.open(encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            headword, _, gloss = line.partition(":")
-            glosses[_norm(headword)].update(_gloss_tokens(gloss))
-    return glosses
+    return {hw: _gloss_tokens(text) for hw, text in _vnedict_entries().items()}
 
 
 def _download_vnedict() -> None:
@@ -489,6 +503,7 @@ def get_han_viet_data() -> HanVietData:
     unihan_readings = _unihan_han_viet_readings()
     hv_readings = get_han_viet_readings() if USE_WINVNKEY_READINGS else unihan_readings
     vnedict = _vnedict_glosses()
+    vnedict_defs = _vnedict_entries()
     syl_freq = get_vi_syllable_frequency()
 
     # Phase 1: reconstruct candidate Sino-Vietnamese words.
@@ -527,16 +542,20 @@ def get_han_viet_data() -> HanVietData:
     corpus_freq = _count_corpus_word_frequency([c[2] for c in candidates])
 
     # Phase 3: assemble Words, packing corpus count (primary) and syllable
-    # frequency (tie-breaker for corpus-absent words) into one integer.
+    # frequency (tie-breaker for corpus-absent words) into one integer. The
+    # displayed definition is the human-attested vnedict gloss (the Vietnamese
+    # meaning); the CEDICT gloss was only used internally to confirm meaning.
     words: List[Word] = []
-    for i, (surface, english, combo) in enumerate(candidates, start=1):
+    for i, (surface, cedict_english, combo) in enumerate(candidates, start=1):
+        qn = " ".join(combo)
         geo_mean = prod(syl_freq.get(s, _MISSING_SYLLABLE_FREQ) for s in combo) ** (
             1 / len(combo)
         )
         frequency = corpus_freq.get(combo, 0) * _CORPUS_COUNT_WEIGHT + min(
             _CORPUS_COUNT_WEIGHT - 1, round(geo_mean * _SYLLABLE_TIEBREAK_SCALE)
         )
-        words.append(Word(surface, f"hv-{i}", " ".join(combo), english, frequency))
+        english = vnedict_defs.get(qn) or cedict_english
+        words.append(Word(surface, f"hv-{i}", qn, english, frequency))
 
     words.sort(key=lambda w: (-w.frequency, w.surface))
 
