@@ -54,6 +54,14 @@ from uniunihan_db.data.types import Word
 LEIPZIG_WEIGHT = 0.7
 OPENSUBS_WEIGHT = 0.3
 
+# Whether to supplement Unihan's Hán-Việt readings with the WinVNKey reading
+# databases. Unihan kVietnamese is authoritative and permissively licensed (clean
+# provenance for publishing); WinVNKey adds ~40% more words/characters by
+# supplying alternate readings Unihan omits (e.g. 長 "trưởng"), but its data
+# provenance/license is unclear. Default off for a publishable book; set True to
+# use the fuller set for personal use. See data/included/vi/README.md.
+USE_WINVNKEY_READINGS = False
+
 # A reconstructed word is only kept if its Vietnamese meaning is *confirmed* --
 # its vnedict gloss agrees with the source Chinese gloss. This keeps totally
 # incorrect entries (false friends, wrong readings) out of the book, at the cost
@@ -449,11 +457,12 @@ def get_han_viet_data() -> HanVietData:
     words are chosen as examples for each character; the blended syllable
     frequency only breaks ties among words too rare to appear in the corpus.
     """
-    # Use the merged readings (Unihan ∪ WinVNKey) as candidates so legitimate
-    # alternate readings (e.g. 長 "trưởng") are available, but prefer the standard
-    # Unihan Sino readings when meaning doesn't force otherwise.
-    hv_readings = get_han_viet_readings()
+    # Candidate readings: Unihan alone (clean provenance) by default, optionally
+    # supplemented with WinVNKey for alternate readings (see USE_WINVNKEY_READINGS).
+    # Either way, prefer the standard Unihan reading when meaning doesn't force
+    # otherwise.
     unihan_readings = _unihan_han_viet_readings()
+    hv_readings = get_han_viet_readings() if USE_WINVNKEY_READINGS else unihan_readings
     vnedict = _vnedict_glosses()
     syl_freq = get_vi_syllable_frequency()
 

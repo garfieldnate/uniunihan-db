@@ -39,17 +39,21 @@ poetry run python -m uniunihan_db.data.vietnamese
 | **vnedict** (denisowski) | VN↔EN glosses (no Han) | CC BY 3.0 | ✅ yes (attribute) |
 | **Leipzig Corpora** (`vie_news`) | syllable frequency (formal) | CC BY | ✅ yes (attribute) |
 | **HermitDave / OpenSubtitles** | syllable frequency (colloquial) | CC BY-**SA** 4.0 | ⚠️ share-alike — using it obligates the book under SA |
-| **WinVNKey** Hán-Việt DBs | char→Hán-Việt reading (~19.5k chars) | unclear (WinVNKey is free sw; data terms unstated) | ⚠️ local use; clear before shipping |
+| **WinVNKey** Hán-Việt DBs | char→Hán-Việt reading (~19.5k chars) | unclear (WinVNKey is free sw; data terms unstated) | ⚠️ **off by default** (`USE_WINVNKEY_READINGS=False`); opt-in for personal use only |
 | **chunom.org** (`standard-list`, `char_data`) | Han-spelled vocab + QN + gloss + freq; Nôm chars | terms unstated | ⚠️ local use; clear before shipping |
 | **nomfoundation.org** | Han-Nôm lookup, glosses | "All rights reserved"; free use only *reported* | ⚠️ get explicit permission |
 | **zetamu Hantu** | char→reading + glosses | © TitTop, no license | ⚠️ local use only |
 | **hvdic.thivien.net** / KanjiDictVN | rich Hán-Việt/Nôm | proprietary | ❌ do not redistribute |
 
-**Bottom line for a shippable public book:** readings from Unihan (+ vnedict
-glosses) and frequency from Leipzig are clean. The only good source of
-*Han-spelled Sino-Vietnamese words* is murky-licensed (chunom.org / nomfoundation
-/ hvdic), so example vocab is currently a **local-build** capability pending a
-licensing decision. See project TODO.
+**Bottom line for a shippable public book:** by default the Hán-Việt part uses
+only cleanly-licensed data — Unihan `kVietnamese` readings, CEDICT Han spellings +
+glosses, vnedict meaning-confirmation, and Leipzig frequency (~3.7k words / ~1.3k
+chars). WinVNKey readings (which would add ~40% more) are **off by default**
+because their provenance is unclear; enable `USE_WINVNKEY_READINGS` in
+`uniunihan_db/data/vietnamese.py` only for personal use. Character keywords come
+from Unihan `kDefinition`; word glosses from CEDICT — no definition text is taken
+from WinVNKey or other murky sources. (Note CEDICT is CC BY-SA, i.e. share-alike.)
+The Chữ Nôm appendix still draws on chunom.org, whose terms are unstated.
 
 ## Notes & remaining caveats
 
