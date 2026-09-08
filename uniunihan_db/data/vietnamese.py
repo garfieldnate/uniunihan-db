@@ -57,13 +57,12 @@ LEIPZIG_WEIGHT = 0.7
 OPENSUBS_WEIGHT = 0.3
 
 # Whether to supplement Unihan's Hán-Việt readings with the WinVNKey reading
-# databases. Unihan kVietnamese is authoritative and permissively licensed (clean
-# provenance for publishing). WinVNKey adds ~40% more words/characters by
-# supplying alternate readings Unihan omits (e.g. 長 "trưởng"), but its files
-# transcribe in-copyright dictionaries and are NOT shipped with the repo. To use
-# them (personal use only), set this True and place the UTF-8 files in
-# data/included/vi/raw/ (see VI_WINVNKEY_FILES / data/included/vi/README.md).
-USE_WINVNKEY_READINGS = False
+# databases. Unihan kVietnamese is authoritative and permissively licensed; the
+# WinVNKey databases add ~40% more words/characters by supplying alternate readings
+# Unihan omits (e.g. 長 "trưởng"). Individual char→reading pairs are uncopyrightable
+# facts, so we use them WITH ATTRIBUTION to the WinVNKey compilers and their source
+# dictionaries (see the book's acknowledgements and data/included/vi/README.md).
+USE_WINVNKEY_READINGS = True
 
 # A reconstructed word is only kept if its Vietnamese meaning is *confirmed* --
 # its vnedict gloss agrees with the source Chinese gloss. This keeps totally

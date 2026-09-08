@@ -24,10 +24,10 @@ CHUNOM_VOCAB_FILE = INCLUDED_DATA_DIR / "chunom_org" / "standard-list.csv"
 # Vietnamese (Hán-Việt / Sino-Vietnamese) source data
 VI_DATA_DIR = INCLUDED_DATA_DIR / "vi"
 VI_RAW_DIR = VI_DATA_DIR / "raw"
-# WinVNKey Hán-Việt reading databases (char -> Hán-Việt reading). These are NOT
-# shipped with the repo -- they transcribe in-copyright dictionaries, so they are
-# used only when USE_WINVNKEY_READINGS is enabled for personal use, and must be
-# supplied locally here (UTF-8, converted from the UTF-16 originals).
+# WinVNKey Hán-Việt reading databases (char -> Hán-Việt reading), UTF-8 (converted
+# from the UTF-16 originals). Used when USE_WINVNKEY_READINGS is on, WITH attribution
+# to the compilers and their source dictionaries (see the book acknowledgements and
+# data/included/vi/README.md).
 VI_WINVNKEY_FILES = [
     VI_RAW_DIR / "han-viet-thanh-son-le-3.04.txt",
     VI_RAW_DIR / "han-viet-hoc-d-ngo.txt",

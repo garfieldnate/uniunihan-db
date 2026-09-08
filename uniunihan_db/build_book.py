@@ -183,6 +183,17 @@ intros = {
         "guess the reading of its relatives. Each character is shown with its "
         "Hán-Việt reading(s), an English keyword, and example Sino-Vietnamese "
         "words written in <i>Hán tự</i> with their Quốc Ngữ spelling.</p>"
+        "<h2>Sources &amp; acknowledgements</h2>"
+        "<p>Hán-Việt readings are from the Unicode <i>Unihan</i> database "
+        "(<code>kVietnamese</code>) with the Unicode L2/23-251 corrections, "
+        "supplemented by the WinVNKey Hán-Việt reading databases compiled by "
+        "Thanh Sơn Lê and Học D. Ngô, which draw on the dictionaries of Thiều Chửu "
+        "(<i>Hán Việt tự điển</i>, 1943), Nguyễn Quốc Hùng (<i>Hán Việt tân tự "
+        "điển</i>, 1975), and Trần Văn Chánh (<i>Tự điển Hán Việt</i>, 2000). "
+        "Word definitions are from <i>vnedict</i> by Paul Denisowski (CC BY 3.0). "
+        "Character keywords are from Unihan; Han-character word forms are from "
+        "CC-CEDICT (CC BY-SA). Word-frequency ordering uses the Leipzig Corpora "
+        "Collection (Vietnamese) and the OpenSubtitles frequency list.</p>"
     ),
     "vi_nom": (
         "<h1>Chữ Nôm Appendix</h1>"

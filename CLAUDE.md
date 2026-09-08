@@ -116,11 +116,13 @@ Sino-xenic vocabulary. The Vietnamese parallel to that is **Hán tự / Hán-Vi�
 Data + logic live in `uniunihan_db/data/vietnamese.py`
 (see `data/included/vi/README.md` for the source/license ledger):
 
-- **Readings** come from Unihan `kVietnamese` (clean provenance) by default. The
-  WinVNKey databases are an opt-in supplement (`USE_WINVNKEY_READINGS`, off) that
-  adds ~40% more words/chars but is **not shipped** — its files transcribe
-  in-copyright dictionaries (see `data/included/vi/README.md`), so you must supply
-  them locally to use them.
+- **Readings** come from Unihan `kVietnamese` (+ Unicode L2/23-251 corrections),
+  supplemented by the WinVNKey databases (`USE_WINVNKEY_READINGS`, on) which add
+  ~40% more words/chars. WinVNKey transcribes dictionaries (see
+  `data/included/vi/README.md`); the readings are used as facts, credited in the
+  book acknowledgements. **Word definitions** are shown from vnedict (human,
+  CC BY); CEDICT is used only internally (word candidates, Han spellings,
+  meaning-confirmation).
 - **Vocabulary + inventory** (`get_han_viet_data`) is reconstructed: take
   multi-character CEDICT (Chinese) words, read each character with its Unihan
   Hán-Việt reading, and keep the word only if that Quốc-Ngữ spelling is confirmed

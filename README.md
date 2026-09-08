@@ -93,12 +93,13 @@ For a clean rebuild that re-runs everything, delete the generated data first:
   components, etc.). See `data/included/vi/README.md` for the Vietnamese
   source/license ledger.
 
-The Vietnamese Hán-Việt part uses only cleanly-licensed data by default (Unihan
-readings, CEDICT spellings/glosses, vnedict meaning-confirmation, Leipzig
-frequency). The WinVNKey Hán-Việt reading databases, which would add more
-coverage, are **not shipped** — they transcribe in-copyright dictionaries — and
-are gated behind `USE_WINVNKEY_READINGS` (off by default) for local personal use;
-see `data/included/vi/README.md`.
+The Vietnamese Hán-Việt part draws readings from Unihan (with Unicode L2/23-251
+corrections) plus the WinVNKey Hán-Việt databases, word definitions from vnedict,
+Han spellings/candidates from CEDICT, and frequency from the Leipzig corpus. The
+WinVNKey databases transcribe dictionaries, so their readings are used as facts
+and credited in the book's acknowledgements; `USE_WINVNKEY_READINGS=False` falls
+back to Unihan-only readings. See `data/included/vi/README.md` for the full
+source/license ledger.
 
 ## Known Issues
 
