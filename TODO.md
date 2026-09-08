@@ -90,11 +90,12 @@ Three distinct data layers — don't conflate them:
   Chửu 1943, Nguyễn Quốc Hùng 1975, Trần Văn Chánh 2000). Rationale: readings are
   facts; credit the compilation. Re-add the WinVNKey files (removed in fc1f393).
 * **Character keywords** (Unihan kDefinition): permissive — keep as-is.
-* **Word definitions** (currently CEDICT, CC BY-SA): **clean-room rewrite** — feed a
-  sub-agent example Vietnamese sentences from the Leipzig corpus (target word
-  highlighted) and have it write original definitions from usage, not from CEDICT or
-  copyrighted dicts. Fan-out over ~thousands of words (use a Workflow). Keep CEDICT
-  internally only (word-candidate list + Han spellings + meaning-confirmation signal).
+* **Word definitions**: display **vnedict** glosses (Paul Denisowski, CC BY 3.0 —
+  human-attested, gives the *Vietnamese* meaning). 100% coverage since every kept
+  word is already vnedict-attested. Load the full gloss text (not just the tokenized
+  set used for matching) and show it instead of the CEDICT English. Clean-room AI
+  rewrite is NOT wanted — human attestation preferred, CC BY-SA is acceptable. Keep
+  CEDICT internal only (word candidates + Han spellings + meaning-confirmation).
 * Do NOT rely on a PD-1943-only source — it loses modern words (e.g. computer).
 
 ### DONE (2026-09-07): initial Hán-Việt part + Chữ Nôm appendix
