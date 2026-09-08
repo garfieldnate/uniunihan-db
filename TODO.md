@@ -81,14 +81,16 @@ Topic: Korean Support
 
 Topic: Vietnamese Support
 
-### NEXT SESSION (planned 2026-09-08): provenance for a publishable book
+### DONE (2026-09-08): provenance pass for a publishable book
 
-Three distinct data layers — don't conflate them:
-* **Character readings** (長→trưởng): re-enable WinVNKey (`USE_WINVNKEY_READINGS=True`)
-  for ~40% more coverage incl. modern words, and add a Credits section attributing
-  WinVNKey compilers (Thanh Sơn Lê, Học D. Ngô) + their source dictionaries (Thiều
-  Chửu 1943, Nguyễn Quốc Hùng 1975, Trần Văn Chánh 2000). Rationale: readings are
-  facts; credit the compilation. Re-add the WinVNKey files (removed in fc1f393).
+Three distinct data layers — all handled:
+* **Character readings** (長→trưởng): WinVNKey re-enabled (`USE_WINVNKEY_READINGS=True`)
+  for ~40% more coverage, used as facts with attribution; Unicode L2/23-251 corrections
+  applied. Credits in the vi part intro name the WinVNKey compilers (Thanh Sơn Lê, Học
+  D. Ngô) + source dictionaries (Thiều Chửu 1943, Nguyễn Quốc Hùng 1975, Trần Văn Chánh
+  2000).
+* Still TODO before publishing: the book-WIDE front matter is placeholder — write a
+  global acknowledgements page (CEDICT/Unihan are used by all four language parts).
 * **Character keywords** (Unihan kDefinition): permissive — keep as-is.
 * **Word definitions**: display **vnedict** glosses (Paul Denisowski, CC BY 3.0 —
   human-attested, gives the *Vietnamese* meaning). 100% coverage since every kept
