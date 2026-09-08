@@ -59,7 +59,13 @@ def __create_group_data(g, char_data):
     for chars in g.get_ordered_clusters():
         cluster = {}
         data["clusters"].append(cluster)
-        for c in chars:
+        # Order characters within a cluster by descending character frequency
+        # (falling back to orthographic order for languages that don't provide a
+        # per-character "frequency"), so the most useful characters come first.
+        ordered_chars = sorted(
+            chars, key=lambda c: (-char_data[c].get("frequency", 0), c)
+        )
+        for c in ordered_chars:
             cluster[c] = char_data[c]
             for pron_data in char_data[c]["prons"].values():
                 for v in pron_data["vocab"]:
@@ -74,4 +80,5 @@ ORGANIZE_DATA = {
     "zh": organize_data,
     "ko": organize_data,
     "vi": organize_data,
+    "vi_nom": organize_data,
 }

@@ -16,6 +16,7 @@ from uniunihan_db.data.datasets import (
 )
 from uniunihan_db.data.paths import JP_VOCAB_OVERRIDE
 from uniunihan_db.data.types import Char2Pron2Words, Word, ZhWord
+from uniunihan_db.data.vietnamese import get_han_viet_data
 from uniunihan_db.lingua.aligner import JpAligner, KoAligner, ZhAligner
 from uniunihan_db.util import format_json
 
@@ -144,7 +145,10 @@ def select_vocab_ko(data):
 
 def select_vocab_vi(data):
     char_data = data["char_data"]
-    word_list: List[Word] = get_chunom_org_vocab()
+    # Sino-Vietnamese vocabulary, pre-sorted by descending frequency. The QN
+    # reading is space-separated per syllable and aligns 1:1 with the han
+    # characters, so the Chinese (space-separated) aligner applies directly.
+    word_list: List[Word] = get_han_viet_data().words
     char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
 
     duplicate_used = set()
@@ -152,7 +156,7 @@ def select_vocab_vi(data):
     for c, c_data in char_data.items():
         for pron, pron_data in c_data["prons"].items():
             words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
-            pron_data["vocab"] = words
+            pron_data["vocab"] = __order_vocab(words, used_vocab)
             for w in pron_data["vocab"]:
                 if w.surface in used_vocab:
                     duplicate_used.add(w.surface)
@@ -186,9 +190,38 @@ def _report_duplicate_use(words):
         logger.debug(words)
 
 
+def select_vocab_vi_nom(data):
+    char_data = data["char_data"]
+    # chunom.org vocabulary; frequency is stored negatively (more common = closer
+    # to zero), so sort ascending on frequency to put common words first.
+    word_list: List[Word] = sorted(get_chunom_org_vocab(), key=lambda w: -w.frequency)
+    char_to_pron_to_vocab = index_vocab(word_list, ZhAligner())
+
+    duplicate_used = set()
+    used_vocab = set()
+    for c, c_data in char_data.items():
+        for pron, pron_data in c_data["prons"].items():
+            words = char_to_pron_to_vocab.get(c, {}).get(pron, [])
+            pron_data["vocab"] = __order_vocab(words, used_vocab)
+            for w in pron_data["vocab"]:
+                if w.surface in used_vocab:
+                    duplicate_used.add(w.surface)
+            used_vocab.update({v.surface for v in pron_data["vocab"]})
+
+    def char_data_iter():
+        for c, c_data in char_data.items():
+            yield c, c_data
+
+    _report_missing_words(char_data_iter())
+    _report_duplicate_use(duplicate_used)
+
+    return data
+
+
 SELECT_VOCAB = {
     "jp": select_vocab_jp,
     "zh": select_vocab_zh,
     "ko": select_vocab_ko,
     "vi": select_vocab_vi,
+    "vi_nom": select_vocab_vi_nom,
 }

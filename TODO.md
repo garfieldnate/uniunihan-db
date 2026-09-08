@@ -81,7 +81,30 @@ Topic: Korean Support
 
 Topic: Vietnamese Support
 
+### DONE (2026-09-07): initial Hán-Việt part + Chữ Nôm appendix
 
+The `vi` pipeline now builds a proper **Hán-Việt** part (parallel to jp/ko/zh),
+and a separate `vi_nom` **Chữ Nôm appendix** was added. See
+`uniunihan_db/data/vietnamese.py` and `data/included/vi/README.md`.
+* Readings: Unihan `kVietnamese` ∪ WinVNKey (merged, normalized).
+* Vocabulary/inventory: reconstructed from CEDICT words read with Hán-Việt
+  readings and confirmed real by vnedict (~5.8k words / ~1.6k chars, all
+  permissively licensed). Character inventory = chars used by that vocab.
+* Frequency: blended Leipzig (CC BY) + OpenSubtitles (CC BY-SA) syllable
+  frequency (weights are constants in `vietnamese.py`); chars ordered within
+  groups by it.
+* Chữ Nôm appendix built from chunom.org data.
+* Wrote part intros for both `vi` and `vi_nom`.
+
+Remaining / follow-ups:
+* Frequency is per-*syllable*, so polysemous syllables (e.g. `không`, also the
+  negator) over-rank some words. Consider a Chinese word-frequency signal or a
+  small discount list for native function-word syllables.
+* Collapse tone-mark-placement reading duplicates (thủy/thuỷ) — not currently a
+  problem in practice (vocab readings come from vnedict's consistent convention).
+* petrus-tvk "Chú thích Hán Việt": unrecoverable (was a JS tool over the Thiều
+  Chửu dictionary; data never archived). Thiều Chửu is freely available at
+  rongmotamhon.net / hvdic.thivien.net if another readings/gloss source is wanted.
 * mark phonetic loans explicitly
 * Get word frequency list
 * Get han tu spellings for words

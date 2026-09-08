@@ -126,6 +126,20 @@ def load_prons_ko(char_data):
 
 
 def load_prons_vi(char_data):
+    # Restructure the reading list into a dict and annotate each reading with its
+    # blended Vietnamese syllable frequency.
+    from uniunihan_db.data.vietnamese import get_vi_syllable_frequency
+
+    syl_freq = get_vi_syllable_frequency()
+    for _, c_data in char_data.items():
+        c_data["prons"] = {
+            p: {"frequency": syl_freq.get(p, 0.0)} for p in c_data["prons"]
+        }
+
+    return char_data
+
+
+def load_prons_vi_nom(char_data):
     # no new data loading; only requires restructuring
     for _, c_data in char_data.items():
         c_data["prons"] = {p: {} for p in c_data["prons"]}
@@ -138,4 +152,5 @@ ADD_PRONUNCIATIONS = {
     "zh": load_prons_zh,
     "ko": load_prons_ko,
     "vi": load_prons_vi,
+    "vi_nom": load_prons_vi_nom,
 }

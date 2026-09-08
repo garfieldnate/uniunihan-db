@@ -40,4 +40,5 @@ GROUP_CHARS = {
     "ko": group_chars,
     "zh": group_chars,
     "vi": group_chars,
+    "vi_nom": group_chars,
 }

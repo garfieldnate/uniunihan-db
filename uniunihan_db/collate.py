@@ -65,6 +65,12 @@ def __get_variants_zh(char, char_info):
 
 
 def __get_variants_vi(char, char_info):
+    # The Hán-Việt inventory uses standard (traditional) Han forms; no
+    # language-specific variant forms are tracked for cross-referencing yet.
+    return []
+
+
+def __get_variants_vi_nom(char, char_info):
     return char_info["gray_variants"] + char_info["black_variants"]
 
 
@@ -73,6 +79,7 @@ __get_variants = {
     "ko": __get_variants_ko,
     "zh": __get_variants_zh,
     "vi": __get_variants_vi,
+    "vi_nom": __get_variants_vi_nom,
 }
 
 

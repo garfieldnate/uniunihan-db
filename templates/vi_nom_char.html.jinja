@@ -4,11 +4,12 @@
 </div>
 <div class="box right-column border">
     <div class="char-data">
+        <div class="box variant">{{ char_info.black_variants + char_info.gray_variants }}</div>
         <div class="box pron">{{
             char_info.prons.keys()|
             join('、')
             }}</div>
-        <div class="box keywords">{{ char_info.keyword }}</div>
+        <div class="box keywords">{{ char_info.definition }}</div>
         <div class="box vocab">{{
             char_info.prons.values()|
             sum(attribute='vocab', start=[])|

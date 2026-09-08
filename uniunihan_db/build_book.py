@@ -22,8 +22,14 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 INPUT_FILE = GENERATED_DATA_DIR / "collated" / "final.json"
 OUTPUT_DIR = GENERATED_DATA_DIR / "book"
 OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
-LANG_TO_HAN = {"jp": "日", "zh": "中", "ko": "韓", "vi": "越"}
-LANG_ENGLISH = {"jp": "Japanese", "zh": "Mandarin", "ko": "Korean", "vi": "Vietnamese"}
+LANG_TO_HAN = {"jp": "日", "zh": "中", "ko": "韓", "vi": "越", "vi_nom": "喃"}
+LANG_ENGLISH = {
+    "jp": "Japanese",
+    "zh": "Mandarin",
+    "ko": "Korean",
+    "vi": "Vietnamese",
+    "vi_nom": "Chữ Nôm",
+}
 
 
 # filters and functions for our jinja template
@@ -164,7 +170,30 @@ intros = {
     "jp": "<h1>Japanese (joyo)</h1><p>TODO: write introduction</p>",
     "zh": "<h1>Mandarin (HSK)</h1><p>TODO: write introduction</p>",
     "ko": "<h1>Korean (kyoyuk)</h1><p>TODO: write introduction</p>",
-    "vi": "<h1>Vietnamese (chunom.org)</h1><p>TODO: write introduction</p>",
+    "vi": (
+        "<h1>Vietnamese (Hán-Việt)</h1>"
+        "<p>A large share of the Vietnamese vocabulary was borrowed from Chinese "
+        "and is known as <i>Hán-Việt</i> (Sino-Vietnamese). Although modern "
+        "Vietnamese is written in the Latin-based <i>Quốc Ngữ</i> alphabet, each "
+        "Sino-Vietnamese morpheme corresponds to a Chinese character "
+        "(<i>chữ Hán</i> / <i>Hán tự</i>) with a regular reading &mdash; just as "
+        "Japanese <i>on-yomi</i> and Korean <i>hanja</i> readings do. This part "
+        "groups those characters by phonetic component and orders them by the "
+        "frequency of their readings, so that recognizing one character helps you "
+        "guess the reading of its relatives. Each character is shown with its "
+        "Hán-Việt reading(s), an English keyword, and example Sino-Vietnamese "
+        "words written in <i>Hán tự</i> with their Quốc Ngữ spelling.</p>"
+    ),
+    "vi_nom": (
+        "<h1>Chữ Nôm Appendix</h1>"
+        "<p><i>Chữ Nôm</i> is the historical logographic script once used to write "
+        "vernacular Vietnamese, alongside borrowed Chinese characters and many "
+        "characters invented in Vietnam. Unlike the Hán-Việt part, which covers "
+        "borrowed Sino-Vietnamese vocabulary, this appendix presents commonly "
+        "attested Nôm characters &mdash; including native words such as pronouns "
+        "and everyday verbs &mdash; grouped by phonetic component, with their Nôm "
+        "readings and example usage. The data is drawn from chunom.org.</p>"
+    ),
 }
 
 

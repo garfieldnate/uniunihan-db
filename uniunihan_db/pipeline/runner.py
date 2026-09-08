@@ -13,7 +13,9 @@ from .oc_mc import OC_MC
 from .organize import ORGANIZE_DATA
 from .select_vocab import SELECT_VOCAB
 
-LANGUAGES = ["zh", "jp", "ko", "vi"]
+# "vi_nom" is the Chữ Nôm appendix (Vietnamese vernacular script), a companion to
+# the Hán-Việt "vi" part.
+LANGUAGES = ["zh", "jp", "ko", "vi", "vi_nom"]
 
 
 def main() -> None:
