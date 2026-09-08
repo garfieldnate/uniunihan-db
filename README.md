@@ -31,9 +31,14 @@ To install dependencies:
 
     poetry install --no-root
 
-To build the book (output to data/generated/book):
+To build the book (output to `data/generated/book`):
 
-    poetry run build-book
+    poetry run poe build_book
+
+This one command reproduces the whole book from scratch: it runs the data
+pipeline for every language, cross-references the results, and renders the HTML.
+See [Data and reproducibility](#data-and-reproducibility) below for what it
+downloads and how the stages fit together.
 
 To install the pre-commit hooks:
 
@@ -49,6 +54,51 @@ All of the lints and tests can be run using the poe task `verify`:
     poetry run poe verify
 
 A VSCode settings file is included which contains configurations for all of the linting and formatting tools installed.
+
+## Data and reproducibility
+
+The entire book is reproducible from the scripts in this repo. From a fresh
+checkout, `poetry install --no-root` followed by `poetry run poe build_book`
+downloads every external dataset, processes it, and writes the HTML book — no
+manual data preparation is required.
+
+### The build pipeline
+
+Three poe tasks make up the pipeline (`build_book` runs all of them as needed):
+
+    poetry run poe pipeline -l <zh|jp|ko|vi|vi_nom>   # one language's data
+    poetry run poe collate                            # all languages + cross-refs
+    poetry run poe build_book                         # render HTML (re-collates if needed)
+
+Each language runs the same ordered stages (see `uniunihan_db/pipeline/`): gather
+characters → add pronunciations → group by phonetic component → integrate
+Old/Middle Chinese → select example vocab → organize by regularity → assign IDs.
+Every stage is a dict keyed by language code, so each language plugs into the
+shared machinery.
+
+For a clean rebuild that re-runs everything, delete the generated data first:
+
+    rm -rf data/generated && poetry run poe build_book
+
+### Where the data comes from
+
+- **Downloaded automatically** into `data/generated/` (cached; safe to delete) by
+  `uniunihan_db/data/datasets.py` and `uniunihan_db/data/vietnamese.py`: Unihan,
+  CC-CEDICT, frequency-annotated EDICT, ytenx (phonetic components / Old & Middle
+  Chinese), libhangul, Kengdic, Jun Da's character frequencies, vnedict, the
+  Leipzig Vietnamese corpus, and the OpenSubtitles Vietnamese frequency list.
+  First run is slow and needs the network; later runs reuse the cache.
+- **Committed as source** under `data/included/`: curated/manual lists (Jōyō,
+  educational hanja, HSK, CKIP, chunom.org, Baxter–Sagart, manual phonetic
+  components, etc.) and, for Vietnamese, the WinVNKey Hán-Việt reading databases
+  under `data/included/vi/`. See `data/included/vi/README.md` for the Vietnamese
+  source/license ledger.
+
+The WinVNKey files in `data/included/vi/raw/` were distributed as UTF-16 and are
+committed here converted to UTF-8 (`iconv -f UTF-16 -t UTF-8 <in> | tr -d '\r'`);
+because they are committed, no re-conversion is needed to build. The merged
+`data/included/vi/han_viet_readings.tsv` is a generated reference table; regenerate
+it (and a coverage report) with `poetry run python -m uniunihan_db.data.vietnamese`.
 
 ## Known Issues
 
