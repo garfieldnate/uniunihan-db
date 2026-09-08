@@ -18,6 +18,7 @@ The syllable-frequency blend combines two openly-licensed corpora; adjust the
 weights below to change how much each register counts.
 """
 
+import csv
 import itertools
 import re
 import tarfile
@@ -40,6 +41,7 @@ from uniunihan_db.data.paths import (
     LEIPZIG_VI_WORDS_FILE,
     OPENSUBS_VI_FILE,
     OPENSUBS_VI_URL,
+    VI_KVIET_CORRECTIONS_FILE,
     VI_WINVNKEY_FILES,
     VNEDICT_FILE,
     VNEDICT_URL,
@@ -314,19 +316,41 @@ def get_vi_syllable_frequency() -> Mapping[str, float]:
 
 
 @cache
+def _kvietnamese_corrections() -> Mapping[str, Tuple[Set[str], Set[str]]]:
+    """char -> (readings to remove, readings to add), from Unicode L2/23-251."""
+    corrections = {}
+    with VI_KVIET_CORRECTIONS_FILE.open(encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        for r in reader:
+            removals = {_norm(x) for x in r["removals"].split("|") if x}
+            additions = {_norm(x) for x in r["additions"].split("|") if x}
+            corrections[r["char"]] = (removals, additions)
+    return corrections
+
+
+@cache
 def _unihan_han_viet_readings() -> Mapping[str, Set[str]]:
-    """char -> {Hán-Việt readings}, strictly from Unihan ``kVietnamese``.
+    """char -> {Hán-Việt readings}, from Unihan ``kVietnamese`` with the Unicode
+    L2/23-251 corrections applied.
 
     Unlike the merged ``get_han_viet_readings``, this excludes the WinVNKey
     databases, which mix in Nôm (phonetic-loan) readings. Using the strict Sino
     readings keeps the reconstructed Sino-Vietnamese vocabulary genuine.
     """
     unihan = get_unihan()
-    return {
+    readings: MutableMapping[str, Set[str]] = {
         c: {_norm(x) for x in e["kVietnamese"]}
         for c, e in unihan.items()
         if e.get("kVietnamese")
     }
+    # Apply the official corrections: remove erroneous readings, add missing ones.
+    for char, (removals, additions) in _kvietnamese_corrections().items():
+        corrected = (readings.get(char, set()) - removals) | additions
+        if corrected:
+            readings[char] = corrected
+        else:
+            readings.pop(char, None)
+    return readings
 
 
 @cache

@@ -37,6 +37,11 @@ VI_WINVNKEY_FILES = [
 # data/vietnamese.py as a review artifact; not committed)
 VI_READINGS_FILE = GENERATED_DATA_DIR / "vi_han_viet_readings.tsv"
 
+# Unicode L2/23-251 corrections to Unihan kVietnamese values (166 chars, each with
+# readings to remove and/or add). Permissively-licensed Unicode working-group data,
+# extracted from https://www.unicode.org/L2/L2023/23251-kvietnameseCorr.pdf
+VI_KVIET_CORRECTIONS_FILE = VI_DATA_DIR / "kvietnamese_corrections.tsv"
+
 # Vietnamese word/syllable frequency lists (downloaded, cached in generated/)
 # Leipzig Corpora Collection (CC BY) -- formal/written register, primary signal.
 # The 1M-sentence news corpus is used both for syllable frequency (words.txt) and,

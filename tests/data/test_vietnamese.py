@@ -3,9 +3,19 @@ import unicodedata
 from uniunihan_db.data.vietnamese import (
     _char_from_codepoint,
     _gloss_agreement,
+    _kvietnamese_corrections,
     _norm,
     _reconstruct_han_viet_reading,
 )
+
+
+def test_kvietnamese_corrections_loaded():
+    corrections = _kvietnamese_corrections()
+    assert len(corrections) == 166
+    # 更 (U+66F4): remove the erroneous Nôm reading "xâu", add Sino readings
+    removals, additions = corrections["更"]
+    assert removals == {"xâu"}
+    assert {"cành", "cánh", "ngạnh"} <= additions
 
 
 def test_gloss_agreement_exact_and_prefix():

@@ -43,13 +43,17 @@ The files carry no data license. Individual char→reading mappings are
 uncopyrightable facts, but redistributing the database as a block reproduces those
 dictionaries' reading tables, so we do not ship it.
 
-Clean ways to recover the extra readings, if wanted (both the user's call):
-- **vi.wiktionary Hán-Việt readings** (CC BY-SA 3.0 / GFDL): the WinVNKey authors
-  explicitly granted their data to Wiktionary in 2006, so pulling alternates
-  through that licensed, attributable channel is clean (note: Wiktionary was
-  otherwise avoided for this project).
-- **Unicode L2/23-251** correction set: 166 fixed `kVietnamese` values (permissive
-  Unicode data) — corrections, not expansions, but worth applying for accuracy.
+**Unicode L2/23-251 corrections are applied.** `kvietnamese_corrections.tsv`
+(committed; extracted from the Unicode working-group document
+`23251-kvietnameseCorr.pdf`) fixes 166 erroneous/incomplete `kVietnamese` values
+by removing wrong readings and adding missing ones; `_unihan_han_viet_readings`
+applies it. This is permissively-licensed Unicode data.
+
+To further recover the ~40% coverage WinVNKey would add, a clean channel exists
+but is the user's call: **vi.wiktionary Hán-Việt readings** (CC BY-SA 3.0 / GFDL,
+attributable) — though note individual char→reading pairs are uncopyrightable
+facts, so the licensing question is really about how they are sourced/attributed
+in bulk, not about any single reading.
 
 ## Source ledger (licensing)
 
