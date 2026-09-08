@@ -9,12 +9,19 @@ Loading + generation logic: `uniunihan_db/data/vietnamese.py`.
 
 ## Files
 
-| Path | What | Committed? |
-|---|---|---|
-| `raw/han-viet-thanh-son-le-3.04.txt` | WinVNKey char→Hán-Việt readings (Thanh Sơn Lê), UTF-8 (converted from UTF-16) | yes (provenance) |
-| `raw/han-viet-hoc-d-ngo.txt` | WinVNKey char→Hán-Việt readings (Học D. Ngô), UTF-8 | yes |
-| `raw/han-viet-trad-supplement-2.02.txt` | WinVNKey supplement, UTF-8 | yes |
-| `han_viet_readings.tsv` | **merged** char→reading table (Unihan `kVietnamese` ∪ WinVNKey); `char⇥codepoint⇥pron1\|pron2…` | yes (generated) |
+This directory holds only this README. All Hán-Việt reading data used by the
+default build comes from Unihan (downloaded), and the frequency/vocab data from
+CEDICT, vnedict, and the Leipzig corpus (also downloaded). Nothing here needs to
+be committed as source.
+
+The optional WinVNKey files (`raw/han-viet-*.txt`) are **deliberately not shipped**
+— see the provenance note below. If you enable `USE_WINVNKEY_READINGS` for personal
+use, place the UTF-8-converted files in `raw/` yourself. A merged reading table +
+coverage report can be regenerated (to `data/generated/`, not committed) with:
+
+```bash
+poetry run python -m uniunihan_db.data.vietnamese
+```
 
 Frequency data is **downloaded and cached** in `data/generated/` (not committed):
 the Leipzig `vie_news_2022_1M` corpus (its `words.txt` for syllable frequency and
@@ -25,11 +32,24 @@ sentences — since per-syllable lists can't tell which multi-syllable word is
 common. The blended syllable frequency is only a tie-breaker for words too rare
 to appear in the corpus.
 
-Regenerate the merged table + coverage report:
+## WinVNKey provenance (why it's not shipped)
 
-```bash
-poetry run python -m uniunihan_db.data.vietnamese
-```
+The WinVNKey Hán-Việt reading databases add ~40% more words/characters, but they
+are **not shipped** and are **off by default**. Their own header states the
+readings were transcribed from several dictionaries, including two that are still
+in copyright — *Hán Việt tân tự điển* (Nguyễn Quốc Hùng, 1975) and *Tự điển Hán
+Việt* (Trần Văn Chánh, 2000) — alongside Thiều Chửu (1943, likely public domain).
+The files carry no data license. Individual char→reading mappings are
+uncopyrightable facts, but redistributing the database as a block reproduces those
+dictionaries' reading tables, so we do not ship it.
+
+Clean ways to recover the extra readings, if wanted (both the user's call):
+- **vi.wiktionary Hán-Việt readings** (CC BY-SA 3.0 / GFDL): the WinVNKey authors
+  explicitly granted their data to Wiktionary in 2006, so pulling alternates
+  through that licensed, attributable channel is clean (note: Wiktionary was
+  otherwise avoided for this project).
+- **Unicode L2/23-251** correction set: 166 fixed `kVietnamese` values (permissive
+  Unicode data) — corrections, not expansions, but worth applying for accuracy.
 
 ## Source ledger (licensing)
 
@@ -39,7 +59,7 @@ poetry run python -m uniunihan_db.data.vietnamese
 | **vnedict** (denisowski) | VN↔EN glosses (no Han) | CC BY 3.0 | ✅ yes (attribute) |
 | **Leipzig Corpora** (`vie_news`) | syllable frequency (formal) | CC BY | ✅ yes (attribute) |
 | **HermitDave / OpenSubtitles** | syllable frequency (colloquial) | CC BY-**SA** 4.0 | ⚠️ share-alike — using it obligates the book under SA |
-| **WinVNKey** Hán-Việt DBs | char→Hán-Việt reading (~19.5k chars) | unclear (WinVNKey is free sw; data terms unstated) | ⚠️ **off by default** (`USE_WINVNKEY_READINGS=False`); opt-in for personal use only |
+| **WinVNKey** Hán-Việt DBs | char→Hán-Việt reading (~19.5k chars) | transcribes in-copyright dictionaries; no data license (see above) | ❌ **not shipped**, off by default (`USE_WINVNKEY_READINGS=False`); local personal use only |
 | **chunom.org** (`standard-list`, `char_data`) | Han-spelled vocab + QN + gloss + freq; Nôm chars | terms unstated | ⚠️ local use; clear before shipping |
 | **nomfoundation.org** | Han-Nôm lookup, glosses | "All rights reserved"; free use only *reported* | ⚠️ get explicit permission |
 | **zetamu Hantu** | char→reading + glosses | © TitTop, no license | ⚠️ local use only |

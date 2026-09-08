@@ -56,10 +56,11 @@ OPENSUBS_WEIGHT = 0.3
 
 # Whether to supplement Unihan's Hán-Việt readings with the WinVNKey reading
 # databases. Unihan kVietnamese is authoritative and permissively licensed (clean
-# provenance for publishing); WinVNKey adds ~40% more words/characters by
-# supplying alternate readings Unihan omits (e.g. 長 "trưởng"), but its data
-# provenance/license is unclear. Default off for a publishable book; set True to
-# use the fuller set for personal use. See data/included/vi/README.md.
+# provenance for publishing). WinVNKey adds ~40% more words/characters by
+# supplying alternate readings Unihan omits (e.g. 長 "trưởng"), but its files
+# transcribe in-copyright dictionaries and are NOT shipped with the repo. To use
+# them (personal use only), set this True and place the UTF-8 files in
+# data/included/vi/raw/ (see VI_WINVNKEY_FILES / data/included/vi/README.md).
 USE_WINVNKEY_READINGS = False
 
 # A reconstructed word is only kept if its Vietnamese meaning is *confirmed* --
@@ -546,7 +547,12 @@ if __name__ == "__main__":
 
     configure_logging(__name__)
 
-    readings = get_han_viet_readings()
+    # Reflect the readings the build actually uses (Unihan-only by default).
+    readings = (
+        get_han_viet_readings()
+        if USE_WINVNKEY_READINGS
+        else _unihan_han_viet_readings()
+    )
     unihan = get_unihan()
 
     with VI_READINGS_FILE.open("w", encoding="utf-8") as f:

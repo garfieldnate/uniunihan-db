@@ -90,15 +90,15 @@ For a clean rebuild that re-runs everything, delete the generated data first:
   First run is slow and needs the network; later runs reuse the cache.
 - **Committed as source** under `data/included/`: curated/manual lists (Jōyō,
   educational hanja, HSK, CKIP, chunom.org, Baxter–Sagart, manual phonetic
-  components, etc.) and, for Vietnamese, the WinVNKey Hán-Việt reading databases
-  under `data/included/vi/`. See `data/included/vi/README.md` for the Vietnamese
+  components, etc.). See `data/included/vi/README.md` for the Vietnamese
   source/license ledger.
 
-The WinVNKey files in `data/included/vi/raw/` were distributed as UTF-16 and are
-committed here converted to UTF-8 (`iconv -f UTF-16 -t UTF-8 <in> | tr -d '\r'`);
-because they are committed, no re-conversion is needed to build. The merged
-`data/included/vi/han_viet_readings.tsv` is a generated reference table; regenerate
-it (and a coverage report) with `poetry run python -m uniunihan_db.data.vietnamese`.
+The Vietnamese Hán-Việt part uses only cleanly-licensed data by default (Unihan
+readings, CEDICT spellings/glosses, vnedict meaning-confirmation, Leipzig
+frequency). The WinVNKey Hán-Việt reading databases, which would add more
+coverage, are **not shipped** — they transcribe in-copyright dictionaries — and
+are gated behind `USE_WINVNKEY_READINGS` (off by default) for local personal use;
+see `data/included/vi/README.md`.
 
 ## Known Issues
 
