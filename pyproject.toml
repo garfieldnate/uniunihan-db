@@ -27,6 +27,17 @@ Jinja2 = "^3.0.1"
 commentjson = "^0.9.0"
 datapackage = "^1.15.2"
 loguru = "^0.5.3"
+# Transitive deps floored to their first release with CPython 3.14 wheels
+# (greenlet via datapackage->SQLAlchemy, markupsafe via Jinja2). Older pins
+# have no 3.14 wheel and fail to build from source on 3.14.
+greenlet = ">=3.2"
+markupsafe = ">=3.0.3"
+# boto3/botocore come in transitively via datapackage -> tabulator (S3 support
+# this project never uses). They are pure-Python and install fine on any Python,
+# but each has thousands of near-daily releases; flooring them stops Poetry's
+# resolver from backtracking across the entire history.
+boto3 = ">=1.34"
+botocore = ">=1.34"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.0.2"
@@ -41,6 +52,10 @@ jaconv = "^0.2.4"
 beautifulsoup4 = "^4.10.0"
 poethepoet = "^0.13.1"
 pyright = "^1.1.351"
+# Transitive deps floored to their first release with CPython 3.14 wheels
+# (PyYAML via pre-commit, coverage via pytest-cov).
+PyYAML = ">=6.0.3"
+coverage = ">=7.10.0"
 
 [build-system]
 # setuptools required because of bug in distutils: https://github.com/python-poetry/poetry/issues/3153

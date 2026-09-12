@@ -46,7 +46,8 @@ def parse_cell_4(cell: Tag):
         # page address is "/pages/𢫘/", etc.
         chars = "".join(a["href"][-2] for a in anchors)
         # TODO: what is this supposed to indicate?
-        if "opacity" in span.get("style", ""):
+        style = span.get("style") or ""
+        if "opacity" in style:
             gray_variants += chars
         else:
             black_variants += chars
