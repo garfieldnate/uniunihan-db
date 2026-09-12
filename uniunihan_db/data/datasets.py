@@ -1,9 +1,10 @@
 import csv
+import enum
 import json
 import tarfile
 import zipfile
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, is_dataclass
 from functools import cache
 from pathlib import Path
 from typing import (
@@ -59,6 +60,18 @@ BAXTER_SAGART_FILE = INCLUDED_DATA_DIR / "BaxterSagartOC2015-10-13.csv"
 #################
 # Downloaders ###
 #################
+
+
+def _json_default(o: Any) -> Any:
+    """JSON serializer for the typed objects unihan-etl (>=0.4x) emits in
+    expanded fields, e.g. the kRSSimplifiedType enum inside kRSUnicode."""
+    if isinstance(o, enum.Enum):
+        return o.value
+    if hasattr(o, "_asdict"):  # namedtuple
+        return o._asdict()
+    if is_dataclass(o) and not isinstance(o, type):
+        return asdict(o)
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
 
 
 def __download_unihan():
@@ -127,7 +140,7 @@ def __download_unihan():
 
     logger.info(f"  Writing unihan to {UNIHAN_FILE}...")
     with Path(UNIHAN_FILE).open("w", encoding="utf-8") as f:
-        json.dump(unihan_dict, f, indent=2, ensure_ascii=False)
+        json.dump(unihan_dict, f, indent=2, ensure_ascii=False, default=_json_default)
     logger.info(f"  Saved unihan DB to: {UNIHAN_FILE}")
 
     global UNIHAN_DICT
@@ -137,7 +150,7 @@ def __download_unihan():
 def export_json(data, destination):
     """Export UNIHAN in JSON format."""
     with Path(destination).open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        json.dump(data, f, indent=2, ensure_ascii=False, default=_json_default)
 
 
 def __download_edict_freq():
