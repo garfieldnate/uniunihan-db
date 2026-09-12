@@ -82,6 +82,17 @@ def lang_intro_page_name(lang):
     return f"{lang}-intro.html"
 
 
+def count_chars(data):
+    """Number of distinct characters covered in one language's data (across all
+    purity types, groups, and clusters)."""
+    chars = set()
+    for pg in data.values():
+        for group in pg["groups"].values():
+            for cluster in group["clusters"]:
+                chars.update(cluster.keys())
+    return len(chars)
+
+
 def purity_group_page_name(lang, purity_type: int):
     return f"{lang}-{purity_type}.html"
 
@@ -141,10 +152,11 @@ def render_front_matter(jinja_env, toc, toc_html):
         f.write(result)
 
 
-def render_part_intro(jinja_env, lang, part_num, prev, next):
+def render_part_intro(jinja_env, lang, part_num, char_count, prev, next):
     part_intro_template = jinja_env.get_template("part_intro.html.jinja")
+    intro = intros[lang].replace("{count}", f"{char_count:,}")
     result = part_intro_template.render(
-        lang=lang, part_num=part_num, intro=intros[lang], prev=prev, next=next
+        lang=lang, part_num=part_num, intro=intro, prev=prev, next=next
     )
     with open(OUTPUT_DIR / lang_intro_page_name(lang), "w") as f:
         f.write(f"<!-- Generated from build_book.py, {datetime.now()} -->")
@@ -167,9 +179,32 @@ def render_purity_group(jinja_env, lang, purity_type, pg, prev, next):
 
 
 intros = {
-    "jp": "<h1>Japanese (joyo)</h1><p>TODO: write introduction</p>",
-    "zh": "<h1>Mandarin (HSK)</h1><p>TODO: write introduction</p>",
-    "ko": "<h1>Korean (kyoyuk)</h1><p>TODO: write introduction</p>",
+    "jp": (
+        "<h1>Japanese (Jōyō kanji)</h1>"
+        "<p>This part covers the <b>Jōyō kanji</b> (常用漢字) &mdash; the Japanese "
+        "Ministry of Education's list of regular-use characters taught in schools "
+        "({count} characters here). Each is grouped by phonetic component and "
+        "ordered by the regularity of its <i>on-yomi</i> readings, shown with "
+        "example vocabulary and cross-references to the same character in the "
+        "other languages.</p>"
+    ),
+    "zh": (
+        "<h1>Mandarin (Hong Kong commonly-used characters)</h1>"
+        "<p>This part covers the characters of the Hong Kong <b>List of Graphemes "
+        "of Commonly-Used Chinese Characters</b> (常用字字形表), selected via the "
+        "Unihan <code>kHKGlyph</code> property ({count} characters here). "
+        "Traditional glyphs are shown, with simplified variants where they differ, "
+        "grouped by phonetic component and ordered by the regularity of their "
+        "Mandarin readings, with example vocabulary from CC-CEDICT.</p>"
+    ),
+    "ko": (
+        "<h1>Korean (Educational Hanja)</h1>"
+        "<p>This part covers the <b>Basic Hanja for Educational Use</b> "
+        "(교육용 기초 한자) &mdash; the South Korean Ministry of Education's list of "
+        "{count} hanja taught in secondary school. Each is grouped by phonetic "
+        "component and ordered by the regularity of its <i>hanja eum</i> reading, "
+        "shown with example Sino-Korean vocabulary.</p>"
+    ),
     "vi": (
         "<h1>Vietnamese (Hán-Việt)</h1>"
         "<p>A large share of the Vietnamese vocabulary was borrowed from Chinese "
@@ -180,7 +215,10 @@ intros = {
         "Japanese <i>on-yomi</i> and Korean <i>hanja</i> readings do. This part "
         "groups those characters by phonetic component and orders them by the "
         "frequency of their readings, so that recognizing one character helps you "
-        "guess the reading of its relatives. Each character is shown with its "
+        "guess the reading of its relatives. There is no standard published "
+        "Hán-Việt character list, so the inventory here is <b>{count} characters</b> "
+        "reconstructed as exactly those used by the confirmed Sino-Vietnamese "
+        "vocabulary (see below). Each character is shown with its "
         "Hán-Việt reading(s), an English keyword, and example Sino-Vietnamese "
         "words written in <i>Hán tự</i> with their Quốc Ngữ spelling.</p>"
         "<h2>Sources &amp; acknowledgements</h2>"
@@ -203,7 +241,8 @@ intros = {
         "borrowed Sino-Vietnamese vocabulary, this appendix presents commonly "
         "attested Nôm characters &mdash; including native words such as pronouns "
         "and everyday verbs &mdash; grouped by phonetic component, with their Nôm "
-        "readings and example usage. The data is drawn from chunom.org.</p>"
+        "readings and example usage ({count} characters here). The data is drawn "
+        "from chunom.org.</p>"
     ),
 }
 
@@ -230,6 +269,7 @@ def build_book():
             jinja_env,
             lang,
             part_num + 1,
+            count_chars(data),
             prev=toc[toc_index - 1],
             next=toc[toc_index + 1],
         )
